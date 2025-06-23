@@ -16,7 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import dao.DBconnecter;
+import utils.DBConnection;
 
 /**
  * Servlet implementation class LoginServlet
@@ -82,7 +82,7 @@ public class LoginServlet extends HttpServlet {
         String id = request.getParameter("id");
         String password = request.getParameter("password");
 
-        try (Connection connection = DBconnecter.getConnection()) {
+        try (Connection connection = DBConnection.getConnection()) {
             // ソルトをデータベースから取得
             String saltQuery = "SELECT salt FROM users WHERE id = ?";
             PreparedStatement saltStmt = connection.prepareStatement(saltQuery);

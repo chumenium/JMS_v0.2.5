@@ -1,183 +1,89 @@
 # 就活管理アプリ
 
-就職活動管理システム（JMS: Job Management System）
+## 概要
+学生の就職活動を管理するためのWebアプリケーションです。学生情報の登録・更新・削除、進級・卒業処理、検索機能などを提供します。
 
-## 📋 概要
+## 技術スタック
+- **バックエンド**: Java Servlet
+- **フロントエンド**: HTML, CSS, JavaScript, JSP
+- **データベース**: SQL
+- **サーバー**: Tomcat
 
-このアプリケーションは、学校の就職活動を管理するためのWebアプリケーションです。
-教員、学生、就職指導部がそれぞれの権限に応じて就職活動の進捗を管理できます。
-
-## 🚀 実行方法
-
-### 前提条件
-
-- **Java 21** 以上
-- **Apache Tomcat 10** 以上
-- **MySQL 8.0** 以上
-- **Eclipse IDE** (推奨)
-
-### 方法1: Eclipse IDE での実行（推奨）
-
-1. **Eclipse IDE をインストール**
-   ```
-   Eclipse IDE for Enterprise Java Developers をダウンロード
-   https://www.eclipse.org/downloads/packages/
-   ```
-
-2. **プロジェクトをインポート**
-   ```
-   File → Import → Existing Projects into Workspace
-   → プロジェクトのルートディレクトリを選択
-   ```
-
-3. **Tomcat サーバーを設定**
-   ```
-   Window → Preferences → Server → Runtime Environments
-   → Tomcat 10 (Java 21) を追加
-   ```
-
-4. **プロジェクトをサーバーに追加**
-   ```
-   プロジェクトを右クリック → Run As → Run on Server
-   → Tomcat 10 を選択
-   ```
-
-5. **アプリケーションにアクセス**
-   ```
-   http://localhost:8080/就活管理アプリ/
-   ```
-
-### 方法2: Maven での実行
-
-1. **Maven をインストール**
-   ```bash
-   # Windows
-   choco install maven
-   
-   # macOS
-   brew install maven
-   
-   # Linux
-   sudo apt install maven
-   ```
-
-2. **プロジェクトをビルド**
-   ```bash
-   mvn clean compile
-   ```
-
-3. **WARファイルを作成**
-   ```bash
-   mvn package
-   ```
-
-4. **Tomcatにデプロイ**
-   ```bash
-   # WARファイルをTomcatのwebappsディレクトリにコピー
-   cp target/job-management-system-1.0.0.war /path/to/tomcat/webapps/就活管理アプリ.war
-   ```
-
-5. **Tomcatを起動**
-   ```bash
-   cd /path/to/tomcat/bin
-   ./startup.sh  # Linux/Mac
-   startup.bat   # Windows
-   ```
-
-### 方法3: 組み込みTomcatでの実行
-
-```bash
-# プロジェクトディレクトリで実行
-mvn cargo:run
+## プロジェクト構造
 ```
-
-## 🗄️ データベース設定
-
-### MySQL データベースの準備
-
-1. **MySQL をインストール・起動**
-
-2. **データベースを作成**
-   ```sql
-   CREATE DATABASE jms_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-   ```
-
-3. **ユーザーを作成**
-   ```sql
-   CREATE USER 'jms_user'@'localhost' IDENTIFIED BY 'password';
-   GRANT ALL PRIVILEGES ON jms_db.* TO 'jms_user'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
-
-### データベース接続設定
-
-`src/main/java/dao/DBconnecter.java` でデータベース接続設定を確認・修正してください。
-
-## 👥 ユーザー権限
-
-| 権限 | 説明 | アクセス可能画面 |
-|------|------|------------------|
-| `teacher` | 教員 | 学生管理、就職管理 |
-| `headmaster` | 校長・教務部長 | 学生管理、就職管理 |
-| `egd` | 就職指導部 | 企業管理、就職管理 |
-| `admin` | システム管理者 | 全画面 |
-| `student` | 学生 | 就職管理 |
-
-## 📁 プロジェクト構造
-
-```
-就活管理アプリ/
+就活管理アプリ2/
 ├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   ├── beans/          # JavaBeans
-│   │   │   ├── dao/            # データアクセス層
-│   │   │   └── servlet/        # サーブレット
-│   │   └── webapp/
-│   │       ├── css/            # スタイルシート
-│   │       ├── images/         # 画像ファイル
-│   │       ├── js/             # JavaScript
-│   │       ├── WEB-INF/
-│   │       │   ├── jsp/        # JSPファイル
-│   │       │   ├── lib/        # ライブラリ
-│   │       │   └── web.xml     # Web設定
-│   │       ├── index.html      # トップページ
-│   │       └── login.html      # ログインページ
-│   └── test/                   # テストコード
-├── build/                      # ビルド出力
-├── .project                    # Eclipse設定
-├── .classpath                  # クラスパス設定
-├── pom.xml                     # Maven設定
-└── README.md                   # このファイル
+│   └── main/
+│       ├── java/
+│       │   ├── beans/          # JavaBeans
+│       │   ├── dao/            # データアクセスオブジェクト
+│       │   ├── servlet/        # Servletクラス
+│       │   └── utils/          # ユーティリティクラス
+│       └── webapp/
+│           ├── css/            # スタイルシート
+│           ├── images/         # 画像ファイル
+│           ├── js/             # JavaScriptファイル
+│           ├── WEB-INF/
+│           │   ├── jsp/        # JSPファイル
+│           │   └── web.xml     # Webアプリケーション設定
+│           ├── index.html      # メインページ
+│           └── login.html      # ログインページ
+├── database_setup.sql          # データベース初期化スクリプト
+└── README_動的プルダウン実装.md  # 実装ドキュメント
 ```
 
-## 🔧 トラブルシューティング
+## セットアップ手順
 
-### よくある問題
+### 1. 必要な環境
+- Java 8以上
+- Apache Tomcat 9以上
+- SQLデータベース（MySQL推奨）
 
-1. **ポート8080が使用中**
-   ```bash
-   # 使用中のプロセスを確認
-   netstat -ano | findstr :8080  # Windows
-   lsof -i :8080                 # Linux/Mac
-   ```
+### 2. データベースのセットアップ
+```sql
+-- database_setup.sqlを実行してデータベースを初期化
+mysql -u username -p database_name < database_setup.sql
+```
 
-2. **データベース接続エラー**
-   - MySQL サービスが起動しているか確認
-   - 接続情報（ホスト、ポート、ユーザー名、パスワード）を確認
+### 3. アプリケーションのデプロイ
+1. プロジェクトをEclipseにインポート
+2. Tomcatサーバーを設定
+3. プロジェクトをサーバーにデプロイ
+4. `http://localhost:8080/就活管理アプリ2/` にアクセス
 
-3. **JSP コンパイルエラー**
-   - Tomcat のバージョンが適切か確認（Tomcat 10 推奨）
-   - Java のバージョンが21以上か確認
+## 主な機能
 
-## 📞 サポート
+### 学生管理
+- **新規登録**: 学生情報の追加
+- **更新**: 既存学生情報の編集
+- **削除**: 学生情報の削除
+- **検索**: 条件に基づく学生検索
 
-問題が発生した場合は、以下を確認してください：
+### 進級・卒業処理
+- 自動進級処理
+- 卒業判定
+- 在籍状況の更新
 
-1. ログファイルの確認
-2. ブラウザの開発者ツールでのエラー確認
-3. Tomcat のログファイル確認
+### セキュリティ
+- パスワードのハッシュ化（SHA-256）
+- ソルト生成によるセキュリティ強化
 
-## 📝 ライセンス
+## 開発者向け情報
 
-このプロジェクトは教育目的で作成されています。 
+### ビルド
+```bash
+# プロジェクトのビルド
+javac -cp "lib/*" src/main/java/**/*.java
+```
+
+### テスト
+```bash
+# テストの実行
+java -cp "lib/*:target/test-classes" org.junit.runner.JUnitCore TestSuite
+```
+
+## ライセンス
+このプロジェクトは教育目的で作成されています。
+
+## 貢献
+バグ報告や機能要望は、Issueとして報告してください。 

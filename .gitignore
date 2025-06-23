@@ -82,24 +82,13 @@ local.properties
 .apt_generated/
 .apt_generated_test/
 
-# Maven
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
-
-# Gradle
-.gradle
-build/
+# Scala IDE specific (Scala & Java IDE for Eclipse)
+.cache-main
+.scala_dependencies
+.worksheet
 
 # IntelliJ IDEA
-.idea
+.idea/
 *.iws
 *.iml
 *.ipr
@@ -110,37 +99,40 @@ build/
 /dist/
 /nbdist/
 /.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
 
 # VS Code
 .vscode/
 
-# OS generated files
+# Mac
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
+
+# Windows
 Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# Application specific
-*.properties
-!src/main/resources/*.properties
-config/
-logs/
-temp/
+# Build directories
+build/
+target/
+out/
 
-# Database
+# Database files
 *.db
 *.sqlite
 *.sqlite3
 
-# Backup files
-*.backup
-*.bak
-*.old
+# Configuration files with sensitive data
+application.properties
+application.yml
+*.env
 
-# IDE specific
-.project
-.classpath
-.settings/ 
+# Logs
+logs/
+*.log
+
+# Temporary files
+temp/
+tmp/ 

@@ -25,11 +25,23 @@
 
 <!-- 学生管理画面用 -->
 
+<!-- バックエンドとの接続のやり取りがあるためいったん放置 -->
+
 
 <!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
 <% 
   String username = (String) session.getAttribute("username"); 
   String role     = (String) session.getAttribute("role"); 
+  
+  // リクエストスコープからプルダウン用データを取得
+  java.util.List<String> classList = (java.util.List<String>) request.getAttribute("classList");
+  java.util.List<String> enrollmentStatusList = (java.util.List<String>) request.getAttribute("enrollmentStatusList");
+  java.util.List<String> assistanceList = (java.util.List<String>) request.getAttribute("assistanceList");
+  java.util.List<String> firstChoiceIndustryList = (java.util.List<String>) request.getAttribute("firstChoiceIndustryList");
+  java.util.List<Integer> graduationYearList = (java.util.List<Integer>) request.getAttribute("graduationYearList");
+  
+  // エラーメッセージを取得
+  String errorMessage = (String) request.getAttribute("errorMessage");
 %>
 <!--▲▲▲▲▲-->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -360,6 +372,14 @@ h1 {
 <h2>学生情報検索<span>search</span></h2>
 </div>
 <!--/.title-->
+
+<%-- エラーメッセージの表示 --%>
+<% if (errorMessage != null && !errorMessage.isEmpty()) { %>
+  <div style="color: red; margin-bottom: 1rem; padding: 0.5rem; background-color: #ffe6e6; border: 1px solid #ff9999; border-radius: 4px;">
+    <%= errorMessage %>
+  </div>
+<% } %>
+
     <form class="grid-form" action="#" method="get">
       <div class="grid-container">
         <div class="field">
@@ -368,7 +388,14 @@ h1 {
         </div>
         <div class="field">
           <label for="class">クラス</label>
-          <input id="class" name="class" type="text" placeholder="例: S3A1">
+          <select id="class" name="class">
+            <option value="">選択してください</option>
+            <% if (classList != null) { %>
+              <% for (String className : classList) { %>
+                <option value="<%= className %>"><%= className %></option>
+              <% } %>
+            <% } %>
+          </select>
         </div>
         <div class="field">
           <label for="number">クラス番号</label>
@@ -382,9 +409,11 @@ h1 {
           <label for="status">在籍状況</label>
           <select id="status" name="enrollment-status">
             <option value="">選択してください</option>
-            <option value="在籍">在籍</option>
-            <option value="休学">休学</option>
-            <option value="卒業">卒業</option>
+            <% if (enrollmentStatusList != null) { %>
+              <% for (String status : enrollmentStatusList) { %>
+                <option value="<%= status %>"><%= status %></option>
+              <% } %>
+            <% } %>
           </select>
         </div>
         <div class="field">
@@ -398,15 +427,36 @@ h1 {
         </div>
         <div class="field">
           <label for="assistance">斡旋</label>
-          <input id="assistance" name="assistance" type="text">
+          <select id="assistance" name="assistance">
+            <option value="">選択してください</option>
+            <% if (assistanceList != null) { %>
+              <% for (String assistance : assistanceList) { %>
+                <option value="<%= assistance %>"><%= assistance %></option>
+              <% } %>
+            <% } %>
+          </select>
         </div>
         <div class="field">
           <label for="first-choice">第一希望業種</label>
-          <input id="first-choice" name="first-choice" type="text">
+          <select id="first-choice" name="first-choice">
+            <option value="">選択してください</option>
+            <% if (firstChoiceIndustryList != null) { %>
+              <% for (String industry : firstChoiceIndustryList) { %>
+                <option value="<%= industry %>"><%= industry %></option>
+              <% } %>
+            <% } %>
+          </select>
         </div>
         <div class="field">
           <label for="graduation-year">卒業年</label>
-          <input id="graduation-year" name="graduation-year" type="number" min="1900" max="2100" placeholder="例: 2025">
+          <select id="graduation-year" name="graduation-year">
+            <option value="">選択してください</option>
+            <% if (graduationYearList != null) { %>
+              <% for (Integer year : graduationYearList) { %>
+                <option value="<%= year %>"><%= year %></option>
+              <% } %>
+            <% } %>
+          </select>
         </div>
       </div>
       <div class="btn-wrap">
@@ -418,18 +468,6 @@ h1 {
 </main>
 <!-- ここまで機能部分を記述 -->
 
-
-<!-- 検索結果を表示する画面　検索した部分と一致するものをDBから取得 -->
-
-
-
-
-
-
-
-
-
-<!--  -->
 
 <section class="bg1 bg-pattern1 arrow full-bleed">
 </section>
