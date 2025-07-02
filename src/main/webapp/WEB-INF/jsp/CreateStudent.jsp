@@ -317,28 +317,25 @@
                             <option value="活動中">活動中</option>
                             <option value="内定済み">内定済み</option>
                             <option value="就職決定">就職決定</option>
+                            <option value="就職辞退">就職辞退</option>
                         </select>
                     </div>
+                    <%@ page import="java.util.List" %>
+                    <% List<String> jobtypes = (List<String>) request.getAttribute("jobtypes"); %>
                     <div class="form-group">
-                        <label for="targetIndustry">希望業種</label>
+                        <label for="targetIndustry">希望職種</label>
                         <select id="targetIndustry" name="targetIndustry">
                             <option value="">選択してください</option>
-                            <option value="IT・通信">IT・通信</option>
-                            <option value="製造業">製造業</option>
-                            <option value="金融・保険">金融・保険</option>
-                            <option value="商社・流通">商社・流通</option>
-                            <option value="建設・不動産">建設・不動産</option>
-                            <option value="メディア・広告">メディア・広告</option>
-                            <option value="サービス業">サービス業</option>
-                            <option value="公務員">公務員</option>
-                            <option value="その他">その他</option>
+                            <% for (String jobtype : jobtypes) {%>
+                                <option value="<%= jobtype %>"><%= jobtype %></option>
+                            <% } %>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="notes">備考</label>
-                    <textarea id="notes" name="notes" rows="4" style="width: 100%; padding: 12px 16px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 16px; resize: vertical;" placeholder="特記事項があれば記入してください"></textarea>
+                    <textarea id="notes" name="notes" rows="4" maxlength="500" style="width: 100%; padding: 12px 16px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 16px; resize: vertical;" placeholder="特記事項があれば記入してください"></textarea>
                 </div>
 
                 <!-- ボタン -->
@@ -368,7 +365,7 @@
             // 学籍番号の形式チェック（8桁）
             if (!/^[0-9]{8}$/.test(studentId)) {
                 e.preventDefault();
-                alert('学籍番号は8桁の数字で自動生成されます。');
+                alert('学籍番号は7桁の数字で自動生成されます。');
                 return;
             }
         });
@@ -393,14 +390,49 @@
                 'G': '32',
             };
             let studentId = '';
+            let studentIdTmp = '';
             if (year && type && grade && group) {
                 const yy = year.slice(-2);
                 const mid = classCodeMap[type] || '';
-                const rand = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-                studentId = '2' + yy + mid + rand; // 8桁
-            }
-            document.getElementById('studentId').value = studentId;
+                const studentIdTmp = yy + mid;
+
+                fetch('/就活管理アプリ/StudentServlet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        action: 'getStudentId',
+                        student_id: studentIdTmp
+                    })
+                })
+                .then(response => {
+                    console.log('レスポンスステータス:', response.status);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.text();  // JSONじゃないなら text() にする
+                })
+                .then(data => {
+                    console.log('受け取ったデータ:', data);
+                    let serialNumber = '';
+                    if (data === "0") {
+                        serialNumber = "001";
+                    } else {
+                        serialNumber = (parseInt(data.slice(-3)) + 1).toString().padStart(3, '0');
+                    }
+
+                    const studentId = "2" + yy + mid + serialNumber; // ← ここで組み立てる
+                    console.log("生成された studentId:", studentId);
+
+                    // 必要ならHTMLの input に設定
+                    document.getElementById("studentId").value = studentId;
+                })
+                .catch(error => {
+                    console.error('エラー:', error);
+                });
         }
+    }
         document.getElementById('admissionYear').addEventListener('change', generateStudentId);
         document.getElementById('classType').addEventListener('change', generateStudentId);
         document.getElementById('classGrade').addEventListener('change', generateStudentId);
@@ -411,20 +443,22 @@
             const grade = document.getElementById('classGrade').value;
             const group = document.getElementById('classGroup').value;
             let className = '';
-            if (type && grade && group) {
-                // 固定文字を決定
-                let fixedChar = '666666';
-                if (type === 'R' || type === 'S') fixedChar = 'A';
-                else if (type === 'M' || type === 'G') fixedChar = 'G';
-                else if (type === 'J') fixedChar = 'S';
-                className = `${type}${grade}${fixedChar}${group}`;
+            if (type != "" && grade != "" && group != "") {
+                let fixedChar = '';
+                if (type == 'R' || type == 'S') fixedChar = 'A';
+                else if (type == 'M' || type == 'G') fixedChar = 'G';
+                else if (type == 'J') fixedChar = 'S';
+                className = type+grade+fixedChar+group;
             }
             document.getElementById('className').value = className;
         }
-        document.getElementById('className').addEventListener('change', updateClassNameRxAx);
-        document.getElementById('classType').addEventListener('change', updateClassNameRxAx);
-        document.getElementById('classGrade').addEventListener('change', updateClassNameRxAx);
-        document.getElementById('classGroup').addEventListener('change', updateClassNameRxAx);
+
+        // イベントリスナーを追加（DOMContentLoadedで確実にDOM読み込み後に設定）
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('classType').addEventListener('change', updateClassNameRxAx);
+            document.getElementById('classGrade').addEventListener('change', updateClassNameRxAx);
+            document.getElementById('classGroup').addEventListener('change', updateClassNameRxAx);
+        });
     </script>
 </body>
 </html> 

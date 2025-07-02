@@ -91,27 +91,53 @@ public class StudentServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
+
         try (Connection conn = DBConnection.getConnection()) {
+            if(action.equals("getStudentId")) {
+                String student_id1 = request.getParameter("student_id");
+                String sql1 = "SELECT MAX(student_id) AS max_id FROM students_tbl WHERE student_id LIKE ?";
+                PreparedStatement stmt1 = conn.prepareStatement(sql1);
+                stmt1.setString(1, student_id1 + "%");
+                ResultSet rs1 = stmt1.executeQuery();
+                if(rs1.next()) {
+                    if(rs1.getString("max_id") == null) {
+                        response.getWriter().println("0");
+                    }else {
+                        response.getWriter().println(rs1.getString("max_id"));
+                    }
+                }else {
+                    response.getWriter().println("0");
+                }
+            }
+                
             if ("add".equals(action)) {
                 // 学生を新規追加する（パスワード管理と学年期間を適用）
-    	        String student_id = request.getParameter("student_id");
+    	        String student_id = request.getParameter("studentId");//学籍番号
     	        String password = request.getParameter("password");
-    	        String student_class = request.getParameter("class");
+    	        String student_class = request.getParameter("className");//クラス名S3A1
     	        String department = null;
     	        String studentClass = null;
     	        if (student_class != null && !student_class.trim().isEmpty()) {
     	            department = student_class.substring(0, 2);
     	            studentClass = student_class.substring(2);
     	        }
-    	        String number = request.getParameter("number");
-    	        String name = request.getParameter("name");
-    	        String name_reading = request.getParameter("name_reading");
+    	        String number = request.getParameter("attendanceNo");//出席番号
+    	        String name = request.getParameter("name");//名前
+    	        String name_reading = request.getParameter("kana");//カナ
     	        String gender = request.getParameter("gender");
     	        String enrollment_status = "在籍";// = request.getParameter("enrollment_status");
-    	        String graduation_year_str = request.getParameter("graduation_year");
+    	        String admission_year_str = request.getParameter("admissionYear");//入学年
+                String class_grade = request.getParameter("classGrade");//クラスの学年
+                String[] departments = {"G","J","M","R","S"};//G2,J2,M3,R4,S3
+            	int[] gradeUpLimits = {2,2,3,4,3};
+                for(int i = 0; i < departments.length; i++) {
+                    if(departments[i].equals(student_class.substring(0, 1))) {
+                        puls_num = gradeUpLimits[i] - (Integer.parseInt(class_grade) - 1);
+                    }
+                }
     	        int graduation_year = 0;
-    	        if (graduation_year_str != null && !graduation_year_str.trim().isEmpty()) {
-    	            graduation_year = Integer.parseInt(graduation_year_str);
+    	        if (admission_year_str != null && !admission_year_str.trim().isEmpty()) {
+    	            graduation_year = Integer.parseInt(admission_year_str) + puls_num;
     	        }
     	        
     	        

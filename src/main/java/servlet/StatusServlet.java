@@ -8,6 +8,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import dao.DropdownDataDAO;
+
 /**
  * Servlet implementation class statusServlet
  */
@@ -97,6 +99,8 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/StudentList.jsp";
 	                    break;
 	                case "createStudent":
+						DropdownDataDAO dropdownDAO = new DropdownDataDAO();
+						request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
 	                    nextPage = "/WEB-INF/jsp/CreateStudent.jsp";
 	                    break;
 	                default:
