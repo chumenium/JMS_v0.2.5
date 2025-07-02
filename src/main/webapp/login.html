@@ -33,15 +33,187 @@
 
     /* ウェルカムメッセージ */
     #welcome {
-      position:absolute; top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      background:#fff; color:#333;
-      padding:1.5rem 3rem; border-radius:1rem;
-      box-shadow:0 5px 15px rgba(0,0,0,0.2);
-      text-align:center; transition:opacity 1s;
-      z-index:10;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 3rem 4rem;
+      border-radius: 2rem;
+      box-shadow: 
+        0 20px 40px rgba(0,0,0,0.1),
+        0 0 0 1px rgba(255,255,255,0.2);
+      text-align: center;
+      transition: all 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
     }
-    #welcome.hidden { opacity:0; pointer-events:none; }
+    
+    #welcome.hidden { 
+      opacity: 0; 
+      pointer-events: none;
+      transform: translate(-50%, -50%) scale(0.8);
+    }
+
+    #welcome h1 {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: #1a5a2e;
+      margin-bottom: 1rem;
+      letter-spacing: 2px;
+      text-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    }
+
+    #welcome .subtitle {
+      font-size: 1.1rem;
+      color: #666;
+      font-weight: 300;
+      margin-top: 0.5rem;
+      opacity: 0;
+      animation: fadeInUp 0.8s ease-out 0.5s forwards;
+    }
+
+    #welcome .accent-line {
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(90deg, #2C7744, #5CA564);
+      margin: 1.5rem auto 0;
+      border-radius: 2px;
+      opacity: 0;
+      animation: expandWidth 1s ease-out 1s forwards;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes expandWidth {
+      from {
+        width: 0;
+        opacity: 0;
+      }
+      to {
+        width: 60px;
+        opacity: 1;
+      }
+    }
+
+    /* ウェルカム背景の装飾 */
+    #welcome::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, #2C7744, #5CA564, #2C7744);
+      border-radius: 2rem;
+      z-index: -1;
+      opacity: 0.3;
+      animation: borderGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 0.6; }
+    }
+
+    /* 背景装飾要素 */
+    .welcome-decoration {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    .decoration-circle {
+      position: absolute;
+      border-radius: 50%;
+      background: linear-gradient(45deg, rgba(44, 119, 68, 0.1), rgba(92, 165, 100, 0.1));
+      animation: float 6s ease-in-out infinite;
+    }
+
+    .decoration-circle:nth-child(1) {
+      width: 80px;
+      height: 80px;
+      top: 20%;
+      left: 10%;
+      animation-delay: 0s;
+    }
+
+    .decoration-circle:nth-child(2) {
+      width: 120px;
+      height: 120px;
+      top: 60%;
+      right: 15%;
+      animation-delay: 2s;
+    }
+
+    .decoration-circle:nth-child(3) {
+      width: 60px;
+      height: 60px;
+      bottom: 20%;
+      left: 20%;
+      animation-delay: 4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(120deg); }
+      66% { transform: translateY(10px) rotate(240deg); }
+    }
+
+    /* パーティクル効果 */
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #2C7744;
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: particleFloat 8s linear infinite;
+    }
+
+    .particle:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+    .particle:nth-child(2) { top: 30%; right: 25%; animation-delay: 1s; }
+    .particle:nth-child(3) { bottom: 40%; left: 15%; animation-delay: 2s; }
+    .particle:nth-child(4) { bottom: 20%; right: 30%; animation-delay: 3s; }
+    .particle:nth-child(5) { top: 50%; left: 5%; animation-delay: 4s; }
+
+    @keyframes particleFloat {
+      0% {
+        transform: translateY(0px) translateX(0px);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.6;
+      }
+      90% {
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-100px) translateX(50px);
+        opacity: 0;
+      }
+    }
 
     /* フォーム本体 */
     form#loginForm {
@@ -120,6 +292,17 @@
       opacity:1; transform:scale(1);
     }
 	
+    /* 新規登録リンク */
+    .login-link {
+      margin-top:1rem; text-align:center;
+    }
+    .login-link a {
+      color:#2C7744; text-decoration:none; font-weight:bold;
+    }
+    .login-link a:hover {
+      text-decoration:underline;
+    }
+	
 	/* ——— 組み込みの「目」アイコンを隠す ——— */
 	/* IE/Edge */
 	input[type="password"]::-ms-reveal,
@@ -139,19 +322,82 @@
 	          appearance: none;
 	}
 
-	
-	
+    .welcome-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .welcome-part {
+      opacity: 1;
+      transform: translateY(0);
+      transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .welcome-part.fade-out {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    #welcomePart1 {
+      animation: welcomePart1Animation 4s ease-in-out forwards;
+    }
+
+    #welcomePart2 {
+      animation: welcomePart2Animation 4s ease-in-out forwards;
+    }
+
+    @keyframes welcomePart1Animation {
+      0%, 50% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      60%, 100% {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+    }
+
+    @keyframes welcomePart2Animation {
+      0%, 60% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      70%, 100% {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+    }
+
   </style>
 </head>
 <body>
 
   <!-- ウェルカム -->
   <div id="welcome">
-    <h1>ようこそ。JMSアプリへ！</h1>
+    <h1 class="welcome-text">
+      <span class="welcome-part" id="welcomePart1">ようこそ</span>
+      <span class="welcome-part" id="welcomePart2">JMSアプリへ</span>
+    </h1>
+    <div class="subtitle">就職活動管理システム</div>
+    <div class="accent-line"></div>
+  </div>
+
+  <!-- 背景装飾 -->
+  <div class="welcome-decoration">
+    <div class="decoration-circle"></div>
+    <div class="decoration-circle"></div>
+    <div class="decoration-circle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
   </div>
 
   <!-- ログインフォーム -->
-  <form id="loginForm" name="loginForm" method="post" action="LoginServlet"
+  <form id="loginForm" name="loginForm" method="post" action="./LoginServlet"
         onsubmit="return validatePassword();">
     <div class="icon">
       <img src="images2/job_hunting_icon.jpg" alt="Job Hunting Icon">
@@ -195,17 +441,33 @@
       <span class="button-text">ログイン</span>
       <div class="button-glow"></div>
     </button>
+
+    <div class="login-link">
+      <a href="register.html">新規登録はこちら</a>
+    </div>
   </form>
 
   <script>
     // ウェルカム→フォーム
     window.addEventListener('load', () => {
+      // 段階的なフェードアウト演出
       setTimeout(() => {
+        // 「ようこそ」をフェードアウト
+        document.getElementById('welcomePart1').classList.add('fade-out');
+      }, 2400); // 2.4秒後に「ようこそ」がフェードアウト開始
+      
+      setTimeout(() => {
+        // 「JMSアプリへ」をフェードアウト
+        document.getElementById('welcomePart2').classList.add('fade-out');
+      }, 2800); // 2.8秒後に「JMSアプリへ」がフェードアウト開始
+      
+      setTimeout(() => {
+        // 全体をフェードアウト
         document.getElementById('welcome').classList.add('hidden');
         setTimeout(() => {
           document.getElementById('loginForm').classList.add('visible');
         }, 1000);
-      }, 3000);
+      }, 4000);
     });
 
     // パスワード表示切替

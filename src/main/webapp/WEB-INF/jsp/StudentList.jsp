@@ -1,82 +1,25 @@
-<!--*
-：：：色のテーマは緑：：：
-学生管理画面
-
-
-**********
-
-<!--* 画面：学生管理画面
-        	
-許可されている権限：
-・教員：teacher
-・校長・教務部長：headmaster
-・システム管理者：admin
- 
-▼▼▼▼
-*-->
-
-
-<!--確認まだ-->
-
-<!--KCS_JMS_PROJECT-->
-
-
-<!-- 学生管理画面用 -->
-
-<!-- バックエンドとの接続のやり取りがあるためいったん放置 -->
-
-
-<!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
-<% 
-  String username = (String) session.getAttribute("username"); 
-  String role     = (String) session.getAttribute("role"); 
-  
-  // デバッグ用：セッション情報をコンソールに出力
-  System.out.println("StudentManagement.jsp - username: " + username);
-  System.out.println("StudentManagement.jsp - role: " + role);
-  
-  // nullチェック
-  if (username == null) {
-    username = "ゲスト";
-  }
-  if (role == null) {
-    role = "guest";
-  }
-  
-  // リクエストスコープからプルダウン用データを取得
-  java.util.List<String> classList = (java.util.List<String>) request.getAttribute("classList");
-  java.util.List<String> enrollmentStatusList = (java.util.List<String>) request.getAttribute("enrollmentStatusList");
-  java.util.List<String> assistanceList = (java.util.List<String>) request.getAttribute("assistanceList");
-  java.util.List<String> firstChoiceIndustryList = (java.util.List<String>) request.getAttribute("firstChoiceIndustryList");
-  java.util.List<Integer> graduationYearList = (java.util.List<Integer>) request.getAttribute("graduationYearList");
-  
-  // エラーメッセージを取得
-  String errorMessage = (String) request.getAttribute("errorMessage");
-%>
-<!--▲▲▲▲▲-->
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>JMSアプリ - 学生管理</title>
+<title>JMSアプリ - 学生一覧管理</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
-
 <style>
-    /* システム上見やすさを追求した学生管理画面デザイン */
+    /* システム上見やすさを追求した学生一覧管理画面デザイン */
     
     /* 全体の設定 */
-    .student-management-page {
+    .student-list-page {
         background: #f8f9fa;
         color: #2c3e50;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         line-height: 1.6;
     }
 
-    .student-management-container {
+    .student-list-container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 24px;
@@ -104,14 +47,6 @@
         margin-bottom: 12px;
         font-weight: 700;
         text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
-    }
-
-    .page-subtitle {
-        font-size: 18px;
-        color: #000000;
-        margin-bottom: 24px;
-        line-height: 1.6;
-        font-weight: 600;
     }
 
     .breadcrumb {
@@ -146,208 +81,163 @@
         font-weight: 600;
     }
 
-    /* クイックアクション - 視認性と操作性の向上 */
-    .quick-actions {
+    /* 検索バー - 視認性と操作性の向上 */
+    .search-bar {
         background: white;
         border-radius: 12px;
-        padding: 32px;
+        padding: 24px;
         box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
         border: 1px solid #e9ecef;
-        margin-bottom: 32px;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .quick-actions::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #2C7744, #5CA564);
-    }
-
-    .quick-actions h3 {
-        font-size: 20px;
-        color: #2c3e50;
         margin-bottom: 24px;
-        text-align: center;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .search-bar input[type="text"] {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+    }
+
+    .search-bar input[type="text"]:focus {
+        outline: none;
+        border-color: #2C7744;
+        box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
+    }
+
+    .search-bar button {
+        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
+    }
+
+    .search-bar button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
+    }
+
+    /* 学生一覧表 - 視認性と操作性の向上 */
+    .student-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+        border: 1px solid #e9ecef;
+    }
+
+    .student-table th, .student-table td {
+        padding: 16px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .student-table th {
+        background: linear-gradient(135deg, #e9f5ee 0%, #f1f8f5 100%);
+        color: #2C7744;
+        font-size: 16px;
         font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
-    .action-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 16px;
+    .student-table tr:last-child td {
+        border-bottom: none;
     }
 
+    .student-table tr:hover {
+        background: linear-gradient(135deg, #f1f8f5 0%, #e9f5ee 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.1);
+    }
+
+    .student-table tr {
+        transition: all 0.2s ease;
+    }
+
+    /* 操作ボタン */
     .action-btn {
         background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
         color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
+        padding: 6px 12px;
+        border-radius: 6px;
         text-decoration: none;
         font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
+        font-size: 14px;
+        display: inline-block;
+        margin-right: 8px;
         transition: all 0.2s ease;
         border: none;
         cursor: pointer;
-        font-size: 16px;
-        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
-        position: relative;
-        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(44, 119, 68, 0.2);
     }
 
     .action-btn:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
+        box-shadow: 0 4px 8px rgba(44, 119, 68, 0.3);
         color: white;
         text-decoration: none;
     }
 
     .action-btn.secondary {
         background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+        box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
     }
 
     .action-btn.secondary:hover {
-        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
     }
 
-    /* メインコンテンツ - 情報階層の改善 */
-    .management-main {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 24px;
-        margin-bottom: 32px;
-        max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* 機能カード - 視認性と操作性の向上 */
-    .management-card {
-        background: white;
-        border-radius: 12px;
-        padding: 32px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e9ecef;
-        transition: all 0.2s ease;
-        position: relative;
-        overflow: hidden;
-        text-align: center;
-    }
-
-    .management-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #2C7744, #5CA564);
-    }
-
-    .management-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        border-color: #2C7744;
-    }
-
-    .card-icon {
-        font-size: 48px;
-        margin-bottom: 20px;
-        display: block;
-        opacity: 0.9;
-    }
-
-    .card-title {
-        font-size: 20px;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 12px;
-        line-height: 1.3;
-    }
-
-    .card-description {
-        color: #6c757d;
-        margin-bottom: 24px;
-        line-height: 1.6;
-        font-size: 16px;
-    }
-
-    .card-stats {
+    /* ページネーション - 視認性と操作性の向上 */
+    .pagination {
         display: flex;
-        justify-content: space-around;
-        margin-bottom: 24px;
-        padding: 20px;
-        background: linear-gradient(135deg, rgba(44, 119, 68, 0.05), rgba(92, 165, 100, 0.05));
-        border-radius: 8px;
-        border: 1px solid rgba(44, 119, 68, 0.1);
+        justify-content: center;
+        gap: 8px;
+        margin-top: 24px;
+        flex-wrap: wrap;
     }
 
-    .stat-item {
-        text-align: center;
-        position: relative;
+    .pagination form {
+        margin: 0;
     }
 
-    .stat-item:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        right: -50%;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 1px;
-        height: 30px;
-        background: linear-gradient(to bottom, transparent, rgba(44, 119, 68, 0.3), transparent);
-    }
-
-    .stat-number {
-        font-size: 24px;
-        font-weight: 700;
+    .pagination button {
+        background: white;
+        border: 2px solid #2C7744;
         color: #2C7744;
-        display: block;
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 44px;
+        box-shadow: 0 2px 4px rgba(44, 119, 68, 0.1);
     }
 
-    .stat-label {
-        font-size: 14px;
-        color: #6c757d;
-        margin-top: 6px;
-        font-weight: 500;
-    }
-
-    .card-link {
+    .pagination button.active, .pagination button:hover {
         background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
         color: white;
-        padding: 14px 28px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: 600;
-        font-size: 16px;
-        display: inline-block;
-        transition: all 0.2s ease;
-        border: none;
-        cursor: pointer;
-        width: 100%;
-        text-align: center;
-        box-sizing: border-box;
-        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
-    }
-
-    .card-link:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
-        color: white;
-        text-decoration: none;
+        box-shadow: 0 4px 8px rgba(44, 119, 68, 0.3);
     }
 
     /* レスポンシブ対応の強化 */
     @media (max-width: 768px) {
-        .student-management-container {
+        .student-list-container {
             padding: 16px;
         }
         
@@ -359,39 +249,32 @@
             font-size: 24px;
         }
         
-        .page-subtitle {
-            font-size: 16px;
-        }
-        
-        .management-main {
-            grid-template-columns: 1fr;
-            gap: 16px;
-        }
-        
-        .action-buttons {
-            grid-template-columns: 1fr;
-        }
-        
-        .quick-actions {
-            padding: 24px;
-        }
-        
-        .management-card {
-            padding: 24px;
-        }
-        
-        .card-stats {
+        .search-bar {
             flex-direction: column;
             gap: 12px;
+            padding: 20px;
         }
         
-        .stat-item:not(:last-child)::after {
-            display: none;
+        .student-table th, .student-table td {
+            padding: 12px 8px;
+            font-size: 14px;
+        }
+        
+        .action-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+        
+        .pagination button {
+            padding: 8px 12px;
+            font-size: 14px;
+            min-width: 40px;
         }
     }
 
     @media (max-width: 480px) {
-        .student-management-container {
+        .student-list-container {
             padding: 12px;
         }
         
@@ -403,119 +286,90 @@
             font-size: 20px;
         }
         
-        .quick-actions {
-            padding: 20px;
+        .search-bar {
+            padding: 16px;
         }
         
-        .management-card {
-            padding: 20px;
-        }
-        
-        .card-title {
-            font-size: 18px;
+        .student-table th, .student-table td {
+            padding: 8px 6px;
+            font-size: 12px;
         }
     }
 
     /* アクセシビリティの向上 */
+    .search-bar input[type="text"]:focus,
+    .search-bar button:focus,
     .action-btn:focus,
-    .card-link:focus {
+    .pagination button:focus {
         outline: 3px solid #2C7744;
-        outline-offset: 2px;
-    }
-
-    .management-card:focus-within {
-        outline: 2px solid #2C7744;
         outline-offset: 2px;
     }
 
     /* 高コントラストモード対応 */
     @media (prefers-contrast: high) {
-        .management-card {
+        .student-table {
             border: 2px solid #2c3e50;
         }
         
         .action-btn,
-        .card-link {
+        .pagination button {
             border: 2px solid #2c3e50;
         }
     }
 
     /* ダークモード対応 */
     @media (prefers-color-scheme: dark) {
-        .student-management-page {
+        .student-list-page {
             background: #1a1a1a;
             color: #ffffff;
         }
         
-        .student-management-container {
+        .student-list-container {
             background: #2d2d2d;
         }
         
-        .quick-actions,
-        .management-card {
+        .search-bar {
             background: #3d3d3d;
             border-color: #4d4d4d;
             color: #ffffff;
         }
         
-        .card-title {
+        .search-bar input[type="text"] {
+            background: #4d4d4d;
+            border-color: #5d5d5d;
             color: #ffffff;
         }
         
-        .card-description {
-            color: #cccccc;
+        .student-table {
+            background: #3d3d3d;
+            color: #ffffff;
+            border-color: #4d4d4d;
         }
-    }
-
-    /* アニメーションの最適化 */
-    .page-header,
-    .quick-actions,
-    .management-card {
-        animation: fadeInUp 0.4s ease forwards;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
+        
+        .student-table th {
+            background: #2C7744;
+            color: #ffffff;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        
+        .student-table tr:hover {
+            background: #2C7744;
+            color: #ffffff;
         }
-    }
-
-    /* ダッシュボード用ヘッダー調整 */
-    .student-management-page header {
-        position: relative;
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    }
-
-    .student-management-page #mainimg {
-        display: none;
-    }
-
-    .student-management-page main {
-        margin-top: 0;
-    }
-
-    /* テキストスライドショー用の調整 */
-    .student-management-page .text-slide-wrapper {
-        margin-top: 0;
-        margin-bottom: 0;
-    }
-
-    .student-management-page .text-slide {
-        font-size: 8vw;
-        opacity: 0.08;
+        
+        .pagination button {
+            background: #3d3d3d;
+            border-color: #2C7744;
+            color: #ffffff;
+        }
     }
 </style>
-
 </head>
-<body class="student-management-page">
+<body class="student-list-page">
 <% 
+  // セッションからユーザー情報を取得
+  String username = (String) session.getAttribute("username"); 
+  String role = (String) session.getAttribute("role"); 
+  
   // 権限名を日本語に変換
   String roleDisplay = "";
   switch(role) {
@@ -561,103 +415,84 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <div class="student-management-container">
+        <div class="student-list-container">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
-                <h1 class="page-title">学生管理</h1>
-                <p class="page-subtitle">学生情報の管理と就職活動の進捗を把握できます</p>
+                <h1 class="page-title">学生一覧管理</h1>
                 <nav class="breadcrumb" aria-label="パンくずリスト">
                     <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
                     <span class="separator" aria-hidden="true">/</span>
-                    <span>学生管理</span>
+                    <a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a>
+                    <span class="separator" aria-hidden="true">/</span>
+                    <span>学生一覧管理</span>
                 </nav>
             </header>
 
-            <!-- メッセージ表示 -->
-            <% if (request.getAttribute("successMessage") != null) { %>
-                <div class="message success-message" style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
-                    ✅ <%= request.getAttribute("successMessage") %>
-                </div>
-            <% } %>
-            <% if (request.getAttribute("errorMessage") != null) { %>
-                <div class="message error-message" style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
-                    ❌ <%= request.getAttribute("errorMessage") %>
-                </div>
-            <% } %>
+            <!-- 検索バー -->
+            <form class="search-bar" method="get" action="StudentServlet">
+                <input type="text" name="keyword" placeholder="氏名・学籍番号・クラスなどで検索..." aria-label="検索キーワード" value="${keyword != null ? keyword : ''}">
+                <button type="submit" aria-label="検索">🔍 検索</button>
+            </form>
 
-            <!-- 操作一覧 -->
-            <section class="quick-actions" role="region" aria-label="操作一覧">
-                <h2>🚀 操作一覧</h2>
-                <div class="action-buttons">
-                    <a href="StudentServlet" class="action-btn" aria-label="学生一覧を表示">
-                        <i class="fas fa-list" aria-hidden="true"></i>学生一覧を表示
-                    </a>
-                    <a href="StatusServlet?status=createStudent" class="action-btn" aria-label="新規学生登録">
-                        <i class="fas fa-plus" aria-hidden="true"></i>新規学生登録
-                    </a>
-                    <a href="StatusServlet?view=studentSearch" class="action-btn secondary" aria-label="学生検索">
-                        <i class="fas fa-search" aria-hidden="true"></i>学生検索
-                    </a>
-                    <a href="StatusServlet?view=studentExport" class="action-btn secondary" aria-label="データエクスポート">
-                        <i class="fas fa-download" aria-hidden="true"></i>データエクスポート
-                    </a>
-                </div>
-            </section>
+            <!-- 学生一覧表 -->
+            <table class="student-table" aria-label="学生一覧">
+                <thead>
+                    <tr>
+                        <th>学籍番号</th>
+                        <th>氏名</th>
+                        <th>クラス</th>
+                        <th>進路状況</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <c:choose>
+                        <c:when test="${not empty students and students[0].size() > 0}">
+                            <c:forEach var="i" begin="0" end="${students[0].size()-1}">
+                                <tr>
+                                    <td>${students[0][i]}</td>
+                                    <td>${students[1][i]}</td>
+                                    <td>${students[2][i]}</td>
+                                    <td>${students[3][i]}</td>
+                                    <td>
+                                        <a href="#" class="action-btn" aria-label="学生詳細を表示">詳細</a>
+                                        <a href="#" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <tr>
+                                <td colspan="5" style="text-align:center; padding: 40px; color: #6c757d; font-style: italic;">
+                                    該当する学生がいません
+                                </td>
+                            </tr>
+                        </c:otherwise>
+                    </c:choose>
+                </tbody>
+            </table>
 
-            <!-- メインコンテンツ -->
-            <section class="management-main" role="region" aria-label="管理機能">
-                
-                <!-- 学生一覧管理 -->
-                <article class="management-card" role="article">
-                    <span class="card-icon" aria-hidden="true">📋</span>
-                    <h3 class="card-title">学生一覧管理</h3>
-                    <p class="card-description">
-                        登録されている学生の一覧を表示し、詳細情報の確認や編集を行えます。
-                    </p>
-                    <div class="card-stats" role="group" aria-label="学生統計">
-                        <div class="stat-item">
-                            <span class="stat-number">150</span>
-                            <span class="stat-label">総学生数</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">45</span>
-                            <span class="stat-label">就職活動中</span>
-                        </div>
-                    </div>
-                    <a href="StudentServlet" class="card-link" aria-label="学生一覧を表示">
-                        学生一覧を表示
-                    </a>
-                </article>
-
-                <!-- 新規学生登録 -->
-                <article class="management-card" role="article">
-                    <span class="card-icon" aria-hidden="true">👤</span>
-                    <h3 class="card-title">新規学生登録</h3>
-                    <p class="card-description">
-                        新しい学生の情報を登録し、システムに追加できます。
-                    </p>
-                    <div class="card-stats" role="group" aria-label="登録統計">
-                        <div class="stat-item">
-                            <span class="stat-number">12</span>
-                            <span class="stat-label">今月登録</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">3</span>
-                            <span class="stat-label">未完了</span>
-                        </div>
-                    </div>
-                    <a href="StatusServlet?status=createStudent" class="card-link" aria-label="新規学生を登録">
-                        新規学生を登録
-                    </a>
-                </article>
-            </section>
+            <!-- ページネーション -->
+            <nav class="pagination" aria-label="ページネーション">
+                <c:if test="${totalPages > 1}">
+                    <c:forEach var="p" begin="1" end="${totalPages}">
+                        <form method="get" action="StudentServlet" style="display:inline;">
+                            <input type="hidden" name="page" value="${p}">
+                            <c:if test="${not empty keyword}">
+                                <input type="hidden" name="keyword" value="${keyword}">
+                            </c:if>
+                            <button type="submit" class="${p == currentPage ? 'active' : ''}" aria-label="ページ ${p} に移動">${p}</button>
+                        </form>
+                    </c:forEach>
+                </c:if>
+            </nav>
         </div>
     </main>
 
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->
     <div class="text-slide-wrapper">
         <div class="text-slide">
-            <span>Student Management System</span>
+            <span>Student List Management</span>
         </div>
     </div>
     <!--▲▲▲▲▲ここまで「テキストスライドショー」-->
@@ -703,7 +538,6 @@
     <span class="pr"><a href="" target="_blank">@ 2025 Job Management System</a></span>
     <!--▲▲ここまで最下部-->
 </div>
-<!--/#container-->
 
 <!--ローディング-->
 <div id="loading">
@@ -758,7 +592,7 @@
 <script src="js/main.js"></script>
 
 <script>
-// 学生管理画面の最適化されたJavaScript
+// 学生一覧管理画面の最適化されたJavaScript
 
 // アクセシビリティの向上
 document.addEventListener('DOMContentLoaded', () => {
@@ -773,13 +607,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // カードリンクのキーボード操作
-    const cardLinks = document.querySelectorAll('.card-link');
-    cardLinks.forEach(link => {
-        link.addEventListener('keydown', (e) => {
+    // 検索フォームの改善
+    const searchForm = document.querySelector('.search-bar form');
+    const searchInput = document.querySelector('.search-bar input[type="text"]');
+    
+    if (searchForm && searchInput) {
+        // 検索ボタンのキーボード操作
+        const searchButton = searchForm.querySelector('button[type="submit"]');
+        if (searchButton) {
+            searchButton.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    searchForm.submit();
+                }
+            });
+        }
+
+        // 検索入力フィールドの改善
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                searchForm.submit();
+            }
+        });
+    }
+
+    // ページネーションボタンのキーボード操作
+    const paginationButtons = document.querySelectorAll('.pagination button');
+    paginationButtons.forEach(button => {
+        button.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
-                link.click();
+                button.click();
             }
         });
     });
@@ -798,40 +657,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 統計データのアニメーション
-    const statNumbers = document.querySelectorAll('.stat-number');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const target = entry.target;
-                const finalValue = parseInt(target.textContent);
-                animateNumber(target, 0, finalValue, 1000);
-                observer.unobserve(target);
-            }
+    // テーブル行のホバー効果の改善
+    const tableRows = document.querySelectorAll('.student-table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            row.style.transform = 'translateY(-1px)';
+        });
+        
+        row.addEventListener('mouseleave', () => {
+            row.style.transform = 'translateY(0)';
         });
     });
-
-    statNumbers.forEach(stat => observer.observe(stat));
 });
-
-// 数値アニメーション関数
-function animateNumber(element, start, end, duration) {
-    const startTime = performance.now();
-    
-    function updateNumber(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const current = Math.floor(start + (end - start) * progress);
-        element.textContent = current;
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateNumber);
-        }
-    }
-    
-    requestAnimationFrame(updateNumber);
-}
 
 // パフォーマンス最適化
 window.addEventListener('load', () => {
@@ -888,3 +725,4 @@ document.addEventListener('visibilitychange', () => {
 
 </body>
 </html>
+ 

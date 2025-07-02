@@ -93,7 +93,7 @@ public class LoginServlet extends HttpServlet {
                 String salt = saltRs.getString("salt");
                 String hashedPassword = hashPassword(password, salt);
 
-                String query = "SELECT username, id, role FROM users WHERE id = ? AND password = ?";
+                String query = "SELECT id, role FROM users WHERE id = ? AND password = ?";
                 PreparedStatement statement = connection.prepareStatement(query);
                 statement.setString(1, id);
                 statement.setString(2, hashedPassword);
@@ -103,24 +103,58 @@ public class LoginServlet extends HttpServlet {
                 if (rs.next()) {
                 	// LoginServlet#doPost(...)
                 	HttpSession session = request.getSession();  // セッションスコープ
-                	session.setAttribute("username", rs.getString("username"));
-                	session.setAttribute("id",       rs.getString("id"));
-                	session.setAttribute("role",     rs.getString("role"));
+                	String userId = rs.getString("id");
+                	String userRole = rs.getString("role");
+                	
+                	// 表示名を決定（学生の場合はname、それ以外はid）
+                	String displayName = userId;
+                	if ("student".equals(userRole)) {
+                		// 学生の場合はstudents_tblからnameを取得
+                		String nameQuery = "SELECT name FROM students_tbl WHERE student_id = ?";
+                		PreparedStatement nameStmt = connection.prepareStatement(nameQuery);
+                		nameStmt.setString(1, userId);
+                		ResultSet nameRs = nameStmt.executeQuery();
+                		
+                		if (nameRs.next()) {
+                			displayName = nameRs.getString("name");
+                		}
+                	} else if ("teacher".equals(userRole)) {
+                		// 教員の場合はteacher_tblからnameを取得
+                		String nameQuery = "SELECT name FROM teacher_tbl WHERE teacher_id = ?";
+                		PreparedStatement nameStmt = connection.prepareStatement(nameQuery);
+                		nameStmt.setString(1, userId);
+                		ResultSet nameRs = nameStmt.executeQuery();
+                		
+                		if (nameRs.next()) {
+                			displayName = nameRs.getString("name");
+                		}
+                	}
+                	
+                	session.setAttribute("username", displayName); // 表示名として保存
+                	session.setAttribute("id", userId);
+                	session.setAttribute("role", userRole);
                 	// （アプリケーションスコープには何も置かない）
 
+                	// デバッグログ
+                	System.out.println("LoginServlet: セッション情報設定完了");
+                	System.out.println("LoginServlet: username = " + displayName);
+                	System.out.println("LoginServlet: id = " + userId);
+                	System.out.println("LoginServlet: role = " + userRole);
 
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/dashboard.jsp");
-                    dispatcher.forward(request, response);
+                    // ログイン成功時はStatusServletにリダイレクト
+                    response.sendRedirect(request.getContextPath() + "/StatusServlet?view=DashBoard");
                 } else {
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("login.html");
-                    dispatcher.forward(request, response);
+                    // ログイン失敗時はエラーページにリダイレクト
+                    response.sendRedirect("error/login-failed.html?type=invalid_credentials");
                 }
             } else {
-                RequestDispatcher dispatcher = request.getRequestDispatcher("login.html");
-                dispatcher.forward(request, response);
+                // ユーザーIDが存在しない場合
+                response.sendRedirect("error/login-failed.html?type=invalid_credentials");
             }
         } catch (Exception e) {
-            throw new ServletException(e);
+            e.printStackTrace();
+            // データベースエラーの場合
+            response.sendRedirect("error/login-failed.html?type=database_error");
         }
     }
 }

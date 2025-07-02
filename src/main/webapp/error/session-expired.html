@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>セッション切れ - JMSアプリ</title>
+  <style>
+    /* リセット & ボックスモデル */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; min-height:100vh; font-family:'Noto Sans JP',sans-serif; }
+
+    /* 背景・中央揃え */
+    body {
+      background: linear-gradient(to right,#2C7744,#5CA564);
+      display:flex; align-items:center; justify-content:center;
+      overflow-x:hidden; color:#fff;
+    }
+
+    /* エラーコンテナ */
+    .error-container {
+      width:90vw; max-width:500px;
+      background:rgba(255,255,255,0.97);
+      border-radius:1rem; padding:3rem 2rem;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+      text-align:center; color:#333;
+    }
+
+    /* エラーアイコン */
+    .error-icon {
+      width:120px; height:120px; margin:0 auto 2rem;
+      border-radius:50%; overflow:hidden;
+      background:#fff3e0; display:flex;
+      align-items:center; justify-content:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+    .error-icon svg {
+      width:60%; height:60%; color:#ff9800;
+    }
+
+    /* エラータイトル */
+    .error-title {
+      font-size:1.8rem; margin-bottom:1rem; color:#333;
+    }
+
+    /* エラーメッセージ */
+    .error-message {
+      font-size:1rem; margin-bottom:2rem; color:#666;
+      line-height:1.6;
+    }
+
+    /* 詳細情報 */
+    .error-details {
+      background:#f5f5f5; padding:1rem; border-radius:.5rem;
+      margin-bottom:2rem; text-align:left;
+    }
+    .error-details h3 {
+      font-size:1rem; margin-bottom:.5rem; color:#333;
+    }
+    .error-details p {
+      font-size:0.9rem; color:#666; margin-bottom:.5rem;
+    }
+
+    /* ボタン */
+    .button-group {
+      display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;
+    }
+    .btn {
+      padding:.75rem 1.5rem; border:none; border-radius:.5rem;
+      font-size:1rem; font-weight:bold; cursor:pointer;
+      text-decoration:none; display:inline-block; transition:all .3s;
+    }
+    .btn-primary {
+      background:linear-gradient(to right,#2C7744,#5CA564);
+      color:#fff;
+    }
+    .btn-secondary {
+      background:#f5f5f5; color:#333; border:1px solid #ddd;
+    }
+    .btn:hover {
+      transform:translateY(-2px); box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* アニメーション */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in {
+      animation: fadeIn 0.8s ease-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container fade-in">
+    <div class="error-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      </svg>
+    </div>
+
+    <h1 class="error-title">セッションが切れました</h1>
+    <p class="error-message">
+      セキュリティのため、セッションの有効期限が切れました。<br>
+      再度ログインしてください。
+    </p>
+
+    <div class="error-details">
+      <h3>セッションが切れる原因：</h3>
+      <p>• 長時間操作を行わなかった</p>
+      <p>• ブラウザを閉じた</p>
+      <p>• 別のページに移動した</p>
+      <p>• セキュリティ上の理由</p>
+    </div>
+
+    <div class="button-group">
+      <a href="../login.html" class="btn btn-primary">ログイン画面に戻る</a>
+    </div>
+  </div>
+
+  <script>
+    // 自動的にログイン画面にリダイレクト（オプション）
+    // 5秒後に自動リダイレクト
+    setTimeout(() => {
+      if (confirm('ログイン画面に移動しますか？')) {
+        window.location.href = '../login.html';
+      }
+    }, 5000);
+  </script>
+</body>
+</html> 

@@ -10,94 +10,72 @@ import java.util.List;
 import utils.DBConnection;
 
 public class DropdownDataDAO {
-    
-    /**
-     * クラス一覧を取得
-     */
-    public List<String> getClassList() throws SQLException, ClassNotFoundException {
-        List<String> classList = new ArrayList<>();
-        String sql = "SELECT DISTINCT class_name FROM classes ORDER BY class_name";
-        
+
+    public List<String> getClasses() {
+        List<String> classes = new ArrayList<>();
+        String sql = "SELECT DISTINCT department, class FROM students_tbl ORDER BY department, class";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                classList.add(rs.getString("class_name"));
+                classes.add(rs.getString("department") + " " + rs.getString("class"));
             }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return classList;
+        return classes;
     }
-    
-    /**
-     * 在籍状況一覧を取得
-     */
-    public List<String> getEnrollmentStatusList() throws SQLException, ClassNotFoundException {
-        List<String> statusList = new ArrayList<>();
-        String sql = "SELECT DISTINCT status_name FROM enrollment_status ORDER BY status_name";
-        
+
+    public List<String> getEnrollmentStatuses() {
+        List<String> statuses = new ArrayList<>();
+        String sql = "SELECT DISTINCT enrollment_status FROM students_tbl ORDER BY enrollment_status";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                statusList.add(rs.getString("status_name"));
+                statuses.add(rs.getString("enrollment_status"));
             }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return statusList;
+        return statuses;
     }
-    
-    /**
-     * 斡旋一覧を取得
-     */
-    public List<String> getAssistanceList() throws SQLException, ClassNotFoundException {
-        List<String> assistanceList = new ArrayList<>();
-        String sql = "SELECT DISTINCT assistance_name FROM assistance_types ORDER BY assistance_name";
-        
+
+    public List<String> getMediationStatuses() {
+        List<String> mediations = new ArrayList<>();
+        mediations.add("学校斡旋");
+        mediations.add("自己応募");
+        mediations.add("縁故");
+        return mediations;
+    }
+
+    public List<String> getIndustries() {
+        List<String> industries = new ArrayList<>();
+        String sql = "SELECT DISTINCT industry_name FROM occupations_tbl ORDER BY industry_name";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                assistanceList.add(rs.getString("assistance_name"));
+                industries.add(rs.getString("industry_name"));
             }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return assistanceList;
+        return industries;
     }
-    
-    /**
-     * 第一希望業種一覧を取得
-     */
-    public List<String> getFirstChoiceIndustryList() throws SQLException, ClassNotFoundException {
-        List<String> industryList = new ArrayList<>();
-        String sql = "SELECT DISTINCT industry_name FROM industries ORDER BY industry_name";
-        
+
+    public List<Integer> getGraduationYears() {
+        List<Integer> years = new ArrayList<>();
+        String sql = "SELECT DISTINCT graduation_year FROM students_tbl ORDER BY graduation_year DESC";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
             while (rs.next()) {
-                industryList.add(rs.getString("industry_name"));
+                years.add(rs.getInt("graduation_year"));
             }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
         }
-        return industryList;
+        return years;
     }
-    
-    /**
-     * 卒業年一覧を取得
-     */
-    public List<Integer> getGraduationYearList() throws SQLException, ClassNotFoundException {
-        List<Integer> yearList = new ArrayList<>();
-        String sql = "SELECT DISTINCT graduation_year FROM students WHERE graduation_year IS NOT NULL ORDER BY graduation_year";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            
-            while (rs.next()) {
-                yearList.add(rs.getInt("graduation_year"));
-            }
-        }
-        return yearList;
-    }
-} 
+}

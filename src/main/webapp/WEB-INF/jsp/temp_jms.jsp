@@ -134,7 +134,7 @@
          || "headmaster".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=studentManagement">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">
         📚 学生管理画面
       </a>
     </li>
@@ -153,7 +153,7 @@
   <% if ("egd".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=CompanyManagement">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">
         🏢 企業管理画面
       </a>
     </li>
@@ -179,7 +179,7 @@
          || "admin".equals(role) 
          || "student".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=jobHunting">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">
         📄 就職管理画面
       </a>
     </li>
@@ -203,7 +203,7 @@
          || "egd".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=applicantList">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">
         📊 受験者一覧画面
       </a>
     </li>
@@ -224,7 +224,7 @@
 
   <% if ("admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=adminDatabase.jsp">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">
         🛠 管理者DB
       </a>
     </li>
@@ -243,7 +243,7 @@
 
   <%-- ログアウト --%>
   <% if (username != null) { %>
-    <li><a href="LogoutServlet">ログアウト</a></li>
+    <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
   <% } %>
 </ul>
 </nav>
@@ -327,7 +327,7 @@
          || "headmaster".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=studentManagement">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">
         📚 学生管理画面
       </a>
     </li>
@@ -346,7 +346,7 @@
   <% if ("egd".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=CompanyManagement">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">
         🏢 企業管理画面
       </a>
     </li>
@@ -372,7 +372,7 @@
          || "admin".equals(role) 
          || "student".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=jobHunting">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">
         📄 就職管理画面
       </a>
     </li>
@@ -396,7 +396,7 @@
          || "egd".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=applicantList">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">
         📊 受験者一覧画面
       </a>
     </li>
@@ -417,7 +417,7 @@
 
   <% if ("admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=adminDatabase.jsp">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">
         🛠 管理者DB
       </a>
     </li>
@@ -436,7 +436,7 @@
 
   <%-- ログアウト --%>
   <% if (username != null) { %>
-    <li><a href="LogoutServlet">ログアウト</a></li>
+    <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
   <% } %>
 </ul>
 </div>
@@ -488,7 +488,7 @@
          || "headmaster".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=studentManagement">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">
         📚 学生管理画面
       </a>
     </li>
@@ -507,7 +507,7 @@
   <% if ("egd".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=CompanyManagement">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">
         🏢 企業管理画面
       </a>
     </li>
@@ -533,7 +533,7 @@
          || "admin".equals(role) 
          || "student".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=jobHunting">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">
         📄 就職管理画面
       </a>
     </li>
@@ -557,7 +557,7 @@
          || "egd".equals(role) 
          || "admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=applicantList">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">
         📊 受験者一覧画面
       </a>
     </li>
@@ -578,7 +578,7 @@
 
   <% if ("admin".equals(role)) { %>
     <li>
-      <a href="StatusServlet?view=adminDatabase.jsp">
+      <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">
         🛠 管理者DB
       </a>
     </li>
@@ -597,7 +597,7 @@
 
   <%-- ログアウト --%>
   <% if (username != null) { %>
-    <li><a href="LogoutServlet">ログアウト</a></li>
+    <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
   <% } %>
 </ul>
 </nav>
