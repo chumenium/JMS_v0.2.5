@@ -130,14 +130,15 @@ public class StudentServlet extends HttpServlet {
                 String class_grade = request.getParameter("classGrade");//クラスの学年
                 String[] departments = {"G","J","M","R","S"};//G2,J2,M3,R4,S3
             	int[] gradeUpLimits = {2,2,3,4,3};
+                int plus_num = 0;
                 for(int i = 0; i < departments.length; i++) {
                     if(departments[i].equals(student_class.substring(0, 1))) {
-                        puls_num = gradeUpLimits[i] - (Integer.parseInt(class_grade) - 1);
+                        plus_num = gradeUpLimits[i] - (Integer.parseInt(class_grade) - 1);
                     }
                 }
     	        int graduation_year = 0;
     	        if (admission_year_str != null && !admission_year_str.trim().isEmpty()) {
-    	            graduation_year = Integer.parseInt(admission_year_str) + puls_num;
+    	            graduation_year = Integer.parseInt(admission_year_str) + plus_num;
     	        }
     	        
     	        

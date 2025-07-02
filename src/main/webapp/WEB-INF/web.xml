@@ -91,4 +91,70 @@
     <url-pattern>/DashboardRedirectServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- テスト用ダッシュボードサーブレット（本番環境では削除すること） -->
+  <servlet>
+    <servlet-name>TestDashboardServlet</servlet-name>
+    <servlet-class>servlet.TestDashboardServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>TestDashboardServlet</servlet-name>
+    <url-pattern>/TestDashboard</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 企業管理サーブレット -->
+  <servlet>
+    <servlet-name>CompanyManagementServlet</servlet-name>
+    <servlet-class>servlet.CompanyManagementServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CompanyManagementServlet</servlet-name>
+    <url-pattern>/CompanyManagementServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 面接・試験入力サーブレット -->
+  <servlet>
+    <servlet-name>InterviewExamInputServlet</servlet-name>
+    <servlet-class>servlet.InterviewExamInputServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>InterviewExamInputServlet</servlet-name>
+    <url-pattern>/InterviewExamInputServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 選考段階管理サーブレット -->
+  <servlet>
+    <servlet-name>SelectionStageServlet</servlet-name>
+    <servlet-class>servlet.SelectionStageServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>SelectionStageServlet</servlet-name>
+    <url-pattern>/SelectionStageServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 学生登録サーブレット -->
+  <servlet>
+    <servlet-name>CreateStudentServlet</servlet-name>
+    <servlet-class>servlet.CreateStudentServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CreateStudentServlet</servlet-name>
+    <url-pattern>/CreateStudentServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- ダッシュボードサーブレット -->
+  <servlet>
+    <servlet-name>DashboardServlet</servlet-name>
+    <servlet-class>servlet.DashboardServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>DashboardServlet</servlet-name>
+    <url-pattern>/DashboardServlet</url-pattern>
+  </servlet-mapping>
+  
 </web-app>
