@@ -399,16 +399,42 @@
             // 学籍番号の形式チェック（8桁）
             if (!/^[0-9]{8}$/.test(studentId)) {
                 e.preventDefault();
-                alert('学籍番号は7桁の数字で自動生成されます。');
+                alert('学籍番号は8桁の数字で自動生成されます。');
                 return;
             }
         });
 
   
+        const kanaInput = document.getElementById('kana');
+        let previousValue = '';  // 直前の値
 
-        document.getElementById('kana').addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
+        // IME確定時に実行（1文字ずつ）
+        kanaInput.addEventListener('compositionend', () => {
+            const currentValue = kanaInput.value;
+            
+            // 直前と比較して追加された文字を特定
+            const addedChar = currentValue.slice(previousValue.length);
+
+            // 追加された1文字がひらがななら変換
+            const katakanaChar = addedChar.replace(/[\u3041-\u3096]/g, (match) =>
+                String.fromCharCode(match.charCodeAt(0) + 0x60)
+            );
+
+            // カタカナに置き換えて反映
+            kanaInput.value = previousValue + katakanaChar;
+
+            // 更新
+            previousValue = kanaInput.value;
         });
+
+        // 入力の変化を追跡
+        kanaInput.addEventListener('input', () => {
+            if (kanaInput.value.length < previousValue.length) {
+                // バックスペースなどで削除された場合も追跡
+                previousValue = kanaInput.value;
+            }
+        });
+
 
         // --- 学籍番号自動生成（表ルール対応） ---
         function generateStudentId() {
@@ -428,7 +454,7 @@
             if (year && type && grade && group) {
                 const yy = year.slice(-2);
                 const mid = classCodeMap[type] || '';
-                const studentIdTmp = yy + mid;
+                const studentIdTmp = "2" + yy + mid;
 
                 fetch('/就活管理アプリ/StudentServlet', {
                     method: 'POST',
