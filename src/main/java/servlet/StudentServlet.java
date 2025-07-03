@@ -16,6 +16,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import dao.DropdownDataDAO;
 import utils.DBConnection;
 
 //@WebServlet("/studentServlet")
@@ -113,7 +114,7 @@ public class StudentServlet extends HttpServlet {
             if ("add".equals(action)) {
                 // 学生を新規追加する（パスワード管理と学年期間を適用）
     	        String student_id = request.getParameter("studentId");//学籍番号
-    	        String password = request.getParameter("password");
+    	        //String password = request.getParameter("password");
     	        String student_class = request.getParameter("className");//クラス名S3A1
     	        String department = null;
     	        String studentClass = null;
@@ -125,69 +126,90 @@ public class StudentServlet extends HttpServlet {
     	        String name = request.getParameter("name");//名前
     	        String name_reading = request.getParameter("kana");//カナ
     	        String gender = request.getParameter("gender");
+                String email = request.getParameter("email");
+                String tel = request.getParameter("tel");
     	        String enrollment_status = "在籍";// = request.getParameter("enrollment_status");
+                // String email = request.getParameter("email");
+                // String tel = request.getParameter("tel");
+                String jobHuntingStatus = request.getParameter("jobHuntingStatus");
     	        String admission_year_str = request.getParameter("admissionYear");//入学年
                 String class_grade = request.getParameter("classGrade");//クラスの学年
                 String[] departments = {"G","J","M","R","S"};//G2,J2,M3,R4,S3
             	int[] gradeUpLimits = {2,2,3,4,3};
+                int puls_num = 0;
                 for(int i = 0; i < departments.length; i++) {
                     if(departments[i].equals(student_class.substring(0, 1))) {
-                        puls_num = gradeUpLimits[i] - (Integer.parseInt(class_grade) - 1);
+                        puls_num = gradeUpLimits[i];// - (Integer.parseInt(class_grade) - 1);
                     }
                 }
     	        int graduation_year = 0;
     	        if (admission_year_str != null && !admission_year_str.trim().isEmpty()) {
     	            graduation_year = Integer.parseInt(admission_year_str) + puls_num;
     	        }
+                String desired_job_type_1st = request.getParameter("targetIndustry1");
+                String desired_job_type_2nd = request.getParameter("targetIndustry2");
+                String desired_job_type_3rd = request.getParameter("targetIndustry3");
+                String remarks = request.getParameter("remarks");
     	        
     	        
     	        // ソルトを生成
     	        String salt = generateSalt();
     	        // パスワードをハッシュ化
-    	        String hashedPassword = hashPassword(password, salt);
+    	        String hashedPassword = hashPassword("123456", salt);
     	        //データ挿入クエリ生成
     	        String registerQuery = "INSERT INTO users (id, password, role, salt) VALUES (?, ?, ?, ?);";
     	        PreparedStatement usersStatement = conn.prepareStatement(registerQuery);
-    	        usersStatement.setString(1, student_id);
-    	        usersStatement.setString(2, hashedPassword);
-    	        usersStatement.setString(3, "student");
-    	        usersStatement.setString(4, salt);
+    	        usersStatement.setString(1, student_id);//OK
+    	        usersStatement.setString(2, hashedPassword);//OK
+    	        usersStatement.setString(3, "student");//OK
+    	        usersStatement.setString(4, salt);//OK
 
     	        String studentQuery = "INSERT INTO students_tbl "
-    	        	    + "(student_id, department, class, number, name, name_reading, gender, enrollment_status, mediation_status, "
-    	        	    + "desired_job_type_1st_id, desired_job_type_2nd_id, desired_job_type_3rd_id, graduation_year) "
-    	        	    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+    	        	    + "(student_id, department, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, "
+    	        	    + "desired_job_type_1st_id, desired_job_type_2nd_id, desired_job_type_3rd_id, graduation_year, remarks) "
+    	        	    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
                 PreparedStatement studentStatement = conn.prepareStatement(studentQuery);
                 
-                studentStatement.setString(1, student_id);
-                studentStatement.setString(2, department);
-                studentStatement.setString(3, studentClass);
-                studentStatement.setString(4, number);
-                studentStatement.setString(5, name);
-                studentStatement.setString(6, name_reading);
-                studentStatement.setString(7, gender);
-                studentStatement.setString(8, enrollment_status);
-                studentStatement.setNull(9, java.sql.Types.VARCHAR);
-                studentStatement.setNull(10, java.sql.Types.VARCHAR);
-                studentStatement.setNull(11, java.sql.Types.VARCHAR);
-                studentStatement.setNull(12, java.sql.Types.VARCHAR);
+                studentStatement.setString(1, student_id);//OK
+                studentStatement.setString(2, department);//OK
+                studentStatement.setString(3, studentClass);//OK
+                studentStatement.setString(4, number);//OK
+                studentStatement.setString(5, name);//OK
+                studentStatement.setString(6, name_reading);//OK
+                studentStatement.setString(7, gender);//OK
+                studentStatement.setString(8, email);//メールアドレス
+                studentStatement.setString(9, tel);//電話番号
+                studentStatement.setString(10, enrollment_status);//OK
+                studentStatement.setNull(11, java.sql.Types.VARCHAR);//OK
+                studentStatement.setString(12, jobHuntingStatus);//OK
+                studentStatement.setInt(13, Integer.parseInt(desired_job_type_1st));//OK
+                studentStatement.setInt(14, Integer.parseInt(desired_job_type_2nd));//OK
+                studentStatement.setInt(15, Integer.parseInt(desired_job_type_3rd));//OK
                 if (graduation_year > 0) {
-                    studentStatement.setInt(13, graduation_year);
+                    studentStatement.setInt(16, graduation_year);
                 } else {
-                    studentStatement.setNull(13, java.sql.Types.INTEGER);
+                    studentStatement.setNull(16, java.sql.Types.INTEGER);
                 }
+                studentStatement.setString(17, remarks);//OK
                 
+                System.out.println(usersStatement.toString());
+                System.out.println(studentStatement.toString());
+
                 int rowsInserted1 = usersStatement.executeUpdate();
                 int rowsInserted2 = studentStatement.executeUpdate();
                 
-                //初期データ例：23105,   S3A1,  21, 山田 太郎, ヤマダ タロウ, 男,    在籍,   NULL,     NULL,     NULL,     NULL ,  2026
-                //             学籍番号,クラス,番号,   名前,     名前読み,   性別,在籍状況,斡旋状況,希望職種1,希望職種2,希望職種3,卒業年
+                //初期データ例：23105,   S3A1,  21, 山田 太郎, ヤマダ タロウ, 男,    在籍,   NULL, 　活動中, 　1,        0,       0 ,  2026   ,NULL
+                //             学籍番号,クラス,番号,   名前,     名前読み,   性別,在籍状況,斡旋状況,就活状況,希望職種1,希望職種2,希望職種3,卒業年,備考
                 if (rowsInserted1 > 0 && rowsInserted2 > 0) {
                 	//データ登録成功
                 	request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
                 } else {
                     //データ登録失敗
+                    request.setAttribute("errorMessage", "データ登録に失敗しました。");
+                    DropdownDataDAO dropdownDAO = new DropdownDataDAO();
+                    request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
+                    request.getRequestDispatcher("/WEB-INF/jsp/CreateStudent.jsp").forward(request, response);
                 }
 
             

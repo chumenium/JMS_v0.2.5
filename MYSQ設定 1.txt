@@ -58,7 +58,7 @@ CREATE TABLE students_tbl (
 CREATE TABLE job_activity_tbl (
 	student_id VARCHAR(8),
 	companys_id INT,
-	activity_status ENUM('未開始','準備中','活動中','内定済み','就職決定','就職辞退'),
+	activity_status ENUM('検討中','エントリー中','選考中','内定承諾','内定保留','内定辞退','不採用','選考中止'),
 	reporte_date DATE,
 	PRIMARY KEY (student_id, companys_id),
 	FOREIGN KEY (student_id) REFERENCES students_tbl(student_id),
@@ -113,9 +113,13 @@ ALTER TABLE students_tbl
 
 ALTER TABLE students_tbl
   ADD remarks VARCHAR(500);
+
+ALTER TABLE students_tbl
+  ADD job_hunting_status ENUM('未開始','準備中','活動中','内定済み','就職決定','就職辞退') after mediation_status;
 -------------------------------------------
 
 テストデータ
+
 
 INSERT INTO occupations_tbl(occupation) VALUES("システムエンジニア");
 INSERT INTO occupations_tbl(occupation) VALUES("プログラマー");
@@ -129,6 +133,8 @@ INSERT INTO occupations_tbl(occupation) VALUES("バックエンドエンジニ�
 INSERT INTO occupations_tbl(occupation) VALUES("組込開発エンジニア");
 INSERT INTO occupations_tbl(occupation) VALUES("販売・営業");
 INSERT INTO occupations_tbl(occupation) VALUES("事務職");
+INSERT INTO occupations_tbl(occupation_id, occupation) VALUES(0, "未設定");
+UPDATE occupations_tbl SET occupation_id = 0 WHERE occupation_id = 13;
 
 INSERT INTO work_place_tbl(work_place) VALUES("北海道");
 INSERT INTO work_place_tbl(work_place) VALUES("青森県");

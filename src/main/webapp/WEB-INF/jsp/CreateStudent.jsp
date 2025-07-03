@@ -204,7 +204,7 @@
         <!-- 登録フォーム -->
         <div class="registration-form">
             <form action="StudentServlet" method="post">
-                <input type="hidden" name="action" value="create">
+                <input type="hidden" name="action" value="add">
                 
                 <!-- 基本情報 -->
                 <h3 style="margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #2C7744; padding-bottom: 8px;">基本情報</h3>
@@ -279,10 +279,18 @@
                             <option value="女">女</option>
                         </select>
                     </div>
+                    <div class="form-group">
+                        <label for="email">メールアドレス</label>
+                        <input type="text" id="email" name="email" maxlength="100" placeholder="例: xxxxx@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="tel">電話番号(ハイフンなし)</label>
+                        <input type="text" id="tel" name="tel" maxlength="11" placeholder="例: 08012345678">
+                    </div>
                 </div>
 
                 <!-- 学籍情報 -->
-                <h3 style="margin: 32px 0 20px 0; color: #2c3e50; border-bottom: 2px solid #2C7744; padding-bottom: 8px;">学籍情報</h3>
+                <!-- <h3 style="margin: 32px 0 20px 0; color: #2c3e50; border-bottom: 2px solid #2C7744; padding-bottom: 8px;">学籍情報</h3>
                 
                 <div class="form-row">
                     <div class="form-group">
@@ -291,9 +299,9 @@
                             <option value="情報工学">情報工学</option>
                         </select>
                     </div>
-                </div>
+                </div> -->
 
-                <div class="form-group">
+                <!-- <div class="form-group">
                     <label for="major">専攻・学科</label>
                     <select id="major" name="major" required>
                         <option value="大学併修">大学併修</option>
@@ -302,7 +310,7 @@
                         <option value="プログラム・デザイン科システム分野">プログラム・デザイン科システム分野</option>
                         <option value="プログラム・デザイン科ゲーム分野">プログラム・デザイン科ゲーム分野</option>
                     </select>
-                </div>
+                </div> -->
 
                 <!-- 就活情報 -->
                 <h3 style="margin: 32px 0 20px 0; color: #2c3e50; border-bottom: 2px solid #2C7744; padding-bottom: 8px;">就活情報</h3>
@@ -311,7 +319,7 @@
                     <div class="form-group">
                         <label for="jobHuntingStatus">就活状況</label>
                         <select id="jobHuntingStatus" name="jobHuntingStatus">
-                            <option value="">選択してください</option>
+                            <option value="未開始">選択してください</option>
                             <option value="未開始">未開始</option>
                             <option value="準備中">準備中</option>
                             <option value="活動中">活動中</option>
@@ -323,11 +331,37 @@
                     <%@ page import="java.util.List" %>
                     <% List<String> jobtypes = (List<String>) request.getAttribute("jobtypes"); %>
                     <div class="form-group">
-                        <label for="targetIndustry">希望職種</label>
-                        <select id="targetIndustry" name="targetIndustry">
-                            <option value="">選択してください</option>
+                        <label for="targetIndustry">第一希望職種</label>
+                        <select id="targetIndustry1" name="targetIndustry1">
+                            <option value="0">選択してください</option>
+                            <% int i = 1; %>
                             <% for (String jobtype : jobtypes) {%>
-                                <option value="<%= jobtype %>"><%= jobtype %></option>
+                                <option value="<%= i %>"><%= jobtype %></option>
+                                <% i++; %>
+                            <% } %>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetIndustry">第二希望職種</label>
+                        <select id="targetIndustry2" name="targetIndustry2">
+                            <option value="0">選択してください</option>
+                            <% int j = 1; %>
+                            <% for (String jobtype : jobtypes) {%>
+                                <option value="<%= j %>"><%= jobtype %></option>
+                                <% j++; %>
+                            <% } %>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="targetIndustry">第三希望職種</label>
+                        <select id="targetIndustry3" name="targetIndustry3">
+                            <option value="0">選択してください</option>
+                            <% int k = 1; %>
+                            <% for (String jobtype : jobtypes) {%>
+                                <option value="<%= k %>"><%= jobtype %></option>
+                                <% k++; %>
                             <% } %>
                         </select>
                     </div>
