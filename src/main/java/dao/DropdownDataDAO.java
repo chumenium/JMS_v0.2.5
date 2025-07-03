@@ -78,4 +78,19 @@ public class DropdownDataDAO {
         }
         return years;
     }
+
+    public List<String> getJobtypes() {
+        List<String> jobtypes = new ArrayList<>();
+        String sql = "SELECT DISTINCT occupation FROM occupations_tbl ORDER BY occupation";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                jobtypes.add(rs.getString("occupation"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return jobtypes;
+    }
 }

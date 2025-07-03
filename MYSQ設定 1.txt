@@ -1,0 +1,188 @@
+
+一括作成
+------------------------------------------
+drop database jms;
+create database jms;
+use jms;
+
+CREATE TABLE occupations_tbl (
+	occupation_id INT AUTO_INCREMENT PRIMARY KEY,
+	occupation VARCHAR(25)
+);
+CREATE TABLE companys_tbl (
+	companys_id INT AUTO_INCREMENT PRIMARY KEY,
+	company_name VARCHAR(50),
+	post_code VARCHAR(10),
+	address VARCHAR(100),
+	tel VARCHAR(15),
+	mail_address VARCHAR(30),
+	manager_name VARCHAR(20),
+	recruitment_results boolean
+);
+CREATE TABLE selection_tbl (
+	selection_id INT AUTO_INCREMENT PRIMARY KEY,
+	selection_name VARCHAR(20)
+);
+
+CREATE TABLE users (
+    id VARCHAR(8) PRIMARY KEY,
+    password VARCHAR(255),
+    role  ENUM('student','teacher','headmaster','egd','admin'),
+    salt VARCHAR(255)
+);
+CREATE TABLE teacher_tbl(
+	teacher_id CHAR(8) PRIMARY KEY,
+	name VARCHAR(20),
+	FOREIGN KEY (teacher_id) REFERENCES users(id)
+);
+
+CREATE TABLE students_tbl (
+	student_id VARCHAR(8) PRIMARY KEY,
+	department VARCHAR(3),
+	class VARCHAR(3),
+	number VARCHAR(3),
+	name VARCHAR(20),
+	name_reading VARCHAR(40),
+	gender ENUM('男','女'),
+	enrollment_status ENUM('在籍','退学','休学','卒業'),
+	mediation_status ENUM('受理','辞退'),
+	desired_job_type_1st_id INT,
+	desired_job_type_2nd_id INT,
+	desired_job_type_3rd_id INT,
+	graduation_year INT,
+	FOREIGN KEY (student_id) REFERENCES users(id),
+	FOREIGN KEY (desired_job_type_1st_id) REFERENCES occupations_tbl(occupation_id),
+	FOREIGN KEY (desired_job_type_2nd_id) REFERENCES occupations_tbl(occupation_id),
+	FOREIGN KEY (desired_job_type_3rd_id) REFERENCES occupations_tbl(occupation_id)
+);
+CREATE TABLE job_activity_tbl (
+	student_id VARCHAR(8),
+	companys_id INT,
+	activity_status ENUM('未開始','準備中','活動中','内定済み','就職決定','就職辞退'),
+	reporte_date DATE,
+	PRIMARY KEY (student_id, companys_id),
+	FOREIGN KEY (student_id) REFERENCES students_tbl(student_id),
+	FOREIGN KEY (companys_id) REFERENCES companys_tbl(companys_id)
+);
+CREATE TABLE job_activity_detail_tbl (
+	student_id VARCHAR(8),
+	companys_id INT,
+	selection_id INT,
+	date DATE,
+	time TIME,
+	venue VARCHAR(30),
+	remarks VARCHAR(200),
+	PRIMARY KEY (student_id, companys_id, selection_id),
+	FOREIGN KEY (student_id) REFERENCES students_tbl(student_id),
+	FOREIGN KEY (companys_id) REFERENCES companys_tbl(companys_id),
+	FOREIGN KEY (selection_id) REFERENCES selection_tbl(selection_id)
+);
+
+CREATE TABLE work_place_tbl (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	work_place VARCHAR(15)
+);
+
+CREATE TABLE students_work_place_tbl (
+	student_id CHAR(8),
+	work_place_id INT,
+	PRIMARY KEY (student_id, work_place_id),
+	FOREIGN KEY (work_place_id) REFERENCES work_place_tbl(id),
+	FOREIGN KEY (student_id) REFERENCES students_tbl(student_id)
+);
+CREATE TABLE company_work_place_tbl (
+	companys_id INT,
+	work_place_id INT,
+	PRIMARY KEY (companys_id, work_place_id),
+	FOREIGN KEY (work_place_id) REFERENCES work_place_tbl(id),
+	FOREIGN KEY (companys_id) REFERENCES companys_tbl(companys_id)
+);
+CREATE TABLE company_occupation_tbl (
+	companys_id INT,
+	occupation_id INT,
+	PRIMARY KEY (companys_id, occupation_id),
+	FOREIGN KEY (occupation_id) REFERENCES occupations_tbl(occupation_id),
+	FOREIGN KEY (companys_id) REFERENCES companys_tbl(companys_id)
+);
+
+ALTER TABLE students_tbl
+  ADD email VARCHAR(50) after gender;
+
+ALTER TABLE students_tbl
+  ADD tel VARCHAR(50) after email;
+
+ALTER TABLE students_tbl
+  ADD remarks VARCHAR(500);
+-------------------------------------------
+
+テストデータ
+
+INSERT INTO occupations_tbl(occupation) VALUES("システムエンジニア");
+INSERT INTO occupations_tbl(occupation) VALUES("プログラマー");
+INSERT INTO occupations_tbl(occupation) VALUES("インフラエンジニア");
+INSERT INTO occupations_tbl(occupation) VALUES("システム運用保守");
+INSERT INTO occupations_tbl(occupation) VALUES("ITコンサルタント");
+INSERT INTO occupations_tbl(occupation) VALUES("ゲームクリエイター");
+INSERT INTO occupations_tbl(occupation) VALUES("WEBデザイナー");
+INSERT INTO occupations_tbl(occupation) VALUES("フロントエンドエンジニア");
+INSERT INTO occupations_tbl(occupation) VALUES("バックエンドエンジニア");
+INSERT INTO occupations_tbl(occupation) VALUES("組込開発エンジニア");
+INSERT INTO occupations_tbl(occupation) VALUES("販売・営業");
+INSERT INTO occupations_tbl(occupation) VALUES("事務職");
+
+INSERT INTO work_place_tbl(work_place) VALUES("北海道");
+INSERT INTO work_place_tbl(work_place) VALUES("青森県");
+INSERT INTO work_place_tbl(work_place) VALUES("岩手県");
+INSERT INTO work_place_tbl(work_place) VALUES("宮城県");
+INSERT INTO work_place_tbl(work_place) VALUES("秋田県");
+INSERT INTO work_place_tbl(work_place) VALUES("山形県");
+INSERT INTO work_place_tbl(work_place) VALUES("福島県");
+INSERT INTO work_place_tbl(work_place) VALUES("茨城県");
+INSERT INTO work_place_tbl(work_place) VALUES("栃木県");
+INSERT INTO work_place_tbl(work_place) VALUES("群馬県");
+INSERT INTO work_place_tbl(work_place) VALUES("埼玉県");
+INSERT INTO work_place_tbl(work_place) VALUES("千葉県");
+INSERT INTO work_place_tbl(work_place) VALUES("東京都");
+INSERT INTO work_place_tbl(work_place) VALUES("神奈川県");
+INSERT INTO work_place_tbl(work_place) VALUES("新潟県");
+INSERT INTO work_place_tbl(work_place) VALUES("富山県");
+INSERT INTO work_place_tbl(work_place) VALUES("石川県");
+INSERT INTO work_place_tbl(work_place) VALUES("福井県");
+INSERT INTO work_place_tbl(work_place) VALUES("山梨県");
+INSERT INTO work_place_tbl(work_place) VALUES("長野県");
+INSERT INTO work_place_tbl(work_place) VALUES("岐阜県");
+INSERT INTO work_place_tbl(work_place) VALUES("静岡県");
+INSERT INTO work_place_tbl(work_place) VALUES("愛知県");
+INSERT INTO work_place_tbl(work_place) VALUES("三重県");
+INSERT INTO work_place_tbl(work_place) VALUES("滋賀県");
+INSERT INTO work_place_tbl(work_place) VALUES("京都府");
+INSERT INTO work_place_tbl(work_place) VALUES("大阪府");
+INSERT INTO work_place_tbl(work_place) VALUES("兵庫県");
+INSERT INTO work_place_tbl(work_place) VALUES("奈良県");
+INSERT INTO work_place_tbl(work_place) VALUES("和歌山県");
+INSERT INTO work_place_tbl(work_place) VALUES("鳥取県");
+INSERT INTO work_place_tbl(work_place) VALUES("島根県");
+INSERT INTO work_place_tbl(work_place) VALUES("岡山県");
+INSERT INTO work_place_tbl(work_place) VALUES("広島県");
+INSERT INTO work_place_tbl(work_place) VALUES("山口県");
+INSERT INTO work_place_tbl(work_place) VALUES("徳島県");
+INSERT INTO work_place_tbl(work_place) VALUES("香川県");
+INSERT INTO work_place_tbl(work_place) VALUES("愛媛県");
+INSERT INTO work_place_tbl(work_place) VALUES("高知県");
+INSERT INTO work_place_tbl(work_place) VALUES("福岡県");
+INSERT INTO work_place_tbl(work_place) VALUES("佐賀県");
+INSERT INTO work_place_tbl(work_place) VALUES("長崎県");
+INSERT INTO work_place_tbl(work_place) VALUES("熊本県");
+INSERT INTO work_place_tbl(work_place) VALUES("大分県");
+INSERT INTO work_place_tbl(work_place) VALUES("宮崎県");
+INSERT INTO work_place_tbl(work_place) VALUES("鹿児島県");
+INSERT INTO work_place_tbl(work_place) VALUES("沖縄県");
+INSERT INTO work_place_tbl(work_place) VALUES("海外");
+INSERT INTO work_place_tbl(work_place) VALUES("その他");
+
+
+
+
+
+
+--------------------------------------------
