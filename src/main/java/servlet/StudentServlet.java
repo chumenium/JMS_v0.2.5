@@ -144,7 +144,7 @@ public class StudentServlet extends HttpServlet {
                 }
     	        int graduation_year = 0;
     	        if (admission_year_str != null && !admission_year_str.trim().isEmpty()) {
-    	            graduation_year = Integer.parseInt(admission_year_str) + puls_num;
+    	            graduation_year = Integer.parseInt(admission_year_str) + plus_num;
     	        }
                 String desired_job_type_1st = request.getParameter("targetIndustry1");
                 String desired_job_type_2nd = request.getParameter("targetIndustry2");

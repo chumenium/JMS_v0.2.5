@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>JMSアプリ - 拡張機能</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="本アプリは就職対策アプリです。">
+<link rel="stylesheet" href="css/style.css">
+<style>
+    .extension-container {
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 40px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+    
+    .extension-icon {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        display: block;
+    }
+    
+    .extension-title {
+        font-size: 2rem;
+        color: #2C7744;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+    
+    .extension-subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 30px;
+    }
+    
+    .extension-description {
+        color: #555;
+        line-height: 1.8;
+        margin-bottom: 40px;
+        text-align: left;
+    }
+    
+    .back-button {
+        background: linear-gradient(45deg, #2C7744, #5CA564);
+        color: white;
+        padding: 15px 30px;
+        border: none;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 1.1rem;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+    
+    .back-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(44, 119, 68, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .status-badge {
+        background: #ff9800;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: bold;
+        display: inline-block;
+        margin-bottom: 20px;
+    }
+</style>
+</head>
+
+<body>
+<div id="container">
+    <!--▼▼▼▼▼ここから「ヘッダー」-->
+    <header>
+        <h1 id="logo"><a href="index.html"><img src="images/logo.png" alt="jms"></a></h1>
+        <nav>
+            <ul>
+                <li><a href="login.html">ログイン</a></li>
+                <li><a href="index.html#koe">在校生の声</a></li>
+                <li><a href="index.html#faq">よく頂く質問</a></li>
+                <li><a href="index.html#flow">就職活動の流れ</a></li>
+                <li><a href="extension.html">お問い合わせ</a></li>
+            </ul>
+        </nav>
+    </header>
+    <!--▲▲▲▲▲ここまで「ヘッダー」-->
+
+    <main>
+        <div class="extension-container">
+            <span class="extension-icon">🚧</span>
+            <div class="status-badge">開発中</div>
+            <h2 class="extension-title">拡張機能</h2>
+            <p class="extension-subtitle">お問い合わせ・資料請求機能</p>
+            
+            <div class="extension-description">
+                <p>この機能は現在仕様として開発中です。</p>
+                <p>以下の機能が予定されています：</p>
+                <ul style="text-align: left; margin: 20px 0;">
+                    <li>お問い合わせフォーム</li>
+                    <li>資料請求フォーム</li>
+                    <li>お問い合わせ履歴管理</li>
+                    <li>自動返信機能</li>
+                    <li>管理者向け問い合わせ管理画面</li>
+                </ul>
+                <p>機能の詳細やリリース予定については、開発チームまでお問い合わせください。</p>
+            </div>
+            
+            <a href="index.html" class="back-button">ホームに戻る</a>
+        </div>
+    </main>
+
+    <!--▼▼▼▼▼ここから「フッター」-->
+    <footer>
+        <div>
+            <p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
+            <ul class="icons">
+                <li><a href="#"><i class="fa-brands fa-x-twitter"></i></a></li>
+                <li><a href="#"><i class="fab fa-line"></i></a></li>
+                <li><a href="#"><i class="fab fa-youtube"></i></a></li>
+                <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+            </ul>
+            <small>Copyright&copy; @ 2025 Job Management System All Rights Reserved.</small>
+        </div>
+        <div>
+            <ul>
+                <li><a href="index.html#koe">在校生の声</a></li>
+                <li><a href="index.html#faq">よく頂く質問</a></li>
+                <li><a href="index.html#flow">就職活動の流れ</a></li>
+                <li><a href="extension.html">お問い合わせ</a></li>
+            </ul>
+        </div>
+    </footer>
+    <!--▲▲▲▲▲ここまで「フッター」-->
+
+    <!--▼▼最下部-->
+    <span class="pr"><a href="" target="_blank">@ 2025 Job Management System</a></span>
+    <!--▲▲ここまで最下部-->
+</div>
+<!--/#container-->
+
+<!--ローディング-->
+<div id="loading">
+    <img src="images/logo.png" alt="Loading">
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+    </div>
+</div>
+
+<!--開閉ボタン（ハンバーガーアイコン）-->
+<div id="menubar_hdr">
+    <span></span><span></span><span></span>
+</div>
+
+<!--開閉ブロック-->
+<div id="menubar">
+    <p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
+    <nav>
+        <ul>
+            <li><a href="index.html">ホーム</a></li>
+            <li><a href="login.html">ログイン</a></li>
+            <li><a href="index.html#koe">在校生の声</a></li>
+            <li><a href="index.html#faq">よく頂く質問</a></li>
+            <li><a href="index.html#flow">就職活動の流れ</a></li>
+            <li><a href="extension.html">お問い合わせ</a></li>
+        </ul>
+    </nav>
+</div>
+<!--/#menubar-->
+
+<!--jQueryの読み込み-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<!--パララックス（inview）-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/protonet-jquery.inview/1.1.2/jquery.inview.min.js"></script>
+<script src="js/jquery.inview_set.js"></script>
+<!--このテンプレート専用のスクリプト-->
+<script src="js/main.js"></script>
+
+</body>
+</html> 
