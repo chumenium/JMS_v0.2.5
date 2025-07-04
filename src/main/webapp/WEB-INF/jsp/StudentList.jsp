@@ -415,6 +415,9 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
+        <div>.</div>
+        <div>.</div>
+        <div>.</div>
         <div class="student-list-container">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
@@ -441,7 +444,7 @@
                         <th>学籍番号</th>
                         <th>氏名</th>
                         <th>クラス</th>
-                        <th>進路状況</th>
+                        <th>就活状況</th>
                         <th>操作</th>
                     </tr>
                 </thead>
