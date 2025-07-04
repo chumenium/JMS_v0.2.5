@@ -81,7 +81,7 @@ public class DropdownDataDAO {
 
     public List<String> getJobtypes() {
         List<String> jobtypes = new ArrayList<>();
-        String sql = "SELECT DISTINCT occupation FROM occupations_tbl ORDER BY occupation";
+        String sql = "SELECT DISTINCT occupation FROM occupations_tbl WHERE occupation_id != 0";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql);
              ResultSet rs = pstmt.executeQuery()) {
