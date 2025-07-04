@@ -432,7 +432,7 @@
             </header>
 
             <!-- 検索バー -->
-            <form class="search-bar" method="get" action="StudentServlet">
+            <form class="search-bar" method="post" action="StudentServlet" id="action" value="search">
                 <input type="text" name="keyword" placeholder="氏名・学籍番号・クラスなどで検索..." aria-label="検索キーワード" value="${keyword != null ? keyword : ''}">
                 <button type="submit" aria-label="検索">🔍 検索</button>
             </form>

@@ -90,7 +90,7 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/jobHunting.jsp";
 	                    break;
 	                case "CompanyManagement":
-	                    nextPage = "/WEB-INF/jsp/CompanyManagement.jsp";
+	                    nextPage = "/WEB-INF/jsp/companyManagement.jsp";
 	                    break;
 	                case "applicantList":
 	                    nextPage = "/WEB-INF/jsp/applicantList.jsp";

@@ -395,7 +395,104 @@ public class StudentServlet extends HttpServlet {
                 stmt1.executeUpdate();
 
                 request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
+            }else if ("search".equals(action)) {
+                System.out.println("searchの処理をします");
+                String keyword = request.getParameter("keyword");
+                String pageParam = request.getParameter("page");
+                int page = 1;
+                int pageSize = 10; // 1ページあたりの表示件数
                 
+                if (pageParam != null) {
+                    try {
+                        page = Integer.parseInt(pageParam);
+                    } catch (NumberFormatException e) {
+                        page = 1;
+                    }
+                }
+
+                ArrayList<ArrayList<String>> students = new ArrayList<>();
+                int totalCount = 0;
+                
+                try (Connection conn2 = DBConnection.getConnection()) {
+                    // 検索条件に基づくWHERE句の構築
+                    String whereClause = "";
+                    if (keyword != null && !keyword.trim().isEmpty()) {
+                        whereClause = " WHERE student_id LIKE ? OR name LIKE ? OR CONCAT(department, class) LIKE ? OR job_hunting_status LIKE ?";
+                    }
+                    
+                    // 総件数取得
+                    String countSql = "SELECT COUNT(*) FROM students_tbl" + whereClause;
+                    PreparedStatement countStmt = conn2.prepareStatement(countSql);
+                    
+                    if (!whereClause.isEmpty()) {
+                        String likePattern = "%" + keyword + "%";
+                        countStmt.setString(1, likePattern);
+                        countStmt.setString(2, likePattern);
+                        countStmt.setString(3, likePattern);
+                        countStmt.setString(4, likePattern);
+                    }
+                    
+                    ResultSet countRs = countStmt.executeQuery();
+                    if (countRs.next()) {
+                        totalCount = countRs.getInt(1);
+                    }
+                    
+                    // 学生データ取得
+                    String sql = "SELECT student_id, name, department, class, job_hunting_status FROM students_tbl";
+                    PreparedStatement stmt = conn2.prepareStatement(sql);
+                    ResultSet rs = stmt.executeQuery();
+                    //ArrayList<ArrayList<String>> students = new ArrayList<>();
+                    ArrayList<String> studentids = new ArrayList<>();
+                    ArrayList<String> names = new ArrayList<>();
+                    ArrayList<String> classs = new ArrayList<>();
+                    ArrayList<String> enrollmentStatuss = new ArrayList<>();
+                    while(rs.next()) {
+                        studentids.add(rs.getString("student_id"));
+                        names.add(rs.getString("name"));
+                        classs.add(rs.getString("department") + rs.getString("class"));
+                        enrollmentStatuss.add(rs.getString("job_hunting_status"));
+                    }
+                    ArrayList<String> studentids2 = new ArrayList<>();
+                    ArrayList<String> names2 = new ArrayList<>();
+                    ArrayList<String> classs2 = new ArrayList<>();
+                    ArrayList<String> enrollmentStatuss2 = new ArrayList<>();
+                    String[] keywords = keyword.split(" ");
+                    for(int i = 0; i < studentids.size(); i++) {
+                        for(int j = 0; j < keywords.length; j++) {
+                            String date = studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i);
+                            if(date.matches(".*"+keywords[j]+".*")) {
+                                studentids2.add(studentids.get(i));
+                                names2.add(names.get(i));
+                                classs2.add(classs.get(i));
+                                enrollmentStatuss2.add(enrollmentStatuss.get(i));
+                            }
+                            System.out.println(studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i));
+                        }
+                    }
+
+                    students.add(studentids2);
+                    students.add(names2);
+                    students.add(classs2);
+                    students.add(enrollmentStatuss2);
+                    
+                } catch (Exception e) {
+                    System.err.println("Database error in search: " + e.getMessage());
+                    e.printStackTrace();
+                    // エラーが発生した場合でも空のリストを設定
+                    students.add(new ArrayList<>());
+                    students.add(new ArrayList<>());
+                    students.add(new ArrayList<>());
+                    students.add(new ArrayList<>());
+                    totalCount = 0;
+                }
+                
+                int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+                request.setAttribute("students", students);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("keyword", keyword);
+
+                request.getRequestDispatcher("/WEB-INF/jsp/StudentList.jsp").forward(request, response);
             } else if ("viewStudents".equals(action)) {
     	        String student_id = request.getParameter("student_id");
     	        String student_class = request.getParameter("class");
@@ -814,10 +911,10 @@ public class StudentServlet extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             
-            System.out.println("StudentServlet: JSPフォワード開始 - StudentList.jsp");
-            System.out.println("StudentServlet: 学生数 = " + students.get(0).size());
-            System.out.println("StudentServlet: 現在ページ = " + page);
-            System.out.println("StudentServlet: 総ページ数 = " + totalPages);
+            // System.out.println("StudentServlet: JSPフォワード開始 - StudentList.jsp");
+            // System.out.println("StudentServlet: 学生数 = " + students.get(0).size());
+            // System.out.println("StudentServlet: 現在ページ = " + page);
+            // System.out.println("StudentServlet: 総ページ数 = " + totalPages);
             
             request.getRequestDispatcher("/WEB-INF/jsp/StudentList.jsp").forward(request, response);
         } catch (Exception e) {

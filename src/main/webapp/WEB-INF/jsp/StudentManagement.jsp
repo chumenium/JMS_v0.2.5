@@ -595,12 +595,12 @@
                     <a href="StatusServlet?status=createStudent" class="action-btn" aria-label="新規学生登録">
                         <i class="fas fa-plus" aria-hidden="true"></i>新規学生登録
                     </a>
-                    <a href="StatusServlet?view=studentSearch" class="action-btn secondary" aria-label="学生検索">
+                    <!-- <a href="StatusServlet?view=studentSearch" class="action-btn secondary" aria-label="学生検索">
                         <i class="fas fa-search" aria-hidden="true"></i>学生検索
                     </a>
                     <a href="StatusServlet?view=studentExport" class="action-btn secondary" aria-label="データエクスポート">
                         <i class="fas fa-download" aria-hidden="true"></i>データエクスポート
-                    </a>
+                    </a> -->
                 </div>
             </section>
 
