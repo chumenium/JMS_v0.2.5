@@ -211,8 +211,42 @@ public class StudentServlet extends HttpServlet {
                     request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
                     request.getRequestDispatcher("/WEB-INF/jsp/CreateStudent.jsp").forward(request, response);
                 }
-
-            
+            //学生情報の詳細を取得する
+            }else if ("detail".equals(action)) {
+                String student_id = request.getParameter("student_id");
+                String sql = "SELECT * FROM students_tbl WHERE student_id = ?";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+                stmt.setString(1, student_id);
+                ResultSet rs = stmt.executeQuery();
+                if(rs.next()) {
+                    request.setAttribute("student_id", rs.getString("student_id"));
+                    request.setAttribute("student_class", rs.getString("class"));
+                    request.setAttribute("department", rs.getString("department"));
+                    request.setAttribute("number", rs.getString("number"));
+                    request.setAttribute("name", rs.getString("name"));
+                    request.setAttribute("name_reading", rs.getString("name_reading"));
+                    request.setAttribute("gender", rs.getString("gender"));
+                    request.setAttribute("email", rs.getString("email"));
+                    request.setAttribute("tel", rs.getString("tel"));
+                    request.setAttribute("enrollment_status", rs.getString("enrollment_status"));
+                    request.setAttribute("mediation_status", rs.getString("mediation_status"));
+                    request.setAttribute("job_hunting_status", rs.getString("job_hunting_status"));
+                    request.setAttribute("desired_job_type_1st", rs.getString("desired_job_type_1st"));
+                    request.setAttribute("desired_job_type_2nd", rs.getString("desired_job_type_2nd"));
+                    request.setAttribute("desired_job_type_3rd", rs.getString("desired_job_type_3rd"));
+                    request.setAttribute("graduation_year", rs.getString("graduation_year"));
+                    request.setAttribute("remarks", rs.getString("remarks"));
+                }
+                String sql2 = "SELECT wp.work_place FROM students_work_place_tbl swp JOIN work_place_tbl wp ON swp.work_place_id = wp.id WHERE swp.student_id = ?";
+                PreparedStatement stmt2 = conn.prepareStatement(sql2);
+                stmt2.setString(1, student_id);
+                ResultSet rs2 = stmt2.executeQuery();
+                ArrayList<String> work_place = new ArrayList<String>();
+                while(rs2.next()) {
+                    work_place.add(rs2.getString("work_place"));
+                }
+                request.setAttribute("work_place", work_place);
+                request.getRequestDispatcher("/WEB-INF/jsp/StudentDetail.jsp").forward(request, response);
             //-------------------------------完成-------------------------------
             } else if ("update".equals(action)) {
                 // 学生情報を更新する
@@ -744,7 +778,7 @@ public class StudentServlet extends HttpServlet {
                 }
 
                 // 学生一覧取得SQL（シンプル版）
-                String sql = "SELECT student_id, name, department, class, enrollment_status FROM students_tbl ORDER BY student_id LIMIT ? OFFSET ?";
+                String sql = "SELECT student_id, name, department, class, job_hunting_status FROM students_tbl ORDER BY student_id LIMIT ? OFFSET ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setInt(1, pageSize);
                 stmt.setInt(2, (page - 1) * pageSize);
@@ -758,7 +792,7 @@ public class StudentServlet extends HttpServlet {
                     studentids.add(rs.getString("student_id"));
                     names.add(rs.getString("name"));
                     classs.add(rs.getString("department") + rs.getString("class"));
-                    enrollmentStatuss.add(rs.getString("enrollment_status"));
+                    enrollmentStatuss.add(rs.getString("job_hunting_status"));
                 }
                 students.add(studentids);
                 students.add(names);
