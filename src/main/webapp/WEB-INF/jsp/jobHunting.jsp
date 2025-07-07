@@ -1,11 +1,11 @@
 <!--*
 ：：：色のテーマは緑：：：
-企業管理画面
+就職管理画面
 
 
 **********
 
-<!--* 画面：企業管理画面
+<!--* 画面：就職管理画面
         	
 許可されている権限：
 ・教員：teacher
@@ -21,7 +21,7 @@
 <!--KCS_JMS_PROJECT-->
 
 
-<!-- 企業管理画面用 -->
+<!-- 就職管理画面用 -->
 
 
 
@@ -59,7 +59,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>JMSアプリ - 学生管理</title>
+<title>JMSアプリ - 就職管理画面</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
@@ -563,12 +563,12 @@
         <div class="student-management-container">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
-                <h1 class="page-title">企業管理</h1>
-                <p class="page-subtitle">企業情報の管理と就職活動の進捗を把握できます</p>
+                <h1 class="page-title">就活管理</h1>
+                <p class="page-subtitle">就活の選考ステージ登録や試験面接情報の入力、書類チェック、<br>受験予定者抽出、活動報告自動出力などの画面に遷移できます。</p>
                 <nav class="breadcrumb" aria-label="パンくずリスト">
                     <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
                     <span class="separator" aria-hidden="true">/</span>
-                    <span>学生管理</span>
+                    <span>就活管理</span>
                 </nav>
             </header>
 
@@ -588,17 +588,23 @@
             <section class="quick-actions" role="region" aria-label="操作一覧">
                 <h2>🚀 操作一覧</h2>
                 <div class="action-buttons">
-                    <a href="StudentServlet" class="action-btn" aria-label="学生一覧を表示">
+                    <a href="CompanyServlet" class="action-btn" aria-label="企業一覧画面へ">
                         <i class="fas fa-list" aria-hidden="true"></i>企業一覧を表示
+                    </a>						 <!-- 画面上は「選考ステージ登録と表示する-->
+                    <a href="StatusServlet?status=          " class="action-btn" aria-label="就活情報検索画面へ">
+                        <i class="fas fa-selection" aria-hidden="true"></i>選考ステージ登録
                     </a>
-                    <a href="StatusServlet?status=createStudent" class="action-btn" aria-label="新規学生登録">
-                        <i class="fas fa-plus" aria-hidden="true"></i>企業登録
+                    <a href="StatusServlet?view=         " class="action-btn secondary" aria-label="試験面接情報入力画面へ">
+                        <i class="fas fa-exam" aria-hidden="true"></i>試験面接情報入力
                     </a>
-                    <a href="StatusServlet?view=studentSearch" class="action-btn secondary" aria-label="学生検索">
-                        <i class="fas fa-search" aria-hidden="true"></i>企業検索
+                    <a href="StatusServlet?view=       " class="action-btn secondary" aria-label="書類提出チェック画面へ">
+                        <i class="fas fa-Document submission" aria-hidden="true"></i>書類提出チェック
                     </a>
-                    <a href="StatusServlet?view=studentExport" class="action-btn secondary" aria-label="データエクスポート">
-                        <i class="fas fa-download" aria-hidden="true"></i>データエクスポート
+                     <a href="StatusServlet?view=      " class="action-btn secondary" aria-label="受験予定者抽出画面へ">
+                        <i class="fas fa-Examination" aria-hidden="true"></i>受験予定者抽出
+                    </a>
+                     <a href="StatusServlet?view=        " class="action-btn secondary" aria-label="活動報告自動出力画面へ">
+                        <i class="fas fa-Activity Report" aria-hidden="true"></i>活動報告自動出力画面
                     </a>
                 </div>
             </section>
@@ -606,50 +612,47 @@
             <!-- メインコンテンツ -->
             <section class="management-main" role="region" aria-label="管理機能">
                 
-                <!-- 学生一覧管理 -->
+                <!-- 企業一覧管理 -->
                 <article class="management-card" role="article">
                     <span class="card-icon" aria-hidden="true">📋</span>
                     <h3 class="card-title">企業一覧管理</h3>
                     <p class="card-description">
-                        登録されている学生の一覧を表示し、詳細情報の確認や編集を行えます。
+                        登録されている企業の一覧を表示し、詳細情報の確認を行えます。
                     </p>
-                    
-                    <!-- DBからデータを取り寄せる部分 -->
-                    
                     <div class="card-stats" role="group" aria-label="学生統計">
                         <div class="stat-item">
-                            <span class="stat-number">150</span>
-                            <span class="stat-label">企業数</span>
+                            <span class="stat-number">250</span>
+                            <span class="stat-label">総企業数</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">45</span>
-                            <span class="stat-label">募集活動中</span>
+                            <span class="stat-number">67</span>
+                            <span class="stat-label">募集中企業</span>
                         </div>
                     </div>
-                    <a href="StudentServlet" class="card-link" aria-label="学生一覧を表示">
+                    <a href="CompanyServlet" class="card-link" aria-label="学生一覧を表示">
                         企業一覧を表示
                     </a>
                 </article>
 
-                <!-- 新規学生登録 -->
+                <!-- 選考ステージ登録 -->
                 <article class="management-card" role="article">
-                    <span class="card-icon" aria-hidden="true">👤</span>
-                    <h3 class="card-title">新規企業登録</h3>
+                    <span class="card-icon" aria-hidden="true">🚶‍♂️‍➡️</span>
+                    <h3 class="card-title">選考ステージ登録</h3>
                     <p class="card-description">
-                        新しい企業の情報を登録し、システムに追加できます。
+                        選考ステージを登録し、企業情報を追加できます。
                     </p>
                     <div class="card-stats" role="group" aria-label="登録統計">
                         <div class="stat-item">
-                            <span class="stat-number">12</span>
+                            <span class="stat-number">43</span>
                             <span class="stat-label">今月登録</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">3</span>
+                            <span class="stat-number">5</span>
                             <span class="stat-label">未完了</span>
                         </div>
                     </div>
-                    <a href="StatusServlet?status=createStudent" class="card-link" aria-label="新規学生を登録">
-                        新規企業を登録
+                    <a href="StatusServlet?status=       " class="card-link" aria-label="新規学生を登録">
+                        選考ステージを登録
                     </a>
                 </article>
             </section>
