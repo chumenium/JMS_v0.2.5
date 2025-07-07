@@ -1,12 +1,14 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.Map;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import dao.StatisticsDAO;
 
 /**
  * ダッシュボードサーブレット
@@ -36,6 +38,20 @@ public class DashboardServlet extends HttpServlet {
         String userId = (String) session.getAttribute("id");
         request.setAttribute("user_id", userId);
         request.setAttribute("user_role", role);
+        
+        // DAOを使用して統計情報を取得
+        try {
+            StatisticsDAO statisticsDAO = new StatisticsDAO();
+            Map<String, Object> dashboardStats = statisticsDAO.getDashboardStatistics();
+            request.setAttribute("dashboardStats", dashboardStats);
+            
+            // 最近の面接情報を取得
+            request.setAttribute("recentInterviews", statisticsDAO.getRecentInterviews(5));
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            // エラーが発生してもダッシュボードは表示
+        }
         
         // ダッシュボードページにフォワード
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/DashBoard.jsp");

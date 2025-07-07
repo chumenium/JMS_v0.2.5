@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -68,29 +69,31 @@ public class StudentServlet extends HttpServlet {
             return 0;
         }
     }
+    
     //引数で渡したステータスの学生すべてを取得する
     private ArrayList<ArrayList<String>> getStudentEnrollment(String enrollmentStatus) {
-    	 try (Connection conn = DBConnection.getConnection()) {
-    		 ArrayList<String> classs = new ArrayList<String>();
-    		 ArrayList<String> studentid = new ArrayList<String>();
-             String sql = "SELECT student_id, class FROM students_tbl WHERE enrollment_status = ?";
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             stmt.setString(1, enrollmentStatus);
-             ResultSet rs = stmt.executeQuery();
-             while (rs.next()) {
-            	 studentid.add(rs.getString("student_id"));
-            	 classs.add(rs.getString("class"));
-             }
-             ArrayList<ArrayList<String>> studentList = new ArrayList<>();
-             studentList.add(studentid);
-             studentList.add(classs);
-             
-             return studentList;
-    	 } catch (Exception e) {
-             e.printStackTrace();
-             return null;
-    	 }
-    	
+    	try {
+    		StudentDAO studentDAO = new StudentDAO();
+    		List<Map<String, Object>> students = studentDAO.getAllStudents();
+    		ArrayList<String> classs = new ArrayList<String>();
+    		ArrayList<String> studentid = new ArrayList<String>();
+    		
+    		for (Map<String, Object> student : students) {
+    			if (enrollmentStatus.equals(student.get("enrollment_status"))) {
+    				studentid.add((String) student.get("student_id"));
+    				classs.add((String) student.get("class"));
+    			}
+    		}
+    		
+    		ArrayList<ArrayList<String>> studentList = new ArrayList<>();
+    		studentList.add(studentid);
+    		studentList.add(classs);
+    		
+    		return studentList;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // セッションの確認

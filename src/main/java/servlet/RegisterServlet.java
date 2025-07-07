@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import dao.UserDAO;
 import utils.DBConnection;
 
 /**
@@ -85,14 +86,11 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        try (Connection connection = DBConnection.getConnection()) {
+        try {
+            UserDAO userDAO = new UserDAO();
+            
             // ユーザーIDの重複チェック
-            String checkQuery = "SELECT id FROM users WHERE id = ?";
-            PreparedStatement checkStmt = connection.prepareStatement(checkQuery);
-            checkStmt.setString(1, id);
-            ResultSet checkRs = checkStmt.executeQuery();
-
-            if (checkRs.next()) {
+            if (userDAO.isUsernameExists(id)) {
                 response.sendRedirect("register.html?error=" + 
                     java.net.URLEncoder.encode("このユーザーIDは既に使用されています", "UTF-8"));
                 return;
@@ -104,17 +102,10 @@ public class RegisterServlet extends HttpServlet {
             // パスワードハッシュ化
             String hashedPassword = hashPassword(password, salt);
 
-            // ユーザー登録
-            String insertQuery = "INSERT INTO users (id, password, role, salt) VALUES (?, ?, ?, ?)";
-            PreparedStatement insertStmt = connection.prepareStatement(insertQuery);
-            insertStmt.setString(1, id);
-            insertStmt.setString(2, hashedPassword);
-            insertStmt.setString(3, role);
-            insertStmt.setString(4, salt);
+            // DAOを使用してユーザー登録
+            boolean success = userDAO.registerUser(id, hashedPassword, "", role);
 
-            int result = insertStmt.executeUpdate();
-
-            if (result > 0) {
+            if (success) {
                 // 登録成功
                 response.sendRedirect("login.html?success=" + 
                     java.net.URLEncoder.encode("登録が完了しました。ログインしてください。", "UTF-8"));

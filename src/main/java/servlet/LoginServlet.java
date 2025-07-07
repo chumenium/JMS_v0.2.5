@@ -8,12 +8,15 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Base64;
+import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import dao.UserDAO;
+import dao.StudentDAO;
 import utils.DBConnection;
 
 /**
@@ -21,24 +24,19 @@ import utils.DBConnection;
  */
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-/**
+
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
 	public LoginServlet() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
-	
-	
-	//JMS
-	
+
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
@@ -46,114 +44,111 @@ public class LoginServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	
-	// パスワード�Eハッシュ化とソルト�E生�E
-    private String hashPassword(String password, String salt) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hashedBytes = md.digest((password + salt).getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hashedBytes) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
-    
-    //警告を抑制
-    @SuppressWarnings("unused")
-    //base64クラスを使用してソルトを
-    //エンコードフォーマット変更
+	// パスワードのハッシュ化とソルトの生成
+	private String hashPassword(String password, String salt) {
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-256");
+			byte[] hashedBytes = md.digest((password + salt).getBytes());
+			StringBuilder sb = new StringBuilder();
+			for (byte b : hashedBytes) {
+				sb.append(String.format("%02x", b));
+			}
+			return sb.toString();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	//警告を抑制
+	@SuppressWarnings("unused")
+	//base64クラスを使用してソルトを
+	//エンコードフォーマット変更
 	private String generateSalt() {
-        SecureRandom sr = new SecureRandom();
-        byte[] salt = new byte[16];
-        sr.nextBytes(salt);
-        return Base64.getEncoder().encodeToString(salt);
-    }
+		SecureRandom sr = new SecureRandom();
+		byte[] salt = new byte[16];
+		sr.nextBytes(salt);
+		return Base64.getEncoder().encodeToString(salt);
+	}
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        request.setCharacterEncoding("UTF-8");
-        response.setContentType("text/html; charset=UTF-8");
-        String id = request.getParameter("id");
-        String password = request.getParameter("password");
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setCharacterEncoding("UTF-8");
+		response.setContentType("text/html; charset=UTF-8");
+		String id = request.getParameter("id");
+		String password = request.getParameter("password");
 
-        try (Connection connection = DBConnection.getConnection()) {
-            // ソルトをチE�Eタベ�Eスから取征E
-            String saltQuery = "SELECT salt FROM users WHERE id = ?";
-            PreparedStatement saltStmt = connection.prepareStatement(saltQuery);
-            saltStmt.setString(1, id);
-            ResultSet saltRs = saltStmt.executeQuery();
+		try {
+			UserDAO userDAO = new UserDAO();
+			StudentDAO studentDAO = new StudentDAO();
+			
+			// ソルトをデータベースから取得
+			String saltQuery = "SELECT salt FROM users WHERE id = ?";
+			try (Connection connection = DBConnection.getConnection();
+				 PreparedStatement saltStmt = connection.prepareStatement(saltQuery)) {
+				
+				saltStmt.setString(1, id);
+				ResultSet saltRs = saltStmt.executeQuery();
 
-            if (saltRs.next()) {
-                String salt = saltRs.getString("salt");
-                String hashedPassword = hashPassword(password, salt);
+				if (saltRs.next()) {
+					String salt = saltRs.getString("salt");
+					String hashedPassword = hashPassword(password, salt);
 
-                String query = "SELECT id, role FROM users WHERE id = ? AND password = ?";
-                PreparedStatement statement = connection.prepareStatement(query);
-                statement.setString(1, id);
-                statement.setString(2, hashedPassword);
+					// DAOを使用してユーザー認証
+					Map<String, Object> user = userDAO.authenticateUser(id, hashedPassword);
 
-                ResultSet rs = statement.executeQuery();
+					if (user != null) {
+						HttpSession session = request.getSession();
+						String userId = (String) user.get("username");
+						String userRole = (String) user.get("role");
+						
+						// 表示名を決定（学生の場合はname、それ以外はid）
+						String displayName = userId;
+						if ("student".equals(userRole)) {
+							// 学生の場合はstudents_tblからnameを取得
+							Map<String, Object> student = studentDAO.getStudentById(userId);
+							if (student != null) {
+								displayName = (String) student.get("name");
+							}
+						} else if ("teacher".equals(userRole)) {
+							// 教員の場合はteacher_tblからnameを取得
+							String nameQuery = "SELECT name FROM teacher_tbl WHERE teacher_id = ?";
+							try (PreparedStatement nameStmt = connection.prepareStatement(nameQuery)) {
+								nameStmt.setString(1, userId);
+								ResultSet nameRs = nameStmt.executeQuery();
+								
+								if (nameRs.next()) {
+									displayName = nameRs.getString("name");
+								}
+							}
+						}
+						
+						session.setAttribute("username", displayName);
+						session.setAttribute("id", userId);
+						session.setAttribute("role", userRole);
 
-                if (rs.next()) {
-                	// LoginServlet#doPost(...)
-                	HttpSession session = request.getSession();  // セチE��ョンスコーチE
-                	String userId = rs.getString("id");
-                	String userRole = rs.getString("role");
-                	
-                	// 表示名を決定（学生�E場合�Ename、それ以外�Eid�E�E
-                	String displayName = userId;
-                	if ("student".equals(userRole)) {
-                		// 学生�E場合�Estudents_tblからnameを取征E
-                		String nameQuery = "SELECT name FROM students_tbl WHERE student_id = ?";
-                		PreparedStatement nameStmt = connection.prepareStatement(nameQuery);
-                		nameStmt.setString(1, userId);
-                		ResultSet nameRs = nameStmt.executeQuery();
-                		
-                		if (nameRs.next()) {
-                			displayName = nameRs.getString("name");
-                		}
-                	} else if ("teacher".equals(userRole)) {
-                		// 教員の場合�Eteacher_tblからnameを取征E
-                		String nameQuery = "SELECT name FROM teacher_tbl WHERE teacher_id = ?";
-                		PreparedStatement nameStmt = connection.prepareStatement(nameQuery);
-                		nameStmt.setString(1, userId);
-                		ResultSet nameRs = nameStmt.executeQuery();
-                		
-                		if (nameRs.next()) {
-                			displayName = nameRs.getString("name");
-                		}
-                	}
-                	
-                	session.setAttribute("username", displayName); // 表示名として保孁E
-                	session.setAttribute("id", userId);
-                	session.setAttribute("role", userRole);
-                	// �E�アプリケーションスコープには何も置かなぁE��E
+						// デバッグログ
+						System.out.println("LoginServlet: セッション接続完了");
+						System.out.println("LoginServlet: username = " + displayName);
+						System.out.println("LoginServlet: id = " + userId);
+						System.out.println("LoginServlet: role = " + userRole);
 
-                	// チE��チE��ログ
-                	System.out.println("LoginServlet: セッション接続完了");
-                	System.out.println("LoginServlet: username = " + displayName);
-                	System.out.println("LoginServlet: id = " + userId);
-                	System.out.println("LoginServlet: role = " + userRole);
-
-                    // ログイン成功時�EStatusServletにリダイレクチE
-                    response.sendRedirect(request.getContextPath() + "/StatusServlet?view=DashBoard");
-                } else {
-                    // ログイン失敗時はエラーペ�EジにリダイレクチE
-                    response.sendRedirect("error/login-failed.html?type=invalid_credentials");
-                }
-            } else {
-                // ユーザーIDが存在しなぁE��吁E
-                response.sendRedirect("error/login-failed.html?type=invalid_credentials");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            // チE�Eタベ�Eスエラーの場吁E
-            response.sendRedirect("error/login-failed.html?type=database_error");
-        }
-    }
+						// ログイン成功時はStatusServletにリダイレクト
+						response.sendRedirect(request.getContextPath() + "/StatusServlet?view=DashBoard");
+					} else {
+						// ログイン失敗時はエラーページにリダイレクト
+						response.sendRedirect("error/login-failed.html?type=invalid_credentials");
+					}
+				} else {
+					// ユーザーIDが存在しない場合
+					response.sendRedirect("error/login-failed.html?type=invalid_credentials");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			// データベースエラーの場合
+			response.sendRedirect("error/login-failed.html?type=database_error");
+		}
+	}
 }
 	
