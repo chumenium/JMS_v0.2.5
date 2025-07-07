@@ -438,7 +438,7 @@ public class StudentServlet extends HttpServlet {
                     }
                     
                     // 学生データ取得
-                    String sql = "SELECT student_id, name, department, class, job_hunting_status FROM students_tbl";
+                    String sql = "SELECT student_id, name, department, class, job_hunting_status, number, name_reading, gender, enrollment_status, mediation_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year FROM students_tbl s LEFT JOIN occupations_tbl o1 ON s.desired_job_type_1st_id = o1.occupation_id LEFT JOIN occupations_tbl o2 ON s.desired_job_type_2nd_id = o2.occupation_id LEFT JOIN occupations_tbl o3 ON s.desired_job_type_3rd_id = o3.occupation_id";
                     PreparedStatement stmt = conn2.prepareStatement(sql);
                     ResultSet rs = stmt.executeQuery();
                     //ArrayList<ArrayList<String>> students = new ArrayList<>();
@@ -446,11 +446,28 @@ public class StudentServlet extends HttpServlet {
                     ArrayList<String> names = new ArrayList<>();
                     ArrayList<String> classs = new ArrayList<>();
                     ArrayList<String> enrollmentStatuss = new ArrayList<>();
+                    ArrayList<String> numbers = new ArrayList<>();
+                    ArrayList<String> nameReadings = new ArrayList<>();
+                    ArrayList<String> genders = new ArrayList<>();
+                    ArrayList<String> mediationStatuss = new ArrayList<>();
+                    ArrayList<String> DJTs1 = new ArrayList<>();
+                    ArrayList<String> DJTs2 = new ArrayList<>();
+                    ArrayList<String> DJTs3 = new ArrayList<>();
+                    ArrayList<String> graduationYears = new ArrayList<>();
                     while(rs.next()) {
                         studentids.add(rs.getString("student_id"));
                         names.add(rs.getString("name"));
                         classs.add(rs.getString("department") + rs.getString("class"));
                         enrollmentStatuss.add(rs.getString("job_hunting_status"));
+                        numbers.add(rs.getString("number"));
+                        nameReadings.add(rs.getString("name_reading"));
+                        genders.add(rs.getString("gender"));
+                        enrollmentStatuss.add(rs.getString("enrollment_status"));
+                        mediationStatuss.add(rs.getString("mediation_status"));
+                        DJTs1.add(rs.getString("1st"));
+                        DJTs2.add(rs.getString("2nd"));
+                        DJTs3.add(rs.getString("3rd"));
+                        graduationYears.add(rs.getString("graduation_year"));
                     }
                     ArrayList<String> studentids2 = new ArrayList<>();
                     ArrayList<String> names2 = new ArrayList<>();
@@ -459,7 +476,7 @@ public class StudentServlet extends HttpServlet {
                     String[] keywords = keyword.split(" ");
                     for(int i = 0; i < studentids.size(); i++) {
                         for(int j = 0; j < keywords.length; j++) {
-                            String date = studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i);
+                            String date = studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i)+numbers.get(i)+nameReadings.get(i)+genders.get(i)+mediationStatuss.get(i)+DJTs1.get(i)+DJTs2.get(i)+DJTs3.get(i)+graduationYears.get(i);
                             if(date.matches(".*"+keywords[j]+".*")) {
                                 studentids2.add(studentids.get(i));
                                 names2.add(names.get(i));
