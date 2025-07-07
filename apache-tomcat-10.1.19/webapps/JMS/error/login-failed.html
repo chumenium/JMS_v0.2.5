@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ログイン失敗 - JMSアプリ</title>
+  <style>
+    /* リセット & ボックスモデル */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html, body { width:100%; min-height:100vh; font-family:'Noto Sans JP',sans-serif; }
+
+    /* 背景・中央揃え */
+    body {
+      background: linear-gradient(to right,#2C7744,#5CA564);
+      display:flex; align-items:center; justify-content:center;
+      overflow-x:hidden; color:#fff;
+    }
+
+    /* エラーコンテナ */
+    .error-container {
+      width:90vw; max-width:500px;
+      background:rgba(255,255,255,0.97);
+      border-radius:1rem; padding:3rem 2rem;
+      box-shadow:0 10px 30px rgba(0,0,0,0.2);
+      text-align:center; color:#333;
+    }
+
+    /* エラーアイコン */
+    .error-icon {
+      width:120px; height:120px; margin:0 auto 2rem;
+      border-radius:50%; overflow:hidden;
+      background:#ffebee; display:flex;
+      align-items:center; justify-content:center;
+      box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    }
+    .error-icon svg {
+      width:60%; height:60%; color:#f44336;
+    }
+
+    /* エラータイトル */
+    .error-title {
+      font-size:1.8rem; margin-bottom:1rem; color:#333;
+    }
+
+    /* エラーメッセージ */
+    .error-message {
+      font-size:1rem; margin-bottom:2rem; color:#666;
+      line-height:1.6;
+    }
+
+    /* 詳細情報 */
+    .error-details {
+      background:#f5f5f5; padding:1rem; border-radius:.5rem;
+      margin-bottom:2rem; text-align:left;
+    }
+    .error-details h3 {
+      font-size:1rem; margin-bottom:.5rem; color:#333;
+    }
+    .error-details p {
+      font-size:0.9rem; color:#666; margin-bottom:.5rem;
+    }
+
+    /* ボタン */
+    .button-group {
+      display:flex; gap:1rem; justify-content:center; flex-wrap:wrap;
+    }
+    .btn {
+      padding:.75rem 1.5rem; border:none; border-radius:.5rem;
+      font-size:1rem; font-weight:bold; cursor:pointer;
+      text-decoration:none; display:inline-block; transition:all .3s;
+    }
+    .btn-primary {
+      background:linear-gradient(to right,#2C7744,#5CA564);
+      color:#fff;
+    }
+    .btn-secondary {
+      background:#f5f5f5; color:#333; border:1px solid #ddd;
+    }
+    .btn:hover {
+      transform:translateY(-2px); box-shadow:0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* アニメーション */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+  </style>
+</head>
+<body>
+  <div class="error-container" id="errorContainer">
+    <div class="error-icon">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+      </svg>
+    </div>
+
+    <h1 class="error-title">ログインに失敗しました</h1>
+    <p class="error-message">
+      ユーザーIDまたはパスワードが正しくありません。<br>
+      入力内容をご確認ください。
+    </p>
+
+    <div class="error-details">
+      <h3>確認してください：</h3>
+      <p>• ユーザーIDが正しく入力されていますか？</p>
+      <p>• パスワードが正しく入力されていますか？</p>
+      <p>• Caps Lockがオンになっていませんか？</p>
+      <p>• アカウントが存在しますか？</p>
+    </div>
+
+    <div class="button-group">
+      <a href="javascript:history.back()" class="btn btn-secondary">前のページに戻る</a>
+      <a href="../login.html" class="btn btn-primary">ログイン画面に戻る</a>
+    </div>
+  </div>
+
+  <script>
+    // ページ読み込み時にシェイクアニメーション
+    window.addEventListener('load', () => {
+      const container = document.getElementById('errorContainer');
+      container.classList.add('shake');
+      
+      // アニメーション終了後にクラスを削除
+      setTimeout(() => {
+        container.classList.remove('shake');
+      }, 500);
+    });
+
+    // URLパラメータからエラーメッセージを取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorType = urlParams.get('type');
+    const errorMessage = urlParams.get('message');
+
+    if (errorMessage) {
+      document.querySelector('.error-message').textContent = decodeURIComponent(errorMessage);
+    }
+
+    // エラータイプに応じてメッセージを変更
+    if (errorType) {
+      const titleElement = document.querySelector('.error-title');
+      const messageElement = document.querySelector('.error-message');
+      
+      switch(errorType) {
+        case 'invalid_credentials':
+          titleElement.textContent = '認証に失敗しました';
+          messageElement.textContent = 'ユーザーIDまたはパスワードが正しくありません。';
+          break;
+        case 'account_locked':
+          titleElement.textContent = 'アカウントがロックされています';
+          messageElement.textContent = 'セキュリティのため、アカウントが一時的にロックされています。しばらく時間をおいてから再度お試しください。';
+          break;
+        case 'session_expired':
+          titleElement.textContent = 'セッションが切れました';
+          messageElement.textContent = 'セッションの有効期限が切れました。再度ログインしてください。';
+          break;
+        case 'database_error':
+          titleElement.textContent = 'システムエラーが発生しました';
+          messageElement.textContent = 'データベース接続でエラーが発生しました。しばらく時間をおいてから再度お試しください。';
+          break;
+      }
+    }
+  </script>
+</body>
+</html> 

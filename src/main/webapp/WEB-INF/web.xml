@@ -81,15 +81,7 @@
     <url-pattern>/LogoutServlet</url-pattern>
   </servlet-mapping>
   
-  <servlet>
-    <servlet-name>DashboardRedirectServlet</servlet-name>
-    <servlet-class>servlet.DashboardRedirectServlet</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>DashboardRedirectServlet</servlet-name>
-    <url-pattern>/DashboardRedirectServlet</url-pattern>
-  </servlet-mapping>
+
   
   <!-- テスト用ダッシュボードサーブレット（本番環境では削除すること） -->
   <servlet>
@@ -155,6 +147,17 @@
   <servlet-mapping>
     <servlet-name>DashboardServlet</servlet-name>
     <url-pattern>/DashboardServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 企業詳細・編集サーブレット -->
+  <servlet>
+    <servlet-name>CompanyDetailServlet</servlet-name>
+    <servlet-class>servlet.CompanyDetailServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CompanyDetailServlet</servlet-name>
+    <url-pattern>/CompanyDetailServlet</url-pattern>
   </servlet-mapping>
   
 </web-app>
