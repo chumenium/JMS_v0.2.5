@@ -135,4 +135,5 @@ logs/
 
 # Temporary files
 temp/
-tmp/ 
+tmp/ build/ 
+*.class 
