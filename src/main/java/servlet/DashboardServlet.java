@@ -20,7 +20,7 @@ public class DashboardServlet extends HttpServlet {
         
         // セッションの確認
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
+        if (session == null || session.getAttribute("id") == null) {
             response.sendRedirect(request.getContextPath() + "/login.html");
             return;
         }
@@ -33,7 +33,7 @@ public class DashboardServlet extends HttpServlet {
         }
         
         // ユーザーIDを取得
-        String userId = (String) session.getAttribute("user_id");
+        String userId = (String) session.getAttribute("id");
         request.setAttribute("user_id", userId);
         request.setAttribute("user_role", role);
         
@@ -48,7 +48,7 @@ public class DashboardServlet extends HttpServlet {
         
         // セッションの確認
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
+        if (session == null || session.getAttribute("id") == null) {
             response.sendRedirect(request.getContextPath() + "/login.html");
             return;
         }

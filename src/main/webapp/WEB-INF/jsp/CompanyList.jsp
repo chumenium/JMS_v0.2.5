@@ -19,695 +19,653 @@
 
 <!-- 企業管理画面用 -->
 
-<!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
 <% 
-  String username = (String) session.getAttribute("username"); 
-  String role     = (String) session.getAttribute("role"); 
+    String username = (String) session.getAttribute("username"); 
+    String role = (String) session.getAttribute("role"); 
+    if (username == null) username = "ゲスト";
+    if (role == null) role = "guest";
+    java.util.List<java.util.Map<String, Object>> companies = (java.util.List<java.util.Map<String, Object>>) request.getAttribute("companies");
+    Integer totalCompanies = (Integer) request.getAttribute("totalCompanies");
+    Integer recruitmentCompanies = (Integer) request.getAttribute("recruitmentCompanies");
 %>
 <!--▲▲▲▲▲-->
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>企業管理画面</title>
+<title>JMSアプリ - 企業一覧</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
 
-<!-- 企業管理画面用CSS -->
 <style>
-/* システム上見やすさを追求した学生一覧管理画面デザイン */
+    /* 企業一覧画面のスタイル */
+    .company-list-page {
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+    }
 
-/* 全体の設定 */
-.company-list-page {
-	background: #f8f9fa;
-	color: #2c3e50;
-	font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-	line-height: 1.6;
-}
+    .company-list-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 24px;
+        min-height: 100vh;
+        background: #ffffff;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
 
-.company-list-container {
-	max-width: 1400px;
-	margin: 0 auto;
-	padding: 24px;
-	min-height: 100vh;
-	background: #ffffff;
-	box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
-}
+    /* ダッシュボード用ヘッダー調整 */
+    .company-list-page header {
+        position: relative;
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
 
-/* ページヘッダー - 視認性向上 */
-.page-header {
-	background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
-	border-radius: 12px;
-	padding: 32px;
-	margin-bottom: 32px;
-	box-shadow: 0 4px 20px rgba(44, 119, 68, 0.15);
-	color: #000000;
-	text-align: center;
-	position: relative;
-	overflow: hidden;
-}
+    .company-list-page #mainimg {
+        display: none;
+    }
 
-.page-title {
-	font-size: 32px;
-	color: #000000;
-	margin-bottom: 12px;
-	font-weight: 700;
-	text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
-}
+    .company-list-page main {
+        margin-top: 0;
+    }
 
-.breadcrumb {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	gap: 12px;
-	font-size: 14px;
-	color: #000000;
-	margin-top: 16px;
-}
+    /* テキストスライドショー用の調整 */
+    .company-list-page .text-slide-wrapper {
+        margin-top: 0;
+        margin-bottom: 0;
+    }
 
-.breadcrumb a {
-	color: #000000;
-	text-decoration: none;
-	transition: all 0.2s ease;
-	padding: 6px 12px;
-	border-radius: 6px;
-	background: rgba(255, 255, 255, 0.3);
-	border: 1px solid rgba(255, 255, 255, 0.4);
-	font-weight: 600;
-}
+    .company-list-page .text-slide {
+        font-size: 8vw;
+        opacity: 0.08;
+    }
 
-.breadcrumb a:hover {
-	background: rgba(255, 255, 255, 0.5);
-	transform: translateY(-1px);
-	color: #000000;
-}
+    /* ページヘッダー */
+    .page-header {
+        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+        border-radius: 12px;
+        padding: 32px;
+        margin-bottom: 32px;
+        box-shadow: 0 4px 20px rgba(44, 119, 68, 0.15);
+        color: #000000;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-.breadcrumb .separator {
-	color: #000000;
-	font-weight: 600;
-}
+    .page-title {
+        font-size: 32px;
+        color: #000000;
+        margin-bottom: 12px;
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
 
-/* 検索バー - 視認性と操作性の向上 */
-.search-bar {
-	background: white;
-	border-radius: 12px;
-	padding: 24px;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-	border: 1px solid #e9ecef;
-	margin-bottom: 24px;
-	display: flex;
-	gap: 12px;
-	align-items: center;
-}
+    .page-subtitle {
+        font-size: 18px;
+        color: #000000;
+        margin-bottom: 24px;
+        line-height: 1.6;
+        font-weight: 600;
+    }
 
-.search-bar input[type="text"] {
-	flex: 1;
-	padding: 12px 16px;
-	border: 1px solid #e9ecef;
-	border-radius: 8px;
-	font-size: 16px;
-	transition: all 0.2s ease;
-}
+    .breadcrumb {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #000000;
+        margin-top: 16px;
+    }
 
-.search-bar input[type="text"]:focus {
-	outline: none;
-	border-color: #2C7744;
-	box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
-}
+    .breadcrumb a {
+        color: #000000;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+    }
 
-.search-bar button {
-	background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
-	color: white;
-	border: none;
-	border-radius: 8px;
-	padding: 12px 24px;
-	font-size: 16px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
-}
+    .breadcrumb a:hover {
+        background: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+        color: #000000;
+    }
 
-.search-bar button:hover {
-	transform: translateY(-1px);
-	box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
-}
+    .breadcrumb .separator {
+        color: #000000;
+        font-weight: 600;
+    }
 
-/* 学生一覧表 - 視認性と操作性の向上 */
-.company-table {
-	width: 100%;
-	border-collapse: collapse;
-	background: white;
-	border-radius: 12px;
-	overflow: hidden;
-	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-	margin-bottom: 24px;
-	border: 1px solid #e9ecef;
-}
+    /* 操作ボタン */
+    .action-buttons {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
 
-.company-table th, .company-table td {
-	padding: 16px 12px;
-	text-align: left;
-	border-bottom: 1px solid #e9ecef;
-}
+    .action-btn {
+        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
+    }
 
-.company-table th {
-	background: linear-gradient(135deg, #e9f5ee 0%, #f1f8f5 100%);
-	color: #2C7744;
-	font-size: 16px;
-	font-weight: 700;
-	text-transform: uppercase;
-	letter-spacing: 0.5px;
-}
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
+        color: white;
+        text-decoration: none;
+    }
 
-.company-table tr:company-child td {
-	border-bottom: none;
-}
+    .action-btn.secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+    }
 
-.company-table tr:hover {
-	background: linear-gradient(135deg, #f1f8f5 0%, #e9f5ee 100%);
-	transform: translateY(-1px);
-	box-shadow: 0 2px 8px rgba(44, 119, 68, 0.1);
-}
+    .action-btn.secondary:hover {
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
 
-.company-table tr {
-	transition: all 0.2s ease;
-}
+    /* 企業一覧テーブル */
+    .company-table-container {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
+        overflow-x: auto;
+    }
 
-/* 操作ボタン */
-.action-btn {
-	background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
-	color: white;
-	padding: 6px 12px;
-	border-radius: 6px;
-	text-decoration: none;
-	font-weight: 600;
-	font-size: 14px;
-	display: inline-block;
-	margin-right: 8px;
-	transition: all 0.2s ease;
-	border: none;
-	cursor: pointer;
-	box-shadow: 0 2px 4px rgba(44, 119, 68, 0.2);
-}
+    .company-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+    }
 
-.action-btn:hover {
-	transform: translateY(-1px);
-	box-shadow: 0 4px 8px rgba(44, 119, 68, 0.3);
-	color: white;
-	text-decoration: none;
-}
+    .company-table th,
+    .company-table td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+    }
 
-.action-btn.secondary {
-	background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-	box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
-}
+    .company-table th {
+        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+        color: white;
+        font-weight: 600;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
 
-.action-btn.secondary:hover {
-	box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
-}
+    .company-table tr:hover {
+        background-color: rgba(44, 119, 68, 0.05);
+    }
 
-/* ページネーション - 視認性と操作性の向上 */
-.pagination {
-	display: flex;
-	justify-content: center;
-	gap: 8px;
-	margin-top: 24px;
-	flex-wrap: wrap;
-}
+    .company-table tr:nth-child(even) {
+        background-color: #f8f9fa;
+    }
 
-.pagination form {
-	margin: 0;
-}
+    .company-table tr:nth-child(even):hover {
+        background-color: rgba(44, 119, 68, 0.05);
+    }
 
-.pagination button {
-	background: white;
-	border: 2px solid #2C7744;
-	color: #2C7744;
-	border-radius: 8px;
-	padding: 10px 16px;
-	font-size: 16px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	min-width: 44px;
-	box-shadow: 0 2px 4px rgba(44, 119, 68, 0.1);
-}
+    /* ステータスバッジ */
+    .status-badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
 
-.pagination button.active, .pagination button:hover {
-	background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
-	color: white;
-	transform: translateY(-1px);
-	box-shadow: 0 4px 8px rgba(44, 119, 68, 0.3);
-}
+    .status-badge.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
 
-/* レスポンシブ対応の強化 */
-@media ( max-width : 768px) {
-	.company-list-container {
-		padding: 16px;
-	}
-	.page-header {
-		padding: 24px;
-	}
-	.page-title {
-		font-size: 24px;
-	}
-	.search-bar {
-		flex-direction: column;
-		gap: 12px;
-		padding: 20px;
-	}
-	.company-table th, .company-table td {
-		padding: 12px 8px;
-		font-size: 14px;
-	}
-	.action-btn {
-		padding: 4px 8px;
-		font-size: 12px;
-		margin-right: 4px;
-	}
-	.pagination button {
-		padding: 8px 12px;
-		font-size: 14px;
-		min-width: 40px;
-	}
-}
+    .status-badge.warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
 
-@media ( max-width : 480px) {
-	.company-list-container {
-		padding: 12px;
-	}
-	.page-header {
-		padding: 20px;
-	}
-	.page-title {
-		font-size: 20px;
-	}
-	.search-bar {
-		padding: 16px;
-	}
-	.company-table th, .company-table td {
-		padding: 8px 6px;
-		font-size: 12px;
-	}
-}
+    /* 操作ボタン */
+    .table-action-btn {
+        padding: 6px 12px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        margin: 2px;
+        display: inline-block;
+        transition: all 0.2s ease;
+    }
 
-/* アクセシビリティの向上 */
-.search-bar input[type="text"]:focus, .search-bar button:focus,
-	.action-btn:focus, .pagination button:focus {
-	outline: 3px solid #2C7744;
-	outline-offset: 2px;
-}
+    .table-action-btn.edit {
+        background-color: #007bff;
+        color: white;
+    }
 
-/* 高コントラストモード対応 */
-@media ( prefers-contrast : high) {
-	.company-table {
-		border: 2px solid #2c3e50;
-	}
-	.action-btn, .pagination button {
-		border: 2px solid #2c3e50;
-	}
-}
+    .table-action-btn.edit:hover {
+        background-color: #0056b3;
+        color: white;
+        text-decoration: none;
+    }
 
-/* ダークモード対応 */
-@media ( prefers-color-scheme : dark) {
-	.company-list-page {
-		background: #1a1a1a;
-		color: #ffffff;
-	}
-	.company-list-container {
-		background: #2d2d2d;
-	}
-	.search-bar {
-		background: #3d3d3d;
-		border-color: #4d4d4d;
-		color: #ffffff;
-	}
-	.search-bar input[type="text"] {
-		background: #4d4d4d;
-		border-color: #5d5d5d;
-		color: #ffffff;
-	}
-	.company-table {
-		background: #3d3d3d;
-		color: #ffffff;
-		border-color: #4d4d4d;
-	}
-	.company-table th {
-		background: #2C7744;
-		color: #ffffff;
-	}
-	.company-table tr:hover {
-		background: #2C7744;
-		color: #ffffff;
-	}
-	.pagination button {
-		background: #3d3d3d;
-		border-color: #2C7744;
-		color: #ffffff;
-	}
-}
+    .table-action-btn.delete {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .table-action-btn.delete:hover {
+        background-color: #c82333;
+        color: white;
+        text-decoration: none;
+    }
+
+    /* 統計情報 */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+
+    .stat-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2C7744;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: #6c757d;
+        margin-top: 4px;
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .company-list-container {
+            padding: 16px;
+        }
+        
+        .page-header {
+            padding: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+        }
+        
+        .action-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .company-table-container {
+            padding: 16px;
+        }
+        
+        .company-table th,
+        .company-table td {
+            padding: 8px;
+            font-size: 14px;
+        }
+    }
+
+    /* 空の状態 */
+    .empty-state {
+        text-align: center;
+        padding: 48px 24px;
+        color: #6c757d;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    .empty-state-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #2c3e50;
+    }
+
+    .empty-state-description {
+        font-size: 16px;
+        margin-bottom: 24px;
+    }
 </style>
-
 </head>
-<body>
-	<div id="container">
-		<!--▼▼▼▼▼ここから「ヘッダー」-->
-		<header>
-			<h1 id="logo">
-				<a href="javascript:void(0);" onclick="location.reload();"><img
-					src="images/logo.png" alt="jms"></a>
-			</h1>
-			<nav>
-				<ul>
-					<li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
-					<!-- 権限に応じた機能リンク -->
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
-					<% } %>
-					<% if ("egd".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
-					<% } %>
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-					<% } %>
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
-					<% } %>
-					<% if ("admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
-					<% } %>
-					<li><a href="extension.html">お問い合わせ</a></li>
-					<% if (username != null) { %>
-					<li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
-					<% } %>
-				</ul>
-			</nav>
-		</header>
-		<!--▲▲▲▲▲ここまで「ヘッダー」-->
+<body class="company-list-page">
 
-		<!-- 権限チェック -->
-		<% if (!"egd".equals(role) && !"admin".equals(role)) { %>
-		<div class="permission-error">
-			<h2>アクセス権限がありません</h2>
-			<p>企業管理画面にアクセスするには、就職指導部またはシステム管理者の権限が必要です。</p>
-			<a href="StatusServlet?view=dashboard" class="btn btn-primary">ダッシュボードに戻る</a>
-		</div>
-		<% } else { %>
+<div id="container">
+    <!-- ヘッダー -->
+    <header>
+        <h1 id="logo"><a href="javascript:void(0);" onclick="location.reload();"><img src="images/logo.png" alt="jms"></a></h1>
+        <nav>
+            <ul>
+                <li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
+                <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
+                <% } %>
+                <% if ("egd".equals(role) || "admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
+                <% } %>
+                <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
+                <% } %>
+                <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
+                <% } %>
+                <% if ("admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
+                <% } %>
+                <li><a href="extension.html">お問い合わせ</a></li>
+                <% if (username != null) { %>
+                    <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
+                <% } %>
+            </ul>
+        </nav>
+    </header>
 
-		<main>
-			<div>.</div>
-			<div>.</div>
-			<div>.</div>
-			<div class="company-list-container">
-				<!-- ページヘッダー -->
-				<header class="page-header" role="banner">
-					<h1 class="page-title">企業一覧管理</h1>
-					<nav class="breadcrumb" aria-label="パンくずリスト">
-						<a
-							href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
-						<span class="separator" aria-hidden="true">/</span> <a
-							href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">企業管理</a>
-						<span class="separator" aria-hidden="true">/</span> <span>企業一覧管理</span>
-					</nav>
-				</header>
+    <main>
+        <div class="company-list-container">
+            <!-- ページヘッダー -->
+            <header class="page-header" role="banner">
+                <h1 class="page-title">企業一覧</h1>
+                <p class="page-subtitle">登録されている企業の一覧を表示します</p>
+                <nav class="breadcrumb" aria-label="パンくずリスト">
+                    <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
+                    <span class="separator" aria-hidden="true">/</span>
+                    <a href="CompanyManagementServlet">企業管理</a>
+                    <span class="separator" aria-hidden="true">/</span>
+                    <span>企業一覧</span>
+                </nav>
+            </header>
 
-				<!-- 検索バー -->
-				<form class="search-bar" method="get" action="StudentServlet">
-					<input type="text" name="keyword"
-						placeholder="企業名・所在地・募集状況などで検索..." aria-label="検索キーワード"
-						value="${keyword != null ? keyword : ''}">
-					<button type="submit" aria-label="検索">🔍 検索</button>
-				</form>
+            <!-- 統計情報 -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <span class="stat-number"><%= totalCompanies != null ? totalCompanies : 0 %></span>
+                    <span class="stat-label">総企業数</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number"><%= recruitmentCompanies != null ? recruitmentCompanies : 0 %></span>
+                    <span class="stat-label">採用実績あり</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number"><%= (totalCompanies != null && recruitmentCompanies != null) ? totalCompanies - recruitmentCompanies : 0 %></span>
+                    <span class="stat-label">採用実績なし</span>
+                </div>
+            </div>
 
-				<!-- 企業一覧表 -->
-				<table class="company-table" aria-label="企業一覧">
-					<thead>
-						<tr>
-							<th>企業名</th>
-							<th>業界</th>
-							<th>所在地</th>
-							<th>募集状況</th>
-							<th>操作</th>
-						</tr>
-					</thead>
-					<tbody>
-						<c:choose>
-							<c:when test="${not empty companys and companys[0].size() > 0}">
-								<c:forEach var="i" begin="0" end="${students[0].size()-1}">
-									<tr>
-										<td>${companys[0][i]}</td>
-										<td>${companys[1][i]}</td>
-										<td>${companys[2][i]}</td>
-										<td>${companys[3][i]}</td>
-										<td><a href="#" class="action-btn" aria-label="企業詳細を表示">詳細</a>
-											<a href="#" class="action-btn secondary" aria-label="企業情報を編集">編集</a>
-										</td>
-									</tr>
-								</c:forEach>
-							</c:when>
-							<c:otherwise>
-								<tr>
-									<td colspan="5"
-										style="text-align: center; padding: 40px; color: #6c757d; font-style: italic;">
-										該当する企業がありません</td>
-								</tr>
-							</c:otherwise>
-						</c:choose>
-					</tbody>
-				</table>
+            <!-- 操作ボタン -->
+            <div class="action-buttons">
+                <a href="CreateCompanyServlet" class="action-btn">
+                    <i class="fas fa-plus"></i>新規企業登録
+                </a>
+                <a href="CompanyManagementServlet" class="action-btn secondary">
+                    <i class="fas fa-arrow-left"></i>企業管理に戻る
+                </a>
+            </div>
 
+            <!-- 企業一覧テーブル -->
+            <div class="company-table-container">
+                <% if (companies != null && !companies.isEmpty()) { %>
+                    <table class="company-table">
+                        <thead>
+                            <tr>
+                                <th>企業ID</th>
+                                <th>企業名</th>
+                                <th>郵便番号</th>
+                                <th>住所</th>
+                                <th>電話番号</th>
+                                <th>メールアドレス</th>
+                                <th>担当者名</th>
+                                <th>採用実績</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (companies != null) { for (java.util.Map<String, Object> company : companies) { %>
+                            <tr>
+                              <td><%= company.get("company_id") %></td>
+                              <td><%= company.get("company_name") %></td>
+                              <td><%= company.get("post_code") %></td>
+                              <td><%= company.get("address") %></td>
+                              <td><%= company.get("tel") %></td>
+                              <td><%= company.get("mail_address") %></td>
+                              <td><%= company.get("manager_name") %></td>
+                              <td>
+                                <% if (company.get("recruitment_results") != null && (Boolean) company.get("recruitment_results")) { %>
+                                  <span class="status-badge success">あり</span>
+                                <% } else { %>
+                                  <span class="status-badge warning">なし</span>
+                                <% } %>
+                              </td>
+                              <td>
+                                <a href="CompanyDetailServlet?companyId=<%= company.get("company_id") %>&mode=edit" class="table-action-btn edit">
+                                  <i class="fas fa-edit"></i>編集
+                                </a>
+                                <% String cid = String.valueOf(company.get("company_id")); %>
+                                <a href="#" class="table-action-btn delete" onclick="deleteCompany('<%= cid %>')">
+                                  <i class="fas fa-trash"></i>削除
+                                </a>
+                              </td>
+                            </tr>
+                            <% }} %>
+                        </tbody>
+                    </table>
+                <% } else { %>
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏢</div>
+                        <h3 class="empty-state-title">企業が登録されていません</h3>
+                        <p class="empty-state-description">新しい企業を登録して、就職活動をサポートしましょう。</p>
+                        <a href="CreateCompanyServlet" class="action-btn">
+                            <i class="fas fa-plus"></i>新規企業登録
+                        </a>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
 
-			</div>
-		</main>
-		<!--開閉ボタン（ハンバーガーアイコン）-->
-		<div id="menubar_hdr">
-			<span></span><span></span><span></span>
-		</div>
+    <!--▼▼▼▼▼ここから「テキストスライドショー」-->
+    <div class="text-slide-wrapper">
+        <div class="text-slide">
+            <span>Company List System</span>
+        </div>
+    </div>
+    <!--▲▲▲▲▲ここまで「テキストスライドショー」-->
 
-		<!--開閉ブロック-->
-		<div id="menubar">
-			<p class="logo">
-				<img src="images/logo.png" alt="Job Management System">
-			</p>
-			<nav>
-				<ul>
-					<li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
-					<!-- 権限に応じた機能リンク -->
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
-					<% } %>
-					<% if ("egd".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
-					<% } %>
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-					<% } %>
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
-					<% } %>
-					<% if ("admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
-					<% } %>
-					<li><a href="extension.html">お問い合わせ</a></li>
-					<% if (username != null) { %>
-					<li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
-					<% } %>
-				</ul>
-			</nav>
-		</div>
-		<!--/#menubar-->
+    <!-- フッター -->
+    <footer>
+        <div>
+            <p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
+            <ul class="icons">
+                <li><a href="#"><i class="fa-brands fa-x-twitter"></i></a></li>
+                <li><a href="#"><i class="fab fa-line"></i></a></li>
+                <li><a href="#"><i class="fab fa-youtube"></i></a></li>
+                <li><a href="#"><i class="fab fa-instagram"></i></a></li>
+            </ul>
+            <small>Copyright&copy; @ 2025 Job Management System All Rights Reserved.</small>
+        </div>
+        <div>
+            <ul>
+                <li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
+                <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
+                <% } %>
+                <% if ("egd".equals(role) || "admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
+                <% } %>
+                <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
+                <% } %>
+                <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
+                <% } %>
+                <% if ("admin".equals(role)) { %>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
+                <% } %>
+                <li><a href="extension.html">お問い合わせ</a></li>
+            </ul>
+        </div>
+    </footer>
 
-		<!--▼▼▼▼▼ここから「テキストスライドショー」-->
-		<div class="text-slide-wrapper">
-			<div class="text-slide">
-				<span>Student Management System</span>
-			</div>
-		</div>
-		<!--▲▲▲▲▲ここまで「テキストスライドショー」-->
+    <span class="pr"><a href="" target="_blank">@ 2025 Job Management System</a></span>
+</div>
 
-		<!--▼▼▼▼▼ここから「フッター」-->
-		<footer>
-			<div>
-				<p class="logo">
-					<img src="images/logo.png" alt="Job Management System">
-				</p>
-				<ul class="icons">
-					<li><a href="#"><i class="fa-brands fa-x-twitter"></i></a></li>
-					<li><a href="#"><i class="fab fa-line"></i></a></li>
-					<li><a href="#"><i class="fab fa-youtube"></i></a></li>
-					<li><a href="#"><i class="fab fa-instagram"></i></a></li>
-				</ul>
-				<small>Copyright&copy; @ 2025 Job Management System All
-					Rights Reserved.</small>
-			</div>
-			<div>
-				<ul>
-					<li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
-					<!-- 権限に応じた機能リンク -->
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
-					<% } %>
-					<% if ("egd".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
-					<% } %>
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-					<% } %>
-					<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
-					<% } %>
-					<% if ("admin".equals(role)) { %>
-					<li><a
-						href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
-					<% } %>
-					<li><a href="extension.html">お問い合わせ</a></li>
-				</ul>
-			</div>
-		</footer>
-		<!--▲▲▲▲▲ここまで「フッター」-->
+<!-- ローディング -->
+<div id="loading">
+    <img src="images/logo.png" alt="Loading">
+    <div class="progress-container">
+        <div class="progress-bar"></div>
+    </div>
+</div>
 
-		<!--▼▼最下部-->
-		<span class="pr"><a href="" target="_blank">@ 2025 Job
-				Management System</a></span>
-		<!--▲▲ここまで最下部-->
-	</div>
-	<!--/#container-->
+<!-- ハンバーガーメニュー -->
+<div id="menubar_hdr">
+    <span></span><span></span><span></span>
+</div>
 
-	<!--ローディング-->
-	<div id="loading">
-		<img src="images/logo.png" alt="Loading">
-		<div class="progress-container">
-			<div class="progress-bar"></div>
-		</div>
-	</div>
+<div id="menubar">
+    <p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
+    <nav>
+        <ul>
+            <li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
+            <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
+            <% } %>
+            <% if ("egd".equals(role) || "admin".equals(role)) { %>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
+            <% } %>
+            <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
+            <% } %>
+            <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
+            <% } %>
+            <% if ("admin".equals(role)) { %>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
+            <% } %>
+            <li><a href="extension.html">お問い合わせ</a></li>
+            <% if (username != null) { %>
+                <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
+            <% } %>
+        </ul>
+    </nav>
+</div>
 
-	<!--開閉ボタン（ハンバーガーアイコン）-->
-	<div id="menubar_hdr">
-		<span></span><span></span><span></span>
-	</div>
+<!-- スクリプト -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/protonet-jquery.inview/1.1.2/jquery.inview.min.js"></script>
+<script src="js/jquery.inview_set.js"></script>
+<script src="js/main.js"></script>
 
-	<!--開閉ブロック-->
-	<div id="menubar">
-		<p class="logo">
-			<img src="images/logo.png" alt="Job Management System">
-		</p>
-		<nav>
-			<ul>
-				<li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
-				<!-- 権限に応じた機能リンク -->
-				<% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
-				<li><a
-					href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
-				<% } %>
-				<% if ("egd".equals(role) || "admin".equals(role)) { %>
-				<li><a
-					href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
-				<% } %>
-				<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
-				<li><a
-					href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-				<% } %>
-				<% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
-				<li><a
-					href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
-				<% } %>
-				<% if ("admin".equals(role)) { %>
-				<li><a
-					href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
-				<% } %>
-				<li><a href="extension.html">お問い合わせ</a></li>
-				<% if (username != null) { %>
-				<li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
-				<% } %>
-			</ul>
-		</nav>
-	</div>
-	<!--/#menubar-->
+<script>
+// 企業一覧画面のJavaScript
 
-	<!--jQueryの読み込み-->
-	<script
-		src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-	<!--パララックス（inview）-->
-	<script
-		src="https://cdnjs.cloudflare.com/ajax/libs/protonet-jquery.inview/1.1.2/jquery.inview.min.js"></script>
-	<script src="js/jquery.inview_set.js"></script>
-	<!--このテンプレート専用のスクリプト-->
-	<script src="js/main.js"></script>
+function deleteCompany(companyId) {
+    if (confirm('企業ID: ' + companyId + ' の企業を削除しますか？\nこの操作は取り消せません。')) {
+        // 削除処理
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = 'CompanyManagementServlet';
+        
+        const actionInput = document.createElement('input');
+        actionInput.type = 'hidden';
+        actionInput.name = 'action';
+        actionInput.value = 'delete';
+        
+        const companyIdInput = document.createElement('input');
+        companyIdInput.type = 'hidden';
+        companyIdInput.name = 'company_id';
+        companyIdInput.value = companyId;
+        
+        form.appendChild(actionInput);
+        form.appendChild(companyIdInput);
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
 
-	<script>
-// 学生管理画面の最適化されたJavaScript
-
-// アクセシビリティの向上
-document.addEventListener('DOMContentLoaded', () => {
-    // キーボードナビゲーションの改善
-    const actionButtons = document.querySelectorAll('.action-btn');
-    actionButtons.forEach(button => {
-        button.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                button.click();
-            }
-        });
-    });
-
-    // カードリンクのキーボード操作
-    const cardLinks = document.querySelectorAll('.card-link');
-    cardLinks.forEach(link => {
-        link.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                link.click();
-            }
-        });
-    });
-
-    // フォーカス管理の改善
-    const focusableElements = document.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
-    focusableElements.forEach(element => {
-        element.addEventListener('focus', () => {
-            element.style.outline = '2px solid #2C7744';
-            element.style.outlineOffset = '2px';
+// ページ読み込み時の処理
+document.addEventListener('DOMContentLoaded', function() {
+    // テーブルの行にホバー効果を追加
+    const tableRows = document.querySelectorAll('.company-table tbody tr');
+    tableRows.forEach(function(row) {
+        row.addEventListener('mouseenter', function() {
+            row.style.backgroundColor = 'rgba(44, 119, 68, 0.05)';
         });
         
-        element.addEventListener('blur', () => {
-            element.style.outline = '';
-            element.style.outlineOffset = '';
+        row.addEventListener('mouseleave', function() {
+            row.style.backgroundColor = '';
         });
     });
-
+    
     // 統計データのアニメーション
     const statNumbers = document.querySelectorAll('.stat-number');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(function(entry) {
             if (entry.isIntersecting) {
                 const target = entry.target;
-                const finalValue = parseInt(target.textContent);
-                animateNumber(target, 0, finalValue, 1000);
+                const text = target.textContent;
+                if (!isNaN(text)) {
+                    const finalValue = parseInt(text);
+                    animateNumber(target, 0, finalValue, 1000);
+                }
                 observer.unobserve(target);
             }
         });
     });
 
-    statNumbers.forEach(stat => observer.observe(stat));
+    statNumbers.forEach(function(stat) {
+        observer.observe(stat);
+    });
 });
 
 // 数値アニメーション関数
@@ -728,63 +686,7 @@ function animateNumber(element, start, end, duration) {
     
     requestAnimationFrame(updateNumber);
 }
-
-// パフォーマンス最適化
-window.addEventListener('load', () => {
-    // 画像の遅延読み込み
-    const images = document.querySelectorAll('img[data-src]');
-    const imageObserver = new IntersectionObserver((entries, observer) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const img = entry.target;
-                img.src = img.dataset.src;
-                img.removeAttribute('data-src');
-                observer.unobserve(img);
-            }
-        });
-    });
-
-    images.forEach(img => imageObserver.observe(img));
-
-    // スムーズスクロール
-    const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
-    smoothScrollLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
-});
-
-// エラーハンドリング
-window.addEventListener('error', (e) => {
-    console.error('JavaScript error:', e.error);
-    // エラーが発生した場合のフォールバック処理
-});
-
-// ページの可視性変更時の処理
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        // ページが非表示になった時の処理
-        console.log('Page hidden');
-    } else {
-        // ページが表示された時の処理
-        console.log('Page visible');
-    }
-});
 </script>
 
-
-	<% } %>
-
-	</div>
 </body>
 </html>

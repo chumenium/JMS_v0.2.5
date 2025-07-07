@@ -20,7 +20,7 @@ public class SelectionStageServlet extends HttpServlet {
         
         // セッションの確認
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
+        if (session == null || session.getAttribute("id") == null) {
             response.sendRedirect(request.getContextPath() + "/login.html");
             return;
         }
@@ -43,7 +43,7 @@ public class SelectionStageServlet extends HttpServlet {
         
         // セッションの確認
         HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("user_id") == null) {
+        if (session == null || session.getAttribute("id") == null) {
             response.sendRedirect(request.getContextPath() + "/login.html");
             return;
         }

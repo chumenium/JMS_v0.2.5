@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
 import utils.DBConnection;
 
 /**
@@ -135,7 +134,7 @@ public class LoginServlet extends HttpServlet {
                 	// �E�アプリケーションスコープには何も置かなぁE��E
 
                 	// チE��チE��ログ
-                	System.out.println("LoginServlet: セチE��ョン惁E��設定完亁E");
+                	System.out.println("LoginServlet: セッション接続完了");
                 	System.out.println("LoginServlet: username = " + displayName);
                 	System.out.println("LoginServlet: id = " + userId);
                 	System.out.println("LoginServlet: role = " + userRole);

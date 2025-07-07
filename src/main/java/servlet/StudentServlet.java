@@ -90,6 +90,20 @@ public class StudentServlet extends HttpServlet {
     	
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // セッションの確認
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // 権限チェック（教員、校長・教務部長、管理者のみ）
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
+        }
+        
         String action = request.getParameter("action");
 
 
@@ -840,6 +854,20 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // セッションの確認
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // 権限チェック（教員、校長・教務部長、管理者のみ）
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
+        }
+        
         // デバッグログ
         System.out.println("StudentServlet doGet: アクセス開始");
         System.out.println("StudentServlet: request URI = " + request.getRequestURI());

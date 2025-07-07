@@ -31,8 +31,14 @@ public class StudentManagementServlet extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// セッションから権限を取得
-        HttpSession session = request.getSession();
+		// セッションの確認
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // セッションから権限を取得
         String role = (String) session.getAttribute("role");
         
         // 権限チェック
@@ -40,7 +46,7 @@ public class StudentManagementServlet extends HttpServlet {
             (!"teacher".equals(role) && 
              !"headmaster".equals(role) && 
              !"admin".equals(role))) {
-            response.sendRedirect("login.html");
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
             return;
         }
         
