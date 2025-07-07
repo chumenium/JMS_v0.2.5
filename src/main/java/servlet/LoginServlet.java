@@ -8,15 +8,12 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Base64;
-import java.util.Map;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import dao.UserDAO;
-import dao.StudentDAO;
 import utils.DBConnection;
 
 /**
@@ -78,14 +75,10 @@ public class LoginServlet extends HttpServlet {
 		String id = request.getParameter("id");
 		String password = request.getParameter("password");
 
-		try {
-			UserDAO userDAO = new UserDAO();
-			StudentDAO studentDAO = new StudentDAO();
-			
+		try (Connection connection = DBConnection.getConnection()) {
 			// ソルトをデータベースから取得
 			String saltQuery = "SELECT salt FROM users WHERE id = ?";
-			try (Connection connection = DBConnection.getConnection();
-				 PreparedStatement saltStmt = connection.prepareStatement(saltQuery)) {
+			try (PreparedStatement saltStmt = connection.prepareStatement(saltQuery)) {
 				
 				saltStmt.setString(1, id);
 				ResultSet saltRs = saltStmt.executeQuery();
@@ -94,50 +87,60 @@ public class LoginServlet extends HttpServlet {
 					String salt = saltRs.getString("salt");
 					String hashedPassword = hashPassword(password, salt);
 
-					// DAOを使用してユーザー認証
-					Map<String, Object> user = userDAO.authenticateUser(id, hashedPassword);
+					// ユーザー認証
+					String authQuery = "SELECT * FROM users WHERE id = ? AND password = ?";
+					try (PreparedStatement authStmt = connection.prepareStatement(authQuery)) {
+						authStmt.setString(1, id);
+						authStmt.setString(2, hashedPassword);
+						ResultSet authRs = authStmt.executeQuery();
 
-					if (user != null) {
-						HttpSession session = request.getSession();
-						String userId = (String) user.get("username");
-						String userRole = (String) user.get("role");
-						
-						// 表示名を決定（学生の場合はname、それ以外はid）
-						String displayName = userId;
-						if ("student".equals(userRole)) {
-							// 学生の場合はstudents_tblからnameを取得
-							Map<String, Object> student = studentDAO.getStudentById(userId);
-							if (student != null) {
-								displayName = (String) student.get("name");
-							}
-						} else if ("teacher".equals(userRole)) {
-							// 教員の場合はteacher_tblからnameを取得
-							String nameQuery = "SELECT name FROM teacher_tbl WHERE teacher_id = ?";
-							try (PreparedStatement nameStmt = connection.prepareStatement(nameQuery)) {
-								nameStmt.setString(1, userId);
-								ResultSet nameRs = nameStmt.executeQuery();
-								
-								if (nameRs.next()) {
-									displayName = nameRs.getString("name");
+						if (authRs.next()) {
+							HttpSession session = request.getSession();
+							String userId = authRs.getString("id");
+							String userRole = authRs.getString("role");
+							
+							// 表示名を決定（学生の場合はname、それ以外はid）
+							String displayName = userId;
+							if ("student".equals(userRole)) {
+								// 学生の場合はstudents_tblからnameを取得
+								String studentQuery = "SELECT name FROM students_tbl WHERE student_id = ?";
+								try (PreparedStatement studentStmt = connection.prepareStatement(studentQuery)) {
+									studentStmt.setString(1, userId);
+									ResultSet studentRs = studentStmt.executeQuery();
+									
+									if (studentRs.next()) {
+										displayName = studentRs.getString("name");
+									}
+								}
+							} else if ("teacher".equals(userRole)) {
+								// 教員の場合はteacher_tblからnameを取得
+								String nameQuery = "SELECT name FROM teacher_tbl WHERE teacher_id = ?";
+								try (PreparedStatement nameStmt = connection.prepareStatement(nameQuery)) {
+									nameStmt.setString(1, userId);
+									ResultSet nameRs = nameStmt.executeQuery();
+									
+									if (nameRs.next()) {
+										displayName = nameRs.getString("name");
+									}
 								}
 							}
+							
+							session.setAttribute("username", displayName);
+							session.setAttribute("id", userId);
+							session.setAttribute("role", userRole);
+
+							// デバッグログ
+							System.out.println("LoginServlet: セッション接続完了");
+							System.out.println("LoginServlet: username = " + displayName);
+							System.out.println("LoginServlet: id = " + userId);
+							System.out.println("LoginServlet: role = " + userRole);
+
+							// ログイン成功時はStatusServletにリダイレクト
+							response.sendRedirect(request.getContextPath() + "/StatusServlet?view=DashBoard");
+						} else {
+							// ログイン失敗時はエラーページにリダイレクト
+							response.sendRedirect("error/login-failed.html?type=invalid_credentials");
 						}
-						
-						session.setAttribute("username", displayName);
-						session.setAttribute("id", userId);
-						session.setAttribute("role", userRole);
-
-						// デバッグログ
-						System.out.println("LoginServlet: セッション接続完了");
-						System.out.println("LoginServlet: username = " + displayName);
-						System.out.println("LoginServlet: id = " + userId);
-						System.out.println("LoginServlet: role = " + userRole);
-
-						// ログイン成功時はStatusServletにリダイレクト
-						response.sendRedirect(request.getContextPath() + "/StatusServlet?view=DashBoard");
-					} else {
-						// ログイン失敗時はエラーページにリダイレクト
-						response.sendRedirect("error/login-failed.html?type=invalid_credentials");
 					}
 				} else {
 					// ユーザーIDが存在しない場合

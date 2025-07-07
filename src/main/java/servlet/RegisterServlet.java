@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import dao.UserDAO;
 import utils.DBConnection;
 
 /**
@@ -86,14 +85,18 @@ public class RegisterServlet extends HttpServlet {
             return;
         }
 
-        try {
-            UserDAO userDAO = new UserDAO();
-            
+        try (Connection connection = DBConnection.getConnection()) {
             // ユーザーIDの重複チェック
-            if (userDAO.isUsernameExists(id)) {
-                response.sendRedirect("register.html?error=" + 
-                    java.net.URLEncoder.encode("このユーザーIDは既に使用されています", "UTF-8"));
-                return;
+            String checkQuery = "SELECT COUNT(*) FROM users WHERE id = ?";
+            try (PreparedStatement checkStmt = connection.prepareStatement(checkQuery)) {
+                checkStmt.setString(1, id);
+                ResultSet checkRs = checkStmt.executeQuery();
+                
+                if (checkRs.next() && checkRs.getInt(1) > 0) {
+                    response.sendRedirect("register.html?error=" + 
+                        java.net.URLEncoder.encode("このユーザーIDは既に使用されています", "UTF-8"));
+                    return;
+                }
             }
 
             // ソルト生成
@@ -102,17 +105,25 @@ public class RegisterServlet extends HttpServlet {
             // パスワードハッシュ化
             String hashedPassword = hashPassword(password, salt);
 
-            // DAOを使用してユーザー登録
-            boolean success = userDAO.registerUser(id, hashedPassword, "", role);
-
-            if (success) {
-                // 登録成功
-                response.sendRedirect("login.html?success=" + 
-                    java.net.URLEncoder.encode("登録が完了しました。ログインしてください。", "UTF-8"));
-            } else {
-                // 登録失敗
-                response.sendRedirect("register.html?error=" + 
-                    java.net.URLEncoder.encode("登録に失敗しました", "UTF-8"));
+            // ユーザー登録
+            String insertQuery = "INSERT INTO users (id, password, salt, role) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement insertStmt = connection.prepareStatement(insertQuery)) {
+                insertStmt.setString(1, id);
+                insertStmt.setString(2, hashedPassword);
+                insertStmt.setString(3, salt);
+                insertStmt.setString(4, role);
+                
+                int result = insertStmt.executeUpdate();
+                
+                if (result > 0) {
+                    // 登録成功
+                    response.sendRedirect("login.html?success=" + 
+                        java.net.URLEncoder.encode("登録が完了しました。ログインしてください。", "UTF-8"));
+                } else {
+                    // 登録失敗
+                    response.sendRedirect("register.html?error=" + 
+                        java.net.URLEncoder.encode("登録に失敗しました", "UTF-8"));
+                }
             }
 
         } catch (Exception e) {

@@ -1,6 +1,12 @@
 package servlet;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -8,7 +14,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import dao.StatisticsDAO;
+import utils.DBConnection;
 
 /**
  * ダッシュボードサーブレット
@@ -39,14 +45,13 @@ public class DashboardServlet extends HttpServlet {
         request.setAttribute("user_id", userId);
         request.setAttribute("user_role", role);
         
-        // DAOを使用して統計情報を取得
-        try {
-            StatisticsDAO statisticsDAO = new StatisticsDAO();
-            Map<String, Object> dashboardStats = statisticsDAO.getDashboardStatistics();
+        // 統計情報を取得
+        try (Connection connection = DBConnection.getConnection()) {
+            Map<String, Object> dashboardStats = getDashboardStatistics(connection);
             request.setAttribute("dashboardStats", dashboardStats);
             
             // 最近の面接情報を取得
-            request.setAttribute("recentInterviews", statisticsDAO.getRecentInterviews(5));
+            request.setAttribute("recentInterviews", getRecentInterviews(connection, 5));
             
         } catch (Exception e) {
             e.printStackTrace();
@@ -97,5 +102,74 @@ public class DashboardServlet extends HttpServlet {
         // 現在は基本的なフォワードのみ
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/DashBoard.jsp");
         dispatcher.forward(request, response);
+    }
+    
+    private Map<String, Object> getDashboardStatistics(Connection connection) throws Exception {
+        Map<String, Object> stats = new HashMap<>();
+        
+        // 学生総数
+        String studentCountQuery = "SELECT COUNT(*) FROM students_tbl";
+        try (PreparedStatement stmt = connection.prepareStatement(studentCountQuery)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                stats.put("totalStudents", rs.getInt(1));
+            }
+        }
+        
+        // 企業総数
+        String companyCountQuery = "SELECT COUNT(*) FROM company_tbl";
+        try (PreparedStatement stmt = connection.prepareStatement(companyCountQuery)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                stats.put("totalCompanies", rs.getInt(1));
+            }
+        }
+        
+        // 面接総数
+        String interviewCountQuery = "SELECT COUNT(*) FROM interview_tbl";
+        try (PreparedStatement stmt = connection.prepareStatement(interviewCountQuery)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                stats.put("totalInterviews", rs.getInt(1));
+            }
+        }
+        
+        // 内定者数
+        String offerCountQuery = "SELECT COUNT(*) FROM interview_tbl WHERE status = '内定'";
+        try (PreparedStatement stmt = connection.prepareStatement(offerCountQuery)) {
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                stats.put("totalOffers", rs.getInt(1));
+            }
+        }
+        
+        return stats;
+    }
+    
+    private List<Map<String, Object>> getRecentInterviews(Connection connection, int limit) throws Exception {
+        List<Map<String, Object>> interviews = new ArrayList<>();
+        
+        String query = "SELECT i.*, s.name as student_name, c.company_name " +
+                      "FROM interview_tbl i " +
+                      "LEFT JOIN students_tbl s ON i.student_id = s.student_id " +
+                      "LEFT JOIN company_tbl c ON i.company_id = c.company_id " +
+                      "ORDER BY i.interview_date DESC LIMIT ?";
+        
+        try (PreparedStatement stmt = connection.prepareStatement(query)) {
+            stmt.setInt(1, limit);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                Map<String, Object> interview = new HashMap<>();
+                interview.put("interview_id", rs.getInt("interview_id"));
+                interview.put("student_name", rs.getString("student_name"));
+                interview.put("company_name", rs.getString("company_name"));
+                interview.put("interview_date", rs.getDate("interview_date"));
+                interview.put("status", rs.getString("status"));
+                interviews.add(interview);
+            }
+        }
+        
+        return interviews;
     }
 } 

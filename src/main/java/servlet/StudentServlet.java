@@ -20,7 +20,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import dao.DropdownDataDAO;
-import dao.StudentDAO;
 import utils.DBConnection;
 
 //@WebServlet("/studentServlet")
@@ -72,17 +71,18 @@ public class StudentServlet extends HttpServlet {
     
     //引数で渡したステータスの学生すべてを取得する
     private ArrayList<ArrayList<String>> getStudentEnrollment(String enrollmentStatus) {
-    	try {
-    		StudentDAO studentDAO = new StudentDAO();
-    		List<Map<String, Object>> students = studentDAO.getAllStudents();
+    	try (Connection conn = DBConnection.getConnection()) {
+    		String sql = "SELECT student_id, class FROM students_tbl WHERE enrollment_status = ?";
+    		PreparedStatement stmt = conn.prepareStatement(sql);
+    		stmt.setString(1, enrollmentStatus);
+    		ResultSet rs = stmt.executeQuery();
+    		
     		ArrayList<String> classs = new ArrayList<String>();
     		ArrayList<String> studentid = new ArrayList<String>();
     		
-    		for (Map<String, Object> student : students) {
-    			if (enrollmentStatus.equals(student.get("enrollment_status"))) {
-    				studentid.add((String) student.get("student_id"));
-    				classs.add((String) student.get("class"));
-    			}
+    		while (rs.next()) {
+    			studentid.add(rs.getString("student_id"));
+    			classs.add(rs.getString("class"));
     		}
     		
     		ArrayList<ArrayList<String>> studentList = new ArrayList<>();
@@ -198,9 +198,31 @@ public class StudentServlet extends HttpServlet {
                 student.put("desired_job_type_3rd_id", Integer.parseInt(desired_job_type_3rd));
                 student.put("graduation_year", graduation_year);
                 student.put("remarks", remarks);
-                StudentDAO studentDAO = new StudentDAO();
-                boolean studentInserted = studentDAO.addStudent(student);
-                if (rowsInserted1 > 0 && studentInserted) {
+                
+                // students_tblへのinsert
+                String studentQuery = "INSERT INTO students_tbl (student_id, department, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, desired_job_type_1st_id, desired_job_type_2nd_id, desired_job_type_3rd_id, graduation_year, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement studentStatement = conn.prepareStatement(studentQuery);
+                studentStatement.setString(1, student_id);
+                studentStatement.setString(2, department);
+                studentStatement.setString(3, studentClass);
+                studentStatement.setString(4, number);
+                studentStatement.setString(5, name);
+                studentStatement.setString(6, name_reading);
+                studentStatement.setString(7, gender);
+                studentStatement.setString(8, email);
+                studentStatement.setString(9, tel);
+                studentStatement.setString(10, enrollment_status);
+                studentStatement.setNull(11, java.sql.Types.VARCHAR);
+                studentStatement.setString(12, jobHuntingStatus);
+                studentStatement.setInt(13, Integer.parseInt(desired_job_type_1st));
+                studentStatement.setInt(14, Integer.parseInt(desired_job_type_2nd));
+                studentStatement.setInt(15, Integer.parseInt(desired_job_type_3rd));
+                studentStatement.setInt(16, graduation_year);
+                studentStatement.setString(17, remarks);
+                
+                int rowsInserted2 = studentStatement.executeUpdate();
+                
+                if (rowsInserted1 > 0 && rowsInserted2 > 0) {
                     request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
                 } else {
                     request.setAttribute("errorMessage", "データ登録に失敗しました。" );
