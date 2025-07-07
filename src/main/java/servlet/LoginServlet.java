@@ -9,7 +9,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Base64;
 
-import servlet.RequestDispatcher;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -48,7 +48,7 @@ public class LoginServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	
-	// パスワードのハッシュ化とソルトの生成
+	// パスワード�Eハッシュ化とソルト�E生�E
     private String hashPassword(String password, String salt) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -83,7 +83,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         try (Connection connection = DBConnection.getConnection()) {
-            // ソルトをデータベースから取得
+            // ソルトをチE�Eタベ�Eスから取征E
             String saltQuery = "SELECT salt FROM users WHERE id = ?";
             PreparedStatement saltStmt = connection.prepareStatement(saltQuery);
             saltStmt.setString(1, id);
@@ -102,14 +102,14 @@ public class LoginServlet extends HttpServlet {
 
                 if (rs.next()) {
                 	// LoginServlet#doPost(...)
-                	HttpSession session = request.getSession();  // セッションスコープ
+                	HttpSession session = request.getSession();  // セチE��ョンスコーチE
                 	String userId = rs.getString("id");
                 	String userRole = rs.getString("role");
                 	
-                	// 表示名を決定（学生の場合はname、それ以外はid）
+                	// 表示名を決定（学生�E場合�Ename、それ以外�Eid�E�E
                 	String displayName = userId;
                 	if ("student".equals(userRole)) {
-                		// 学生の場合はstudents_tblからnameを取得
+                		// 学生�E場合�Estudents_tblからnameを取征E
                 		String nameQuery = "SELECT name FROM students_tbl WHERE student_id = ?";
                 		PreparedStatement nameStmt = connection.prepareStatement(nameQuery);
                 		nameStmt.setString(1, userId);
@@ -119,7 +119,7 @@ public class LoginServlet extends HttpServlet {
                 			displayName = nameRs.getString("name");
                 		}
                 	} else if ("teacher".equals(userRole)) {
-                		// 教員の場合はteacher_tblからnameを取得
+                		// 教員の場合�Eteacher_tblからnameを取征E
                 		String nameQuery = "SELECT name FROM teacher_tbl WHERE teacher_id = ?";
                 		PreparedStatement nameStmt = connection.prepareStatement(nameQuery);
                 		nameStmt.setString(1, userId);
@@ -130,30 +130,30 @@ public class LoginServlet extends HttpServlet {
                 		}
                 	}
                 	
-                	session.setAttribute("username", displayName); // 表示名として保存
+                	session.setAttribute("username", displayName); // 表示名として保孁E
                 	session.setAttribute("id", userId);
                 	session.setAttribute("role", userRole);
-                	// （アプリケーションスコープには何も置かない）
+                	// �E�アプリケーションスコープには何も置かなぁE��E
 
-                	// デバッグログ
-                	System.out.println("LoginServlet: セッション情報設定完了");
+                	// チE��チE��ログ
+                	System.out.println("LoginServlet: セチE��ョン惁E��設定完亁E);
                 	System.out.println("LoginServlet: username = " + displayName);
                 	System.out.println("LoginServlet: id = " + userId);
                 	System.out.println("LoginServlet: role = " + userRole);
 
-                    // ログイン成功時はStatusServletにリダイレクト
+                    // ログイン成功時�EStatusServletにリダイレクチE
                     response.sendRedirect(request.getContextPath() + "/StatusServlet?view=DashBoard");
                 } else {
-                    // ログイン失敗時はエラーページにリダイレクト
+                    // ログイン失敗時はエラーペ�EジにリダイレクチE
                     response.sendRedirect("error/login-failed.html?type=invalid_credentials");
                 }
             } else {
-                // ユーザーIDが存在しない場合
+                // ユーザーIDが存在しなぁE��吁E
                 response.sendRedirect("error/login-failed.html?type=invalid_credentials");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            // データベースエラーの場合
+            // チE�Eタベ�Eスエラーの場吁E
             response.sendRedirect("error/login-failed.html?type=database_error");
         }
     }

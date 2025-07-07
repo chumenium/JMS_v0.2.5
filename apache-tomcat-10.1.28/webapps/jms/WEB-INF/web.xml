@@ -91,17 +91,6 @@
     <url-pattern>/DashboardRedirectServlet</url-pattern>
   </servlet-mapping>
   
-<<<<<<< HEAD
-  <!-- テスト用サーブレット -->
-  <servlet>
-    <servlet-name>TestUIServlet</servlet-name>
-    <servlet-class>test.TestUIServlet</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>TestUIServlet</servlet-name>
-    <url-pattern>/TestUIServlet</url-pattern>
-=======
   <!-- テスト用ダッシュボードサーブレット（本番環境では削除すること） -->
   <servlet>
     <servlet-name>TestDashboardServlet</servlet-name>
@@ -111,6 +100,17 @@
   <servlet-mapping>
     <servlet-name>TestDashboardServlet</servlet-name>
     <url-pattern>/TestDashboard</url-pattern>
+  </servlet-mapping>
+  
+  <!-- テスト用サーブレット -->
+  <servlet>
+    <servlet-name>TestUIServlet</servlet-name>
+    <servlet-class>test.TestUIServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>TestUIServlet</servlet-name>
+    <url-pattern>/TestUIServlet</url-pattern>
   </servlet-mapping>
   
   <!-- 企業管理サーブレット -->
@@ -166,7 +166,28 @@
   <servlet-mapping>
     <servlet-name>DashboardServlet</servlet-name>
     <url-pattern>/DashboardServlet</url-pattern>
->>>>>>> 364414c18d1c438f99f2bec51ef8e2aa404aa9c0
   </servlet-mapping>
   
-</web-app>
+  <!-- 企業詳細・編集サーブレット -->
+  <servlet>
+    <servlet-name>CompanyDetailServlet</servlet-name>
+    <servlet-class>servlet.CompanyDetailServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CompanyDetailServlet</servlet-name>
+    <url-pattern>/CompanyDetailServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- テスト用企業詳細・編集サーブレット -->
+  <servlet>
+    <servlet-name>TestCompanyDetailServlet</servlet-name>
+    <servlet-class>servlet.TestCompanyDetailServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>TestCompanyDetailServlet</servlet-name>
+    <url-pattern>/TestCompanyDetailServlet</url-pattern>
+  </servlet-mapping>
+  
+</web-app> 
