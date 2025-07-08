@@ -15,7 +15,7 @@ public class DBConnection {
       // 無料MySQLホスティング設定（Filess.io）
     private static final String FREE_URL = "jdbc:mysql://sa7np.h.filess.io:3307/jms_essential";
     private static final String FREE_USER = "jms_essential";
-    private static final String FREE_PASSWORD = ""; // TODO: Filess.ioから取得した実際のパスワードを入力してください
+    private static final String FREE_PASSWORD = "admin_jms"; // TODO: Filess.ioから取得した実際のパスワードを入力してください
   
       // 使用するDB設定（true: 無料DB, false: GCP DB）
     private static final boolean USE_FREE_DB = true;

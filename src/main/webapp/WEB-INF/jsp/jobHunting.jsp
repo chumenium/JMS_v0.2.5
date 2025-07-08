@@ -1,14 +1,15 @@
 <!--*
 ：：：色のテーマは緑：：：
-企業管理画面
+就職管理画面
 
 
 **********
 
-<!--* 画面：企業管理画面
+<!--* 画面：就職管理画面
         	
 許可されている権限：
-・就職指導部：egd
+・教員：teacher
+・校長・教務部長：headmaster
 ・システム管理者：admin
  
 ▼▼▼▼
@@ -20,15 +21,18 @@
 <!--KCS_JMS_PROJECT-->
 
 
-<!-- 企業管理画面用 -->
+<!-- 就職管理画面用 -->
 
+
+
+<!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
 <% 
   String username = (String) session.getAttribute("username"); 
   String role     = (String) session.getAttribute("role"); 
   
   // デバッグ用：セッション情報をコンソールに出力
-  System.out.println("CompanyManagement.jsp - username: " + username);
-  System.out.println("CompanyManagement.jsp - role: " + role);
+  System.out.println("StudentManagement.jsp - username: " + username);
+  System.out.println("StudentManagement.jsp - role: " + role);
   
   // nullチェック
   if (username == null) {
@@ -38,36 +42,40 @@
     role = "guest";
   }
   
+  // リクエストスコープからプルダウン用データを取得
+  java.util.List<String> classList = (java.util.List<String>) request.getAttribute("classList");
+  java.util.List<String> enrollmentStatusList = (java.util.List<String>) request.getAttribute("enrollmentStatusList");
+  java.util.List<String> assistanceList = (java.util.List<String>) request.getAttribute("assistanceList");
+  java.util.List<String> firstChoiceIndustryList = (java.util.List<String>) request.getAttribute("firstChoiceIndustryList");
+  java.util.List<Integer> graduationYearList = (java.util.List<Integer>) request.getAttribute("graduationYearList");
+  
   // エラーメッセージを取得
   String errorMessage = (String) request.getAttribute("errorMessage");
-  String successMessage = (String) request.getAttribute("successMessage");
 %>
 <!--▲▲▲▲▲-->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-
-<!--▲▲▲▲▲-->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>JMSアプリ - 企業管理</title>
+<title>JMSアプリ - 就職管理画面</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
 
 <style>
-    /* システム上見やすさを追求した企業管理画面デザイン */
+    /* システム上見やすさを追求した学生管理画面デザイン */
     
     /* 全体の設定 */
-    .company-management-page {
+    .student-management-page {
         background: #f8f9fa;
         color: #2c3e50;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         line-height: 1.6;
     }
 
-    .company-management-container {
+    .student-management-container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 24px;
@@ -338,7 +346,7 @@
 
     /* レスポンシブ対応の強化 */
     @media (max-width: 768px) {
-        .company-management-container {
+        .student-management-container {
             padding: 16px;
         }
         
@@ -382,7 +390,7 @@
     }
 
     @media (max-width: 480px) {
-        .company-management-container {
+        .student-management-container {
             padding: 12px;
         }
         
@@ -433,12 +441,12 @@
 
     /* ダークモード対応 */
     @media (prefers-color-scheme: dark) {
-        .company-management-page {
+        .student-management-page {
             background: #1a1a1a;
             color: #ffffff;
         }
         
-        .company-management-container {
+        .student-management-container {
             background: #2d2d2d;
         }
         
@@ -477,35 +485,35 @@
     }
 
     /* ダッシュボード用ヘッダー調整 */
-    .company-management-page header {
+    .student-management-page header {
         position: relative;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
-    .company-management-page #mainimg {
+    .student-management-page #mainimg {
         display: none;
     }
 
-    .company-management-page main {
+    .student-management-page main {
         margin-top: 0;
     }
 
     /* テキストスライドショー用の調整 */
-    .company-management-page .text-slide-wrapper {
+    .student-management-page .text-slide-wrapper {
         margin-top: 0;
         margin-bottom: 0;
     }
 
-    .company-management-page .text-slide {
+    .student-management-page .text-slide {
         font-size: 8vw;
         opacity: 0.08;
     }
 </style>
 
 </head>
-<body class="company-management-page">
+<body class="student-management-page">
 <% 
   // 権限名を日本語に変換
   String roleDisplay = "";
@@ -552,27 +560,27 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <div class="company-management-container">
+        <div class="student-management-container">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
-                <h1 class="page-title">企業管理</h1>
-                <p class="page-subtitle">企業情報の管理と採用実績の把握ができます</p>
+                <h1 class="page-title">就活管理</h1>
+                <p class="page-subtitle">就活の選考ステージ登録や試験面接情報の入力、書類チェック、<br>受験予定者抽出、活動報告自動出力などの画面に遷移できます。</p>
                 <nav class="breadcrumb" aria-label="パンくずリスト">
                     <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
                     <span class="separator" aria-hidden="true">/</span>
-                    <span>企業管理</span>
+                    <span>就活管理</span>
                 </nav>
             </header>
 
             <!-- メッセージ表示 -->
-            <% if (successMessage != null) { %>
+            <% if (request.getAttribute("successMessage") != null) { %>
                 <div class="message success-message" style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
-                    ✅ <%= successMessage %>
+                    ✅ <%= request.getAttribute("successMessage") %>
                 </div>
             <% } %>
-            <% if (errorMessage != null) { %>
+            <% if (request.getAttribute("errorMessage") != null) { %>
                 <div class="message error-message" style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
-                    ❌ <%= errorMessage %>
+                    ❌ <%= request.getAttribute("errorMessage") %>
                 </div>
             <% } %>
 
@@ -580,11 +588,23 @@
             <section class="quick-actions" role="region" aria-label="操作一覧">
                 <h2>🚀 操作一覧</h2>
                 <div class="action-buttons">
-                    <a href="CompanyListServlet" class="action-btn" aria-label="企業一覧を表示">
+                    <a href="CompanyServlet" class="action-btn" aria-label="企業一覧画面へ">
                         <i class="fas fa-list" aria-hidden="true"></i>企業一覧を表示
+                    </a>						 <!-- 画面上は「選考ステージ登録と表示する-->
+                    <a href="StatusServlet?status=          " class="action-btn" aria-label="就活情報検索画面へ">
+                        <i class="fas fa-selection" aria-hidden="true"></i>選考ステージ登録
                     </a>
-                    <a href="CreateCompanyServlet" class="action-btn" aria-label="新規企業登録">
-                        <i class="fas fa-plus" aria-hidden="true"></i>新規企業登録
+                    <a href="StatusServlet?view=         " class="action-btn secondary" aria-label="試験面接情報入力画面へ">
+                        <i class="fas fa-exam" aria-hidden="true"></i>試験面接情報入力
+                    </a>
+                    <a href="StatusServlet?view=       " class="action-btn secondary" aria-label="書類提出チェック画面へ">
+                        <i class="fas fa-Document submission" aria-hidden="true"></i>書類提出チェック
+                    </a>
+                     <a href="StatusServlet?view=      " class="action-btn secondary" aria-label="受験予定者抽出画面へ">
+                        <i class="fas fa-Examination" aria-hidden="true"></i>受験予定者抽出
+                    </a>
+                     <a href="StatusServlet?view=        " class="action-btn secondary" aria-label="活動報告自動出力画面へ">
+                        <i class="fas fa-Activity Report" aria-hidden="true"></i>活動報告自動出力画面
                     </a>
                 </div>
             </section>
@@ -594,45 +614,45 @@
                 
                 <!-- 企業一覧管理 -->
                 <article class="management-card" role="article">
-                    <span class="card-icon" aria-hidden="true">🏢</span>
+                    <span class="card-icon" aria-hidden="true">📋</span>
                     <h3 class="card-title">企業一覧管理</h3>
                     <p class="card-description">
-                        登録されている企業の一覧を表示し、詳細情報の確認や編集を行えます。
+                        登録されている企業の一覧を表示し、詳細情報の確認を行えます。
                     </p>
-                    <div class="card-stats" role="group" aria-label="企業統計">
+                    <div class="card-stats" role="group" aria-label="学生統計">
                         <div class="stat-item">
-                            <span class="stat-number">-</span>
+                            <span class="stat-number">250</span>
                             <span class="stat-label">総企業数</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">-</span>
-                            <span class="stat-label">採用実績あり</span>
+                            <span class="stat-number">67</span>
+                            <span class="stat-label">募集中企業</span>
                         </div>
                     </div>
-                    <a href="CompanyListServlet" class="card-link" aria-label="企業一覧を表示">
+                    <a href="CompanyServlet" class="card-link" aria-label="学生一覧を表示">
                         企業一覧を表示
                     </a>
                 </article>
 
-                <!-- 新規企業登録 -->
+                <!-- 選考ステージ登録 -->
                 <article class="management-card" role="article">
-                    <span class="card-icon" aria-hidden="true">➕</span>
-                    <h3 class="card-title">新規企業登録</h3>
+                    <span class="card-icon" aria-hidden="true">🚶‍♂️‍➡️</span>
+                    <h3 class="card-title">選考ステージ登録</h3>
                     <p class="card-description">
-                        新しい企業の情報を登録し、システムに追加できます。
+                        選考ステージを登録し、企業情報を追加できます。
                     </p>
                     <div class="card-stats" role="group" aria-label="登録統計">
                         <div class="stat-item">
-                            <span class="stat-number">新規</span>
-                            <span class="stat-label">登録可能</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">-</span>
+                            <span class="stat-number">43</span>
                             <span class="stat-label">今月登録</span>
                         </div>
+                        <div class="stat-item">
+                            <span class="stat-number">5</span>
+                            <span class="stat-label">未完了</span>
+                        </div>
                     </div>
-                    <a href="CreateCompanyServlet" class="card-link" aria-label="新規企業を登録">
-                        新規企業を登録
+                    <a href="StatusServlet?status=       " class="card-link" aria-label="新規学生を登録">
+                        選考ステージを登録
                     </a>
                 </article>
             </section>
@@ -642,7 +662,7 @@
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->
     <div class="text-slide-wrapper">
         <div class="text-slide">
-            <span>Company Management System</span>
+            <span>Student Management System</span>
         </div>
     </div>
     <!--▲▲▲▲▲ここまで「テキストスライドショー」-->
@@ -743,7 +763,7 @@
 <script src="js/main.js"></script>
 
 <script>
-// 企業管理画面の最適化されたJavaScript
+// 学生管理画面の最適化されたJavaScript
 
 // アクセシビリティの向上
 document.addEventListener('DOMContentLoaded', () => {
@@ -789,11 +809,8 @@ document.addEventListener('DOMContentLoaded', () => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const target = entry.target;
-                const text = target.textContent;
-                if (!isNaN(text)) {
-                    const finalValue = parseInt(text);
-                    animateNumber(target, 0, finalValue, 1000);
-                }
+                const finalValue = parseInt(target.textContent);
+                animateNumber(target, 0, finalValue, 1000);
                 observer.unobserve(target);
             }
         });

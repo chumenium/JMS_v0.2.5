@@ -9,6 +9,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.ServletException;
@@ -65,31 +68,48 @@ public class StudentServlet extends HttpServlet {
             return 0;
         }
     }
+    
     //引数で渡したステータスの学生すべてを取得する
     private ArrayList<ArrayList<String>> getStudentEnrollment(String enrollmentStatus) {
-    	 try (Connection conn = DBConnection.getConnection()) {
-    		 ArrayList<String> classs = new ArrayList<String>();
-    		 ArrayList<String> studentid = new ArrayList<String>();
-             String sql = "SELECT student_id, class FROM students_tbl WHERE enrollment_status = ?";
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             stmt.setString(1, enrollmentStatus);
-             ResultSet rs = stmt.executeQuery();
-             while (rs.next()) {
-            	 studentid.add(rs.getString("student_id"));
-            	 classs.add(rs.getString("class"));
-             }
-             ArrayList<ArrayList<String>> studentList = new ArrayList<>();
-             studentList.add(studentid);
-             studentList.add(classs);
-             
-             return studentList;
-    	 } catch (Exception e) {
-             e.printStackTrace();
-             return null;
-    	 }
-    	
+    	try (Connection conn = DBConnection.getConnection()) {
+    		String sql = "SELECT student_id, class FROM students_tbl WHERE enrollment_status = ?";
+    		PreparedStatement stmt = conn.prepareStatement(sql);
+    		stmt.setString(1, enrollmentStatus);
+    		ResultSet rs = stmt.executeQuery();
+    		
+    		ArrayList<String> classs = new ArrayList<String>();
+    		ArrayList<String> studentid = new ArrayList<String>();
+    		
+    		while (rs.next()) {
+    			studentid.add(rs.getString("student_id"));
+    			classs.add(rs.getString("class"));
+    		}
+    		
+    		ArrayList<ArrayList<String>> studentList = new ArrayList<>();
+    		studentList.add(studentid);
+    		studentList.add(classs);
+    		
+    		return studentList;
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    		return null;
+    	}
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // セッションの確認
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // 権限チェック（教員、校長・教務部長、管理者のみ）
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
+        }
+        
         String action = request.getParameter("action");
 
 
@@ -113,100 +133,99 @@ public class StudentServlet extends HttpServlet {
                 
             if ("add".equals(action)) {
                 // 学生を新規追加する（パスワード管理と学年期間を適用）
-    	        String student_id = request.getParameter("studentId");//学籍番号
-    	        //String password = request.getParameter("password");
-    	        String student_class = request.getParameter("className");//クラス名S3A1
-    	        String department = null;
-    	        String studentClass = null;
-    	        if (student_class != null && !student_class.trim().isEmpty()) {
-    	            department = student_class.substring(0, 2);
-    	            studentClass = student_class.substring(2);
-    	        }
-    	        String number = request.getParameter("attendanceNo");//出席番号
-    	        String name = request.getParameter("name");//名前
-    	        String name_reading = request.getParameter("kana");//カナ
-    	        String gender = request.getParameter("gender");
+                String student_id = request.getParameter("studentId");//学籍番号
+                String student_class = request.getParameter("className");//クラス名S3A1
+                String department = null;
+                String studentClass = null;
+                if (student_class != null && !student_class.trim().isEmpty()) {
+                    department = student_class.substring(0, 2);
+                    studentClass = student_class.substring(2);
+                }
+                String number = request.getParameter("attendanceNo");//出席番号
+                String name = request.getParameter("name");//名前
+                String name_reading = request.getParameter("kana");//カナ
+                String gender = request.getParameter("gender");
                 String email = request.getParameter("email");
                 String tel = request.getParameter("tel");
-    	        String enrollment_status = "在籍";// = request.getParameter("enrollment_status");
-                // String email = request.getParameter("email");
-                // String tel = request.getParameter("tel");
+                String enrollment_status = "在籍";
                 String jobHuntingStatus = request.getParameter("jobHuntingStatus");
-    	        String admission_year_str = request.getParameter("admissionYear");//入学年
-                String class_grade = request.getParameter("classGrade");//クラスの学年
-                String[] departments = {"G","J","M","R","S"};//G2,J2,M3,R4,S3
-            	int[] gradeUpLimits = {2,2,3,4,3};
+                String admission_year_str = request.getParameter("admissionYear");
+                String class_grade = request.getParameter("classGrade");
+                String[] departments = {"G","J","M","R","S"};
+                int[] gradeUpLimits = {2,2,3,4,3};
                 int plus_num = 0;
                 for(int i = 0; i < departments.length; i++) {
                     if(departments[i].equals(student_class.substring(0, 1))) {
-                        plus_num = gradeUpLimits[i];// - (Integer.parseInt(class_grade) - 1);
+                        plus_num = gradeUpLimits[i];
                     }
                 }
-    	        int graduation_year = 0;
-    	        if (admission_year_str != null && !admission_year_str.trim().isEmpty()) {
-    	            graduation_year = Integer.parseInt(admission_year_str) + plus_num;
-    	        }
+                int graduation_year = 0;
+                if (admission_year_str != null && !admission_year_str.trim().isEmpty()) {
+                    graduation_year = Integer.parseInt(admission_year_str) + plus_num;
+                }
                 String desired_job_type_1st = request.getParameter("targetIndustry1");
                 String desired_job_type_2nd = request.getParameter("targetIndustry2");
                 String desired_job_type_3rd = request.getParameter("targetIndustry3");
                 String remarks = request.getParameter("remarks");
-    	        
-    	        
-    	        // ソルトを生成
-    	        String salt = generateSalt();
-    	        // パスワードをハッシュ化
-    	        String hashedPassword = hashPassword("123456", salt);
-    	        //データ挿入クエリ生成
-    	        String registerQuery = "INSERT INTO users (id, password, role, salt) VALUES (?, ?, ?, ?);";
-    	        PreparedStatement usersStatement = conn.prepareStatement(registerQuery);
-    	        usersStatement.setString(1, student_id);//OK
-    	        usersStatement.setString(2, hashedPassword);//OK
-    	        usersStatement.setString(3, "student");//OK
-    	        usersStatement.setString(4, salt);//OK
-
-    	        String studentQuery = "INSERT INTO students_tbl "
-    	        	    + "(student_id, department, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, "
-    	        	    + "desired_job_type_1st_id, desired_job_type_2nd_id, desired_job_type_3rd_id, graduation_year, remarks) "
-    	        	    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
-
-                PreparedStatement studentStatement = conn.prepareStatement(studentQuery);
-                
-                studentStatement.setString(1, student_id);//OK
-                studentStatement.setString(2, department);//OK
-                studentStatement.setString(3, studentClass);//OK
-                studentStatement.setString(4, number);//OK
-                studentStatement.setString(5, name);//OK
-                studentStatement.setString(6, name_reading);//OK
-                studentStatement.setString(7, gender);//OK
-                studentStatement.setString(8, email);//メールアドレス
-                studentStatement.setString(9, tel);//電話番号
-                studentStatement.setString(10, enrollment_status);//OK
-                studentStatement.setNull(11, java.sql.Types.VARCHAR);//OK
-                studentStatement.setString(12, jobHuntingStatus);//OK
-                studentStatement.setInt(13, Integer.parseInt(desired_job_type_1st));//OK
-                studentStatement.setInt(14, Integer.parseInt(desired_job_type_2nd));//OK
-                studentStatement.setInt(15, Integer.parseInt(desired_job_type_3rd));//OK
-                if (graduation_year > 0) {
-                    studentStatement.setInt(16, graduation_year);
-                } else {
-                    studentStatement.setNull(16, java.sql.Types.INTEGER);
-                }
-                studentStatement.setString(17, remarks);//OK
-                
-                System.out.println(usersStatement.toString());
-                System.out.println(studentStatement.toString());
-
+                // ソルトを生成
+                String salt = generateSalt();
+                // パスワードをハッシュ化
+                String hashedPassword = hashPassword("123456", salt);
+                // usersテーブルへのinsert（現状維持）
+                String registerQuery = "INSERT INTO users (id, password, role, salt) VALUES (?, ?, ?, ?);";
+                PreparedStatement usersStatement = conn.prepareStatement(registerQuery);
+                usersStatement.setString(1, student_id);
+                usersStatement.setString(2, hashedPassword);
+                usersStatement.setString(3, "student");
+                usersStatement.setString(4, salt);
                 int rowsInserted1 = usersStatement.executeUpdate();
+                // students_tblへのinsertはDAO経由に
+                Map<String, Object> student = new HashMap<>();
+                student.put("student_id", student_id);
+                student.put("department", department);
+                student.put("class", studentClass);
+                student.put("number", number);
+                student.put("name", name);
+                student.put("name_reading", name_reading);
+                student.put("gender", gender);
+                student.put("email", email);
+                student.put("tel", tel);
+                student.put("enrollment_status", enrollment_status);
+                student.put("mediation_status", null);
+                student.put("job_hunting_status", jobHuntingStatus);
+                student.put("desired_job_type_1st_id", Integer.parseInt(desired_job_type_1st));
+                student.put("desired_job_type_2nd_id", Integer.parseInt(desired_job_type_2nd));
+                student.put("desired_job_type_3rd_id", Integer.parseInt(desired_job_type_3rd));
+                student.put("graduation_year", graduation_year);
+                student.put("remarks", remarks);
+                
+                // students_tblへのinsert
+                String studentQuery = "INSERT INTO students_tbl (student_id, department, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, desired_job_type_1st_id, desired_job_type_2nd_id, desired_job_type_3rd_id, graduation_year, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement studentStatement = conn.prepareStatement(studentQuery);
+                studentStatement.setString(1, student_id);
+                studentStatement.setString(2, department);
+                studentStatement.setString(3, studentClass);
+                studentStatement.setString(4, number);
+                studentStatement.setString(5, name);
+                studentStatement.setString(6, name_reading);
+                studentStatement.setString(7, gender);
+                studentStatement.setString(8, email);
+                studentStatement.setString(9, tel);
+                studentStatement.setString(10, enrollment_status);
+                studentStatement.setNull(11, java.sql.Types.VARCHAR);
+                studentStatement.setString(12, jobHuntingStatus);
+                studentStatement.setInt(13, Integer.parseInt(desired_job_type_1st));
+                studentStatement.setInt(14, Integer.parseInt(desired_job_type_2nd));
+                studentStatement.setInt(15, Integer.parseInt(desired_job_type_3rd));
+                studentStatement.setInt(16, graduation_year);
+                studentStatement.setString(17, remarks);
+                
                 int rowsInserted2 = studentStatement.executeUpdate();
                 
-                //初期データ例：23105,   S3A1,  21, 山田 太郎, ヤマダ タロウ, 男,    在籍,   NULL, 　活動中, 　1,        0,       0 ,  2026   ,NULL
-                //             学籍番号,クラス,番号,   名前,     名前読み,   性別,在籍状況,斡旋状況,就活状況,希望職種1,希望職種2,希望職種3,卒業年,備考
                 if (rowsInserted1 > 0 && rowsInserted2 > 0) {
-                	//データ登録成功
-                	request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
+                    request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
                 } else {
-                    //データ登録失敗
-                    request.setAttribute("errorMessage", "データ登録に失敗しました。");
+                    request.setAttribute("errorMessage", "データ登録に失敗しました。" );
                     DropdownDataDAO dropdownDAO = new DropdownDataDAO();
                     request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
                     request.getRequestDispatcher("/WEB-INF/jsp/CreateStudent.jsp").forward(request, response);
@@ -395,7 +414,121 @@ public class StudentServlet extends HttpServlet {
                 stmt1.executeUpdate();
 
                 request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
+            }else if ("search".equals(action)) {
+                System.out.println("searchの処理をします");
+                String keyword = request.getParameter("keyword");
+                String pageParam = request.getParameter("page");
+                int page = 1;
+                int pageSize = 10; // 1ページあたりの表示件数
                 
+                if (pageParam != null) {
+                    try {
+                        page = Integer.parseInt(pageParam);
+                    } catch (NumberFormatException e) {
+                        page = 1;
+                    }
+                }
+
+                ArrayList<ArrayList<String>> students = new ArrayList<>();
+                int totalCount = 0;
+                
+                try (Connection conn2 = DBConnection.getConnection()) {
+                    // 検索条件に基づくWHERE句の構築
+                    String whereClause = "";
+                    if (keyword != null && !keyword.trim().isEmpty()) {
+                        whereClause = " WHERE student_id LIKE ? OR name LIKE ? OR CONCAT(department, class) LIKE ? OR job_hunting_status LIKE ?";
+                    }
+                    
+                    // 総件数取得
+                    String countSql = "SELECT COUNT(*) FROM students_tbl" + whereClause;
+                    PreparedStatement countStmt = conn2.prepareStatement(countSql);
+                    
+                    if (!whereClause.isEmpty()) {
+                        String likePattern = "%" + keyword + "%";
+                        countStmt.setString(1, likePattern);
+                        countStmt.setString(2, likePattern);
+                        countStmt.setString(3, likePattern);
+                        countStmt.setString(4, likePattern);
+                    }
+                    
+                    ResultSet countRs = countStmt.executeQuery();
+                    if (countRs.next()) {
+                        totalCount = countRs.getInt(1);
+                    }
+                    
+                    // 学生データ取得
+                    String sql = "SELECT student_id, name, department, class, job_hunting_status, number, name_reading, gender, enrollment_status, mediation_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year FROM students_tbl s LEFT JOIN occupations_tbl o1 ON s.desired_job_type_1st_id = o1.occupation_id LEFT JOIN occupations_tbl o2 ON s.desired_job_type_2nd_id = o2.occupation_id LEFT JOIN occupations_tbl o3 ON s.desired_job_type_3rd_id = o3.occupation_id";
+                    PreparedStatement stmt = conn2.prepareStatement(sql);
+                    ResultSet rs = stmt.executeQuery();
+                    //ArrayList<ArrayList<String>> students = new ArrayList<>();
+                    ArrayList<String> studentids = new ArrayList<>();
+                    ArrayList<String> names = new ArrayList<>();
+                    ArrayList<String> classs = new ArrayList<>();
+                    ArrayList<String> enrollmentStatuss = new ArrayList<>();
+                    ArrayList<String> numbers = new ArrayList<>();
+                    ArrayList<String> nameReadings = new ArrayList<>();
+                    ArrayList<String> genders = new ArrayList<>();
+                    ArrayList<String> mediationStatuss = new ArrayList<>();
+                    ArrayList<String> DJTs1 = new ArrayList<>();
+                    ArrayList<String> DJTs2 = new ArrayList<>();
+                    ArrayList<String> DJTs3 = new ArrayList<>();
+                    ArrayList<String> graduationYears = new ArrayList<>();
+                    while(rs.next()) {
+                        studentids.add(rs.getString("student_id"));
+                        names.add(rs.getString("name"));
+                        classs.add(rs.getString("department") + rs.getString("class"));
+                        enrollmentStatuss.add(rs.getString("job_hunting_status"));
+                        numbers.add(rs.getString("number"));
+                        nameReadings.add(rs.getString("name_reading"));
+                        genders.add(rs.getString("gender"));
+                        enrollmentStatuss.add(rs.getString("enrollment_status"));
+                        mediationStatuss.add(rs.getString("mediation_status"));
+                        DJTs1.add(rs.getString("1st"));
+                        DJTs2.add(rs.getString("2nd"));
+                        DJTs3.add(rs.getString("3rd"));
+                        graduationYears.add(rs.getString("graduation_year"));
+                    }
+                    ArrayList<String> studentids2 = new ArrayList<>();
+                    ArrayList<String> names2 = new ArrayList<>();
+                    ArrayList<String> classs2 = new ArrayList<>();
+                    ArrayList<String> enrollmentStatuss2 = new ArrayList<>();
+                    String[] keywords = keyword.split(" ");
+                    for(int i = 0; i < studentids.size(); i++) {
+                        for(int j = 0; j < keywords.length; j++) {
+                            String date = studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i)+numbers.get(i)+nameReadings.get(i)+genders.get(i)+mediationStatuss.get(i)+DJTs1.get(i)+DJTs2.get(i)+DJTs3.get(i)+graduationYears.get(i);
+                            if(date.matches(".*"+keywords[j]+".*")) {
+                                studentids2.add(studentids.get(i));
+                                names2.add(names.get(i));
+                                classs2.add(classs.get(i));
+                                enrollmentStatuss2.add(enrollmentStatuss.get(i));
+                            }
+                            System.out.println(studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i));
+                        }
+                    }
+
+                    students.add(studentids2);
+                    students.add(names2);
+                    students.add(classs2);
+                    students.add(enrollmentStatuss2);
+                    
+                } catch (Exception e) {
+                    System.err.println("Database error in search: " + e.getMessage());
+                    e.printStackTrace();
+                    // エラーが発生した場合でも空のリストを設定
+                    students.add(new ArrayList<>());
+                    students.add(new ArrayList<>());
+                    students.add(new ArrayList<>());
+                    students.add(new ArrayList<>());
+                    totalCount = 0;
+                }
+                
+                int totalPages = (int) Math.ceil((double) totalCount / pageSize);
+                request.setAttribute("students", students);
+                request.setAttribute("currentPage", page);
+                request.setAttribute("totalPages", totalPages);
+                request.setAttribute("keyword", keyword);
+
+                request.getRequestDispatcher("/WEB-INF/jsp/StudentList.jsp").forward(request, response);
             } else if ("viewStudents".equals(action)) {
     	        String student_id = request.getParameter("student_id");
     	        String student_class = request.getParameter("class");
@@ -726,6 +859,20 @@ public class StudentServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // セッションの確認
+        jakarta.servlet.http.HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // 権限チェック（教員、校長・教務部長、管理者のみ）
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
+        }
+        
         // デバッグログ
         System.out.println("StudentServlet doGet: アクセス開始");
         System.out.println("StudentServlet: request URI = " + request.getRequestURI());
@@ -814,10 +961,10 @@ public class StudentServlet extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("keyword", keyword);
             
-            System.out.println("StudentServlet: JSPフォワード開始 - StudentList.jsp");
-            System.out.println("StudentServlet: 学生数 = " + students.get(0).size());
-            System.out.println("StudentServlet: 現在ページ = " + page);
-            System.out.println("StudentServlet: 総ページ数 = " + totalPages);
+            // System.out.println("StudentServlet: JSPフォワード開始 - StudentList.jsp");
+            // System.out.println("StudentServlet: 学生数 = " + students.get(0).size());
+            // System.out.println("StudentServlet: 現在ページ = " + page);
+            // System.out.println("StudentServlet: 総ページ数 = " + totalPages);
             
             request.getRequestDispatcher("/WEB-INF/jsp/StudentList.jsp").forward(request, response);
         } catch (Exception e) {

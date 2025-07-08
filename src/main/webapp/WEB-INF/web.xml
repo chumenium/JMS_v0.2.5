@@ -81,26 +81,9 @@
     <url-pattern>/LogoutServlet</url-pattern>
   </servlet-mapping>
   
-  <servlet>
-    <servlet-name>DashboardRedirectServlet</servlet-name>
-    <servlet-class>servlet.DashboardRedirectServlet</servlet-class>
-  </servlet>
+
   
-  <servlet-mapping>
-    <servlet-name>DashboardRedirectServlet</servlet-name>
-    <url-pattern>/DashboardRedirectServlet</url-pattern>
-  </servlet-mapping>
-  
-  <!-- テスト用ダッシュボードサーブレット（本番環境では削除すること） -->
-  <servlet>
-    <servlet-name>TestDashboardServlet</servlet-name>
-    <servlet-class>servlet.TestDashboardServlet</servlet-class>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>TestDashboardServlet</servlet-name>
-    <url-pattern>/TestDashboard</url-pattern>
-  </servlet-mapping>
+
   
   <!-- 企業管理サーブレット -->
   <servlet>
@@ -166,6 +149,28 @@
   <servlet-mapping>
     <servlet-name>CompanyDetailServlet</servlet-name>
     <url-pattern>/CompanyDetailServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 企業一覧サーブレット -->
+  <servlet>
+    <servlet-name>CompanyListServlet</servlet-name>
+    <servlet-class>servlet.CompanyListServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CompanyListServlet</servlet-name>
+    <url-pattern>/CompanyListServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 企業登録サーブレット -->
+  <servlet>
+    <servlet-name>CreateCompanyServlet</servlet-name>
+    <servlet-class>servlet.CreateCompanyServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>CreateCompanyServlet</servlet-name>
+    <url-pattern>/CreateCompanyServlet</url-pattern>
   </servlet-mapping>
   
 </web-app>

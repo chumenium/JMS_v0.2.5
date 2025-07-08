@@ -432,7 +432,8 @@
             </header>
 
             <!-- 検索バー -->
-            <form class="search-bar" method="get" action="StudentServlet">
+            <form class="search-bar" method="post" action="StudentServlet">
+                <input type="hidden" name="action" value="search">
                 <input type="text" name="keyword" placeholder="氏名・学籍番号・クラスなどで検索..." aria-label="検索キーワード" value="${keyword != null ? keyword : ''}">
                 <button type="submit" aria-label="検索">🔍 検索</button>
             </form>
@@ -458,8 +459,8 @@
                                     <td>${students[2][i]}</td>
                                     <td>${students[3][i]}</td>
                                     <td>
-                                        <a href="#" class="action-btn" aria-label="学生詳細を表示">詳細</a>
-                                        <a href="#" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
+                                        <a href="StudentViewServlet?id=${students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
+                                        <a href="StudentDetailServlet?id=${students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
                                     </td>
                                 </tr>
                             </c:forEach>

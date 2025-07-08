@@ -43,9 +43,8 @@ public class DropdownDataDAO {
 
     public List<String> getMediationStatuses() {
         List<String> mediations = new ArrayList<>();
-        mediations.add("学校斡旋");
-        mediations.add("自己応募");
-        mediations.add("縁故");
+        mediations.add("受理");
+        mediations.add("辞退");
         return mediations;
     }
 
@@ -92,5 +91,20 @@ public class DropdownDataDAO {
             e.printStackTrace();
         }
         return jobtypes;
+    }
+
+    public List<String> getWorkplaces() {
+        List<String> workplaces = new ArrayList<>();
+        String sql = "SELECT work_place FROM work_place_tbl ORDER BY id";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                workplaces.add(rs.getString("work_place"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return workplaces;
     }
 }
