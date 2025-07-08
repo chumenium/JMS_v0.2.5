@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import dao.DropdownDataDAO;
 
 /**
- * Servlet implementation class statusServlet
+ * Servlet implementation class StatusServlet
  */
 //@WebServlet("/StatusServlet")
 public class StatusServlet extends HttpServlet {
@@ -135,8 +135,8 @@ public class StatusServlet extends HttpServlet {
 	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
 	                        return;
 	                    }
-					DropdownDataDAO dropdownDAO = new DropdownDataDAO();
-					request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
+						DropdownDataDAO DropdownDataDAO = new DropdownDataDAO();
+	request.setAttribute("jobtypes", DropdownDataDAO.getJobtypes());
 	                    nextPage = "/WEB-INF/jsp/CreateStudent.jsp";
 	                    break;
 	                case "studentDetail":

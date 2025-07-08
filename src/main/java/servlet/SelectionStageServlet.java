@@ -18,7 +18,7 @@ import dao.SelectionStageDAO;
  */
 public class SelectionStageServlet extends HttpServlet {
     
-    private SelectionStageDAO selectionStageDAO = new SelectionStageDAO();
+    	private SelectionStageDAO SelectionStageDAO = new SelectionStageDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -45,14 +45,14 @@ public class SelectionStageServlet extends HttpServlet {
         List<Map<String, Object>> selectionStages;
         if ("admin".equals(role)) {
             // 管理者の場合は全ての選考段階を取得
-            selectionStages = selectionStageDAO.getAllSelectionStages();
+            			selectionStages = SelectionStageDAO.getAllSelectionStages();
         } else {
             // 学生の場合は自分の選考段階のみ取得
-            selectionStages = selectionStageDAO.getSelectionStagesByStudentId(studentId);
+            			selectionStages = SelectionStageDAO.getSelectionStagesByStudentId(studentId);
         }
         
         // 統計情報を取得
-        Map<String, Integer> statistics = selectionStageDAO.getSelectionStageStatistics();
+        		Map<String, Integer> statistics = SelectionStageDAO.getSelectionStageStatistics();
         
         request.setAttribute("selectionStages", selectionStages);
         request.setAttribute("statistics", statistics);
@@ -97,7 +97,7 @@ public class SelectionStageServlet extends HttpServlet {
             String currentStage = request.getParameter("currentStage");
             String notes = request.getParameter("notes");
             
-            boolean success = selectionStageDAO.updateSelectionStage(id, currentStage, notes);
+            		boolean success = SelectionStageDAO.updateSelectionStage(id, currentStage, notes);
             
             if (success) {
                 request.setAttribute("message", "選考段階を更新しました。");
@@ -117,7 +117,7 @@ public class SelectionStageServlet extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
             String newStage = request.getParameter("newStage");
             
-            boolean success = selectionStageDAO.advanceSelectionStage(id, newStage);
+            		boolean success = SelectionStageDAO.advanceSelectionStage(id, newStage);
             
             if (success) {
                 request.setAttribute("message", "選考段階を進行させました。");
@@ -136,7 +136,7 @@ public class SelectionStageServlet extends HttpServlet {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             
-            boolean success = selectionStageDAO.rejectSelectionStage(id);
+            		boolean success = SelectionStageDAO.rejectSelectionStage(id);
             
             if (success) {
                 request.setAttribute("message", "選考を不合格にしました。");

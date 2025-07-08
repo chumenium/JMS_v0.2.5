@@ -17,7 +17,7 @@ import dao.StudentDAO;
  */
 public class StudentListServlet extends HttpServlet {
     
-    private StudentDAO studentDAO = new StudentDAO();
+    	private StudentDAO StudentDAO = new StudentDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -39,7 +39,7 @@ public class StudentListServlet extends HttpServlet {
         
         try {
             // 学生一覧を取得
-            List<Map<String, Object>> students = studentDAO.getAllStudents();
+            		List<Map<String, Object>> students = StudentDAO.getAllStudents();
             request.setAttribute("students", students);
             
             // 検索パラメータがある場合の処理
@@ -54,8 +54,8 @@ public class StudentListServlet extends HttpServlet {
             }
             
             // ドロップダウン用のデータを取得
-            List<String> classes = studentDAO.getClasses();
-            List<String> statuses = studentDAO.getEnrollmentStatuses();
+            		List<String> classes = StudentDAO.getClasses();
+		List<String> statuses = StudentDAO.getEnrollmentStatuses();
             
             request.setAttribute("classes", classes);
             request.setAttribute("statuses", statuses);

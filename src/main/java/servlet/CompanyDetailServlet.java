@@ -2,6 +2,7 @@ package servlet;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
@@ -18,7 +19,7 @@ import dao.CompanyDAO;
  */
 public class CompanyDetailServlet extends HttpServlet {
     
-    private CompanyDAO companyDAO = new CompanyDAO();
+    	private CompanyDAO CompanyDAO = new CompanyDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -48,21 +49,32 @@ public class CompanyDetailServlet extends HttpServlet {
             int companyId = Integer.parseInt(companyIdStr);
             
             // 企業情報を取得
-            CompanyBean company = companyDAO.getCompanyById(companyId);
-            if (company == null) {
+            Map<String, Object> companyData = CompanyDAO.getCompanyById(companyId);
+            if (companyData == null) {
                 request.setAttribute("errorMessage", "指定された企業が見つかりません。");
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/error/404.html");
                 dispatcher.forward(request, response);
                 return;
             }
             
-            // 勤務地・職種名を取得
-            String workPlaceName = companyDAO.getWorkPlaceName(company.getWorkPlaceId());
-            String occupationName = companyDAO.getOccupationName(company.getOccupationId());
+            // MapからCompanyBeanに変換
+            CompanyBean company = new CompanyBean();
+            company.setCompanyId((Integer) companyData.get("companys_id"));
+            company.setCompanyName((String) companyData.get("company_name"));
+            company.setPostCode((String) companyData.get("post_code"));
+            company.setAddress((String) companyData.get("address"));
+            company.setTel((String) companyData.get("tel"));
+            company.setMailAddress((String) companyData.get("mail_address"));
+            company.setManagerName((String) companyData.get("manager_name"));
+            company.setRecruitmentResults((Boolean) companyData.get("recruitment_results"));
             
-            // プルダウン用データを取得
-            List<String> workPlaces = companyDAO.getWorkPlaces();
-            List<String> occupations = companyDAO.getOccupations();
+            			// 勤務地・職種名を取得
+			String workPlaceName = CompanyDAO.getWorkPlaceName(company.getWorkPlaceId());
+			String occupationName = CompanyDAO.getOccupationName(company.getOccupationId());
+			
+			// プルダウン用データを取得
+			List<String> workPlaces = CompanyDAO.getWorkPlaces();
+			List<String> occupations = CompanyDAO.getOccupations();
             
             // リクエストスコープに設定
             request.setAttribute("company", company);
@@ -131,8 +143,8 @@ public class CompanyDetailServlet extends HttpServlet {
             company.setWorkPlaceId(workPlaceId);
             company.setOccupationId(occupationId);
             
-            // 更新処理
-            boolean success = companyDAO.updateCompany(company);
+            			// 更新処理
+			boolean success = CompanyDAO.updateCompany(company);
             
             if (success) {
                 request.setAttribute("successMessage", "企業情報を更新しました。");
@@ -157,8 +169,8 @@ public class CompanyDetailServlet extends HttpServlet {
             return 0;
         }
         
-        // 簡易的な実装（実際はDAOで検索）
-        List<String> workPlaces = companyDAO.getWorkPlaces();
+        		// 簡易的な実装（実際はDAOで検索）
+		List<String> workPlaces = CompanyDAO.getWorkPlaces();
         for (int i = 0; i < workPlaces.size(); i++) {
             if (workPlaces.get(i).equals(workPlaceName)) {
                 return i + 1; // IDは1から始まると仮定
@@ -175,8 +187,8 @@ public class CompanyDetailServlet extends HttpServlet {
             return 0;
         }
         
-        // 簡易的な実装（実際はDAOで検索）
-        List<String> occupations = companyDAO.getOccupations();
+        		// 簡易的な実装（実際はDAOで検索）
+		List<String> occupations = CompanyDAO.getOccupations();
         for (int i = 0; i < occupations.size(); i++) {
             if (occupations.get(i).equals(occupationName)) {
                 return i + 1; // IDは1から始まると仮定

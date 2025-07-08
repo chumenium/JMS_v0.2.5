@@ -17,12 +17,12 @@ import java.util.Map;
  */
 public class CompanyListServlet extends HttpServlet {
     
-    private CompanyDAO companyDAO;
+    	private CompanyDAO CompanyDAO;
     
     @Override
     public void init() throws ServletException {
         try {
-            companyDAO = new CompanyDAO();
+            		CompanyDAO = new CompanyDAO();
         } catch (Exception e) {
             throw new ServletException("CompanyDAOの初期化に失敗しました", e);
         }
@@ -48,12 +48,12 @@ public class CompanyListServlet extends HttpServlet {
         
         try {
             // 企業一覧を取得
-            List<Map<String, Object>> companies = companyDAO.getAllCompanies();
+            		List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
             request.setAttribute("companies", companies);
             
             // 統計情報を取得
-            int totalCompanies = companyDAO.getCompanyCount();
-            int recruitmentCompanies = companyDAO.getRecruitmentCompanyCount();
+            		int totalCompanies = CompanyDAO.getCompanyCount();
+		int recruitmentCompanies = CompanyDAO.getRecruitmentCompanyCount();
             request.setAttribute("totalCompanies", totalCompanies);
             request.setAttribute("recruitmentCompanies", recruitmentCompanies);
         } catch (Exception e) {
