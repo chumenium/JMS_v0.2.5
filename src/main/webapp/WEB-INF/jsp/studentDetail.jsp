@@ -18,12 +18,31 @@
             line-height: 1.6;
         }
         .edit-container {
-            max-width: 800px;
+            max-width: 1400px;
+            width: 96vw;
             margin: 40px auto;
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(44, 119, 68, 0.08);
-            padding: 32px 40px;
+            padding: 40px 2vw;
+            box-sizing: border-box;
+        }
+        @media (max-width: 1400px) {
+            .edit-container {
+                padding: 32px 1vw;
+            }
+        }
+        @media (max-width: 768px) {
+            .edit-container {
+                margin: 20px 0;
+                padding: 16px 2vw;
+            }
+        }
+        @media (max-width: 480px) {
+            .edit-container {
+                margin: 8px 0;
+                padding: 8px 1vw;
+            }
         }
         .edit-title {
             font-size: 28px;
@@ -37,6 +56,92 @@
             grid-template-columns: 1fr 1fr;
             gap: 24px;
             margin-bottom: 32px;
+        }
+        
+        @media (max-width: 768px) {
+            .student-info {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .edit-container {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .edit-title {
+                font-size: 24px;
+            }
+            
+            .info-section {
+                padding: 16px;
+            }
+            
+            .info-section h3 {
+                font-size: 16px;
+            }
+            
+            .form-group input[type="text"],
+            .form-group input[type="email"],
+            .form-group input[type="tel"],
+            .form-group select,
+            .form-group textarea {
+                font-size: 16px;
+                padding: 14px 16px;
+                min-height: 52px;
+            }
+            
+            .form-group label {
+                font-size: 16px;
+                margin-bottom: 6px;
+            }
+            
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-width: 100px;
+                min-height: 52px;
+                margin-bottom: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .edit-container {
+                margin: 12px;
+                padding: 16px;
+            }
+            
+            .edit-title {
+                font-size: 20px;
+            }
+            
+            .info-section {
+                padding: 12px;
+            }
+            
+            .info-section h3 {
+                font-size: 18px;
+            }
+            
+            .form-group input[type="text"],
+            .form-group input[type="email"],
+            .form-group input[type="tel"],
+            .form-group select,
+            .form-group textarea {
+                font-size: 18px;
+                padding: 16px 20px;
+                min-height: 56px;
+            }
+            
+            .form-group label {
+                font-size: 18px;
+            }
+            
+            .btn {
+                padding: 16px 24px;
+                font-size: 18px;
+                min-height: 56px;
+            }
         }
         .info-section {
             background: #f8f9fa;
@@ -68,13 +173,14 @@
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 10px 12px;
+            padding: 12px 16px;
             border: 1.5px solid #e9ecef;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
             background: #fff;
-            transition: border-color 0.2s;
+            transition: all 0.2s ease;
             box-sizing: border-box;
+            min-height: 48px;
         }
         .form-group input:focus,
         .form-group select:focus,
@@ -95,6 +201,13 @@
             padding-top: 24px;
             border-top: 1px solid #e9ecef;
         }
+        
+        @media (max-width: 768px) {
+            .action-buttons {
+                margin-top: 24px;
+                padding-top: 16px;
+            }
+        }
         .btn {
             background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
             color: white;
@@ -109,6 +222,18 @@
             margin-right: 12px;
             text-decoration: none;
             display: inline-block;
+            min-width: 120px;
+            min-height: 48px;
+        }
+        
+        @media (max-width: 768px) {
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-width: 100px;
+                min-height: 52px;
+                margin-bottom: 8px;
+            }
         }
         .btn:hover {
             background: #388E3C;

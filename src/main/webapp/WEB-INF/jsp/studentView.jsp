@@ -18,12 +18,31 @@
             line-height: 1.6;
         }
         .view-container {
-            max-width: 800px;
+            max-width: 1400px;
+            width: 96vw;
             margin: 40px auto;
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(44, 119, 68, 0.08);
-            padding: 32px 40px;
+            padding: 40px 2vw;
+            box-sizing: border-box;
+        }
+        @media (max-width: 1400px) {
+            .view-container {
+                padding: 32px 1vw;
+            }
+        }
+        @media (max-width: 768px) {
+            .view-container {
+                margin: 20px 0;
+                padding: 16px 2vw;
+            }
+        }
+        @media (max-width: 480px) {
+            .view-container {
+                margin: 8px 0;
+                padding: 8px 1vw;
+            }
         }
         .view-title {
             font-size: 28px;
@@ -37,6 +56,75 @@
             grid-template-columns: 1fr 1fr;
             gap: 24px;
             margin-bottom: 32px;
+        }
+        
+        @media (max-width: 768px) {
+            .student-info {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .view-container {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .view-title {
+                font-size: 24px;
+            }
+            
+            .info-section {
+                padding: 16px;
+            }
+            
+            .info-section h3 {
+                font-size: 16px;
+            }
+            
+            .info-value {
+                font-size: 16px;
+                padding: 10px 12px;
+                min-height: 52px;
+            }
+            
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-width: 100px;
+                min-height: 52px;
+                margin-bottom: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .view-container {
+                margin: 12px;
+                padding: 16px;
+            }
+            
+            .view-title {
+                font-size: 20px;
+            }
+            
+            .info-section {
+                padding: 12px;
+            }
+            
+            .info-section h3 {
+                font-size: 18px;
+            }
+            
+            .info-value {
+                font-size: 18px;
+                padding: 12px 16px;
+                min-height: 56px;
+            }
+            
+            .btn {
+                padding: 16px 24px;
+                font-size: 18px;
+                min-height: 56px;
+            }
         }
         .info-section {
             background: #f8f9fa;
@@ -81,6 +169,13 @@
             padding-top: 24px;
             border-top: 1px solid #e9ecef;
         }
+        
+        @media (max-width: 768px) {
+            .action-buttons {
+                margin-top: 24px;
+                padding-top: 16px;
+            }
+        }
         .btn {
             background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
             color: white;
@@ -95,6 +190,18 @@
             margin-right: 12px;
             text-decoration: none;
             display: inline-block;
+            min-width: 120px;
+            min-height: 48px;
+        }
+        
+        @media (max-width: 768px) {
+            .btn {
+                padding: 14px 20px;
+                font-size: 16px;
+                min-width: 100px;
+                min-height: 52px;
+                margin-bottom: 8px;
+            }
         }
         .btn:hover {
             background: #388E3C;

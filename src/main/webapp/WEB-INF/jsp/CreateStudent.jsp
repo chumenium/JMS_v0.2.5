@@ -19,12 +19,29 @@
     }
 
     .create-student-container {
-        max-width: 800px;
+        max-width: 1400px;
+        width: 96vw;
         margin: 0 auto;
-        padding: 24px;
+        padding: 40px 2vw;
         min-height: 100vh;
         background: #ffffff;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        box-sizing: border-box;
+    }
+    @media (max-width: 1400px) {
+        .create-student-container {
+            padding: 32px 1vw;
+        }
+    }
+    @media (max-width: 768px) {
+        .create-student-container {
+            padding: 16px 2vw;
+        }
+    }
+    @media (max-width: 480px) {
+        .create-student-container {
+            padding: 8px 1vw;
+        }
     }
 
     /* ページヘッダー - 視認性向上 */
@@ -103,7 +120,8 @@
     }
 
     .form-group input,
-    .form-group select {
+    .form-group select,
+    .form-group textarea {
         width: 100%;
         padding: 12px 16px;
         border: 1px solid #e9ecef;
@@ -111,20 +129,18 @@
         font-size: 16px;
         transition: all 0.2s ease;
         box-sizing: border-box;
+        min-height: 48px;
     }
 
     .form-group input:focus,
-    .form-group select:focus {
+    .form-group select:focus,
+    .form-group textarea:focus {
         outline: none;
         border-color: #2C7744;
         box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
     }
 
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
-    }
+
 
     .required {
         color: #e74c3c;
@@ -178,6 +194,145 @@
         color: white;
         text-decoration: none;
     }
+    
+    /* ダークモード対応 */
+    @media (prefers-color-scheme: dark) {
+        .create-student-page {
+            background: #181a1b;
+            color: #f1f1f1;
+        }
+        
+        .create-student-container {
+            background: #23272a;
+            box-shadow: 0 0 20px rgba(44, 119, 68, 0.18);
+        }
+        
+        .page-header {
+            background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+            color: #000000;
+        }
+        
+        .page-title {
+            color: #000000;
+        }
+        
+        .breadcrumb a {
+            color: #000000;
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .breadcrumb a:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: #000000;
+        }
+        
+        .registration-form {
+            background: #23272a;
+            border-color: #40444b;
+        }
+        
+        .form-group label {
+            color: #dcddde;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: #2c2f33;
+            color: #f1f1f1;
+            border-color: #40444b;
+        }
+        
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #7fffd4;
+            box-shadow: 0 0 0 3px rgba(127, 255, 212, 0.1);
+        }
+        
+        .form-group input[readonly] {
+            background: #23272a !important;
+            color: #72767d !important;
+            border-color: #40444b;
+        }
+        
+        .required {
+            color: #ff6b6b;
+        }
+    }
+    
+    /* レスポンシブ対応 */
+    @media (max-width: 768px) {
+        .create-student-container {
+            padding: 16px;
+        }
+        
+        .page-header {
+            padding: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+        }
+        
+        .registration-form {
+            padding: 24px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            font-size: 16px;
+            padding: 14px 16px;
+            min-height: 52px;
+        }
+        
+        .form-group label {
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-group .btn {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .create-student-container {
+            padding: 12px;
+        }
+        
+        .page-header {
+            padding: 20px;
+        }
+        
+        .page-title {
+            font-size: 20px;
+        }
+        
+        .registration-form {
+            padding: 20px;
+        }
+        
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            font-size: 18px;
+            padding: 16px 20px;
+            min-height: 56px;
+        }
+        
+        .form-group label {
+            font-size: 18px;
+        }
+    }
 </style>
 </head>
 <body class="create-student-page">
@@ -208,13 +363,11 @@
                 
                 <!-- 基本情報 -->
                 <h3 style="margin-bottom: 20px; color: #2c3e50; border-bottom: 2px solid #2C7744; padding-bottom: 8px;">基本情報</h3>
-                <div class="form-row">
+                <div class="form-grid">
                     <div class="form-group">
                         <label for="admissionYear">入学年（西暦）<span class="required">*</span></label>
                         <input type="number" id="admissionYear" name="admissionYear" min="2000" max="2099" required placeholder="例: 2022">
                     </div>
-                </div>
-                <div class="form-row">
                     <div class="form-group">
                         <label for="classType">クラス種別 <span class="required">*</span></label>
                         <select id="classType" name="classType" required>
@@ -244,22 +397,18 @@
                             <option value="2">2組</option>
                         </select>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="className">クラス名（自動生成）</label>
-                    <input type="text" id="className" name="className" readonly placeholder="自動生成">
-                </div>
-                <div class="form-row">
+                    <div class="form-group">
+                        <label for="className">クラス名（自動生成）</label>
+                        <input type="text" id="className" name="className" readonly placeholder="自動生成">
+                    </div>
                     <div class="form-group">
                         <label for="attendanceNo">出席番号 <span class="required">*</span></label>
                         <input type="number" id="attendanceNo" name="attendanceNo" min="1" max="999" required placeholder="例: 1">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="studentId">学籍番号 </label>
-                    <input type="text" id="studentId" name="studentId" required maxlength="8" readonly placeholder="自動生成">
-                </div>
-                <div class="form-row">
+                    <div class="form-group">
+                        <label for="studentId">学籍番号 </label>
+                        <input type="text" id="studentId" name="studentId" required maxlength="8" readonly placeholder="自動生成">
+                    </div>
                     <div class="form-group">
                         <label for="name">氏名 <span class="required">*</span></label>
                         <input type="text" id="name" name="name" required placeholder="例: 山田太郎">
@@ -268,9 +417,6 @@
                         <label for="kana">フリガナ <span class="required">*</span></label>
                         <input type="text" id="kana" name="kana" required placeholder="例: ヤマダタロウ">
                     </div>
-                </div>
-
-                <div class="form-row">
                     <div class="form-group">
                         <label for="gender">性別 <span class="required">*</span></label>
                         <select id="gender" name="gender" required>
@@ -314,8 +460,7 @@
 
                 <!-- 就活情報 -->
                 <h3 style="margin: 32px 0 20px 0; color: #2c3e50; border-bottom: 2px solid #2C7744; padding-bottom: 8px;">就活情報</h3>
-                
-                <div class="form-row">
+                <div class="form-grid">
                     <div class="form-group">
                         <label for="jobHuntingStatus">就活状況</label>
                         <select id="jobHuntingStatus" name="jobHuntingStatus">
@@ -367,13 +512,15 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="notes">備考</label>
-                    <textarea id="notes" name="notes" rows="4" maxlength="500" style="width: 100%; padding: 12px 16px; border: 1px solid #e9ecef; border-radius: 8px; font-size: 16px; resize: vertical;" placeholder="特記事項があれば記入してください"></textarea>
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: 1 / span 2;">
+                        <label for="notes">備考</label>
+                        <textarea id="notes" name="notes" rows="4" maxlength="500" placeholder="特記事項があれば記入してください"></textarea>
+                    </div>
                 </div>
 
                 <!-- ボタン -->
-                <div class="form-buttons">
+                <div class="btn-group">
                     <button type="submit" class="btn btn-primary">登録する</button>
                     <a href="StatusServlet?status=studentManagement" class="btn btn-secondary">キャンセル</a>
                 </div>
