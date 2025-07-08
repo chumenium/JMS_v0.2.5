@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-import dao.DropdownDataDAO;
+import dao.StudentDAO;
 
 /**
  * Servlet implementation class StudentManagementServlet
@@ -50,7 +50,7 @@ public class StudentManagementServlet extends HttpServlet {
             return;
         }
         
-		DropdownDataDAO dao = new DropdownDataDAO();
+		StudentDAO dao = new StudentDAO();
         List<String> classes = dao.getClasses();
         List<String> statuses = dao.getEnrollmentStatuses();
         List<String> mediations = dao.getMediationStatuses();

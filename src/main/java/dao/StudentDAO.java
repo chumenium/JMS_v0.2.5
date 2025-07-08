@@ -3,11 +3,114 @@ package dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import beans.StudentBeans;
 import utils.DBConnection;
 
 public class StudentDAO {
+
+    public List<String> getClasses() {
+        List<String> classes = new ArrayList<>();
+        String sql = "SELECT DISTINCT department, class FROM students_tbl ORDER BY department, class";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                classes.add(rs.getString("department") + " " + rs.getString("class"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return classes;
+    }
+
+    public List<String> getEnrollmentStatuses() {
+        List<String> statuses = new ArrayList<>();
+        String sql = "SELECT DISTINCT enrollment_status FROM students_tbl ORDER BY enrollment_status";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                statuses.add(rs.getString("enrollment_status"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return statuses;
+    }
+
+    public List<String> getMediationStatuses() {
+        List<String> mediations = new ArrayList<>();
+        mediations.add("受理");
+        mediations.add("辞退");
+        return mediations;
+    }
+
+    public List<String> getIndustries() {
+        List<String> industries = new ArrayList<>();
+        String sql = "SELECT DISTINCT industry_name FROM occupations_tbl ORDER BY industry_name";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                industries.add(rs.getString("industry_name"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return industries;
+    }
+
+    public List<Integer> getGraduationYears() {
+        List<Integer> years = new ArrayList<>();
+        String sql = "SELECT DISTINCT graduation_year FROM students_tbl ORDER BY graduation_year DESC";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                years.add(rs.getInt("graduation_year"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return years;
+    }
+
+    public List<String> getJobtypes() {
+        List<String> jobtypes = new ArrayList<>();
+        String sql = "SELECT DISTINCT occupation FROM occupations_tbl WHERE occupation_id != 0";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                jobtypes.add(rs.getString("occupation"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return jobtypes;
+    }
+
+    public List<String> getWorkplaces() {
+        List<String> workplaces = new ArrayList<>();
+        String sql = "SELECT work_place FROM work_place_tbl ORDER BY id";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql);
+             ResultSet rs = pstmt.executeQuery()) {
+            while (rs.next()) {
+                workplaces.add(rs.getString("work_place"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return workplaces;
+    }
+
     public static StudentBeans getStudentById(String id) {
         StudentBeans student = null;
         Connection conn = null;
@@ -195,5 +298,39 @@ public class StudentDAO {
             try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
         return occupationName;
+    }
+    
+    /**
+     * 全ての学生情報を取得
+     */
+    public List<Map<String, Object>> getAllStudents() {
+        List<Map<String, Object>> students = new ArrayList<>();
+        String sql = "SELECT * FROM students_tbl ORDER BY student_id";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Map<String, Object> student = new HashMap<>();
+                student.put("student_id", rs.getString("student_id"));
+                student.put("name", rs.getString("name"));
+                student.put("class", rs.getString("class"));
+                student.put("number", rs.getString("number"));
+                student.put("name_reading", rs.getString("name_reading"));
+                student.put("gender", rs.getString("gender"));
+                student.put("email", rs.getString("email"));
+                student.put("tel", rs.getString("tel"));
+                student.put("enrollment_status", rs.getString("enrollment_status"));
+                student.put("mediation_status", rs.getString("mediation_status"));
+                student.put("job_hunting_status", rs.getString("job_hunting_status"));
+                student.put("graduation_year", rs.getString("graduation_year"));
+                student.put("remarks", rs.getString("remarks"));
+                students.add(student);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return students;
     }
 } 

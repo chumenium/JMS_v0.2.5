@@ -3,30 +3,74 @@ package servlet;
 import java.io.IOException;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import beans.StudentBeans;
 import dao.StudentDAO;
-import dao.DropdownDataDAO;
 import utils.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-@WebServlet("/StudentDetailServlet")
+/**
+ * 学生詳細サーブレット
+ * 学生の詳細情報表示と編集機能を提供
+ */
 public class StudentDetailServlet extends HttpServlet {
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String studentId = request.getParameter("id");
-        StudentBeans student = StudentDAO.getStudentById(studentId);
         
-        // 職種IDを職種名に変換
-        if (student != null) {
+        // セッションの確認
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // 権限チェック
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!role.equals("admin") && !role.equals("teacher") && 
+                           !role.equals("headmaster") && !role.equals("student"))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
+        }
+        
+            String studentId = request.getParameter("id");
+            
+            // 学生の場合は自分の情報のみ閲覧可能
+            if ("student".equals(role)) {
+                String sessionStudentId = (String) session.getAttribute("id");
+                if (studentId == null) {
+                    studentId = sessionStudentId;
+                } else if (!studentId.equals(sessionStudentId)) {
+                    response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+                    return;
+                }
+            }
+            
+            if (studentId == null || studentId.trim().isEmpty()) {
+                request.setAttribute("error", "学生IDが指定されていません。");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
+                dispatcher.forward(request, response);
+                return;
+            }
+            
+            StudentBeans student = StudentDAO.getStudentById(studentId);
+            
+            if (student == null) {
+                request.setAttribute("error", "指定された学生が見つかりません。");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
+                dispatcher.forward(request, response);
+                return;
+            }
+            
+            // 職種IDを職種名に変換
             try {
                 if (student.getDesiredJobType1() != null && !student.getDesiredJobType1().isEmpty()) {
                     String jobType1Name = StudentDAO.getOccupationNameById(Integer.parseInt(student.getDesiredJobType1()));
@@ -43,23 +87,54 @@ public class StudentDetailServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 // 既に職種名が設定されている場合は何もしない
             }
+            
+            // プルダウン用のデータを取得
+            StudentDAO dropdownDAO = new StudentDAO();
+            request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
+            request.setAttribute("workplaces", dropdownDAO.getWorkplaces());
+            
+            request.setAttribute("student", student);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
+            dispatcher.forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "システムエラーが発生しました: " + e.getMessage());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
+            dispatcher.forward(request, response);
         }
-        
-        // プルダウン用のデータを取得
-        DropdownDataDAO dropdownDAO = new DropdownDataDAO();
-        request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
-        request.setAttribute("workplaces", dropdownDAO.getWorkplaces());
-        
-        request.setAttribute("student", student);
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
-        dispatcher.forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // フォームからデータを取得
-        String studentId = request.getParameter("studentId");
+        
+        // セッションの確認
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // 権限チェック（編集は管理者、教員、本人のみ）
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!role.equals("admin") && !role.equals("teacher") && 
+                           !role.equals("headmaster") && !role.equals("student"))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
+        }
+        
+            // フォームからデータを取得
+            String studentId = request.getParameter("studentId");
+            
+            // 学生の場合は自分の情報のみ編集可能
+            if ("student".equals(role)) {
+                String sessionStudentId = (String) session.getAttribute("id");
+                if (studentId == null || !studentId.equals(sessionStudentId)) {
+                    response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+                    return;
+                }
+            }
         String className = request.getParameter("className");
         String number = request.getParameter("number");
         String name = request.getParameter("name");
@@ -128,17 +203,19 @@ public class StudentDetailServlet extends HttpServlet {
         student.setRemarks(remarks);
         student.setDesiredWorkPlace(desiredWorkPlace);
         
-        // データベースを更新
-        try {
+            // データベースを更新
             StudentDAO.updateStudent(student);
             System.out.println("データベース更新成功");
+            
+            // 更新後、詳細画面にリダイレクト
+            response.sendRedirect(request.getContextPath() + "/StudentDetailServlet?id=" + studentId);
+            
         } catch (Exception e) {
             System.out.println("データベース更新エラー: " + e.getMessage());
             e.printStackTrace();
+            request.setAttribute("error", "データベース更新中にエラーが発生しました: " + e.getMessage());
+            doGet(request, response);
         }
-        
-        // 更新後、詳細画面にリダイレクト
-        response.sendRedirect("StudentDetailServlet?id=" + studentId);
     }
     
     // 職種名から職種IDを取得するメソッド

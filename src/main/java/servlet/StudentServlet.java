@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -19,7 +18,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import dao.DropdownDataDAO;
+import dao.StudentDAO;
 import utils.DBConnection;
 
 //@WebServlet("/studentServlet")
@@ -226,7 +225,7 @@ public class StudentServlet extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
                 } else {
                     request.setAttribute("errorMessage", "データ登録に失敗しました。" );
-                    DropdownDataDAO dropdownDAO = new DropdownDataDAO();
+                    StudentDAO dropdownDAO = new StudentDAO();
                     request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
                     request.getRequestDispatcher("/WEB-INF/jsp/CreateStudent.jsp").forward(request, response);
                 }
@@ -529,197 +528,6 @@ public class StudentServlet extends HttpServlet {
                 request.setAttribute("keyword", keyword);
 
                 request.getRequestDispatcher("/WEB-INF/jsp/StudentList.jsp").forward(request, response);
-            } else if ("viewStudents".equals(action)) {
-    	        String student_id = request.getParameter("student_id");
-    	        String student_class = request.getParameter("class");
-    	        String department = null;
-    	        String studentClass = null;
-    	        if (student_class != null && !student_class.trim().isEmpty()) {
-    	            department = student_class.substring(0, 2);
-    	            studentClass = student_class.substring(2);
-    	        }
-    	        String number = request.getParameter("number");
-    	        String name_reading = request.getParameter("name_reading");
-    	        String gender = request.getParameter("gender");
-    	        String enrollment_status = request.getParameter("enrollment_status");
-    	        String mediation_status = request.getParameter("mediation_status");
-    	        String desired_job_type_1st = request.getParameter("desired_job_type_1st");
-    	        String graduation_year = request.getParameter("graduation_year");
-    	        String sql = "SELECT * FROM students_tbl ";
-    	        int i = 0;
-    	        if(student_id != null && !student_id.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"student_id = ? ";
-    	        	i++;
-    	        }
-    	        if(student_class != null && !student_class.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"department = ? AND class = ? ";
-    	        	i++;
-    	        	i++;
-    	        }
-    	        if(number != null && !number.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"number = ? ";
-    	        	i++;
-    	        }
-    	        if(name_reading != null && !name_reading.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"name_reading = ? ";
-    	        	i++;
-    	        }
-    	        if(gender != null && !gender.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"gender = ? ";
-    	        	i++;
-    	        }
-    	        if(enrollment_status != null && !enrollment_status.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"enrollment_status = ? ";
-    	        	i++;
-    	        }
-    	        if(mediation_status != null && !mediation_status.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"mediation_status = ? ";
-    	        	i++;
-    	        }
-    	        if(desired_job_type_1st != null && !desired_job_type_1st.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"desired_job_type_1st_id = ? ";
-    	        	i++;
-    	        }
-    	        if(graduation_year != null && !graduation_year.trim().isEmpty()) {
-    	        	if(i == 0) {
-    	        		sql = sql + "WHERE ";
-    	        	}else {
-    	        		sql = sql + "AND ";
-    	        	}
-    	        	sql = sql+"graduation_year = ? ";
-    	        	i++;
-    	        }
-    	        sql = sql + ";";
-
-                
-                PreparedStatement stmt = conn.prepareStatement(sql);
-
-
-    	        if(graduation_year != null && !graduation_year.trim().isEmpty()) {
-    	        	stmt.setInt(i, Integer.parseInt(graduation_year));
-    	        	i--;
-    	        }
-    	        if(desired_job_type_1st != null && !desired_job_type_1st.trim().isEmpty()) {
-    	        	stmt.setInt(i, Integer.parseInt(desired_job_type_1st));
-    	        	i--;
-    	        }
-    	        if(mediation_status != null && !mediation_status.trim().isEmpty()) {
-    	        	stmt.setString(i, mediation_status);
-    	        	i--;
-    	        }
-    	        if(enrollment_status != null && !enrollment_status.trim().isEmpty()) {
-    	        	stmt.setString(i, enrollment_status);
-    	        	i--;
-    	        }
-    	        if(gender != null && !gender.trim().isEmpty()) {
-    	        	stmt.setString(i, gender);
-    	        	i--;
-    	        }
-    	        if(name_reading != null && !name_reading.trim().isEmpty()) {
-    	        	stmt.setString(i, name_reading);
-    	        	i--;
-    	        }
-    	        if(number != null && !number.trim().isEmpty()) {
-    	        	stmt.setString(i, number);
-    	        	i--;
-    	        }
-    	        if(student_class != null && !student_class.trim().isEmpty()) {
-    	        	stmt.setString(i, studentClass);
-    	        	stmt.setString(i, department);
-    	        	i--;
-    	        	i--;
-    	        }
-    	        if(student_id != null && !student_id.trim().isEmpty()) {
-    	        	stmt.setString(i, student_id);
-    	        	i--;
-    	        }
-                
-                ResultSet rs = stmt.executeQuery();
-    	        
-                ArrayList<ArrayList<String>> students = new ArrayList<>();
-                ArrayList<String> studentids = new ArrayList<>();
-                ArrayList<String> classs = new ArrayList<>();
-                ArrayList<String> numbers = new ArrayList<>();
-                ArrayList<String> names = new ArrayList<>();
-                ArrayList<String> nameReadings = new ArrayList<>();
-                ArrayList<String> genders = new ArrayList<>();
-                ArrayList<String> enrollmentStatuss = new ArrayList<>();
-                ArrayList<String> mediationStatuss = new ArrayList<>();
-                ArrayList<String> DJTs1 = new ArrayList<>();
-                ArrayList<String> DJTs2 = new ArrayList<>();
-                ArrayList<String> DJTs3 = new ArrayList<>();
-                ArrayList<String> graduationYears = new ArrayList<>();
-                
-                while (rs.next()) {
-                	studentids.add(rs.getString("student_id"));
-                	String class_num = rs.getString("department") + rs.getString("class");
-                	classs.add(class_num);
-                	numbers.add(rs.getString("number"));
-                	names.add(rs.getString("name"));
-                	nameReadings.add(rs.getString("name_reading"));
-                	genders.add(rs.getString("gender"));
-                	enrollmentStatuss.add(rs.getString("enrollment_status"));
-                	mediationStatuss.add(rs.getString("mediation_status"));
-                	DJTs1.add(String.valueOf(rs.getInt("desired_job_type_1st_id")));
-                	DJTs2.add(String.valueOf(rs.getInt("desired_job_type_2nd_id")));
-                	DJTs3.add(String.valueOf(rs.getInt("desired_job_type_3rd_id")));
-                	graduationYears.add(String.valueOf(rs.getInt("graduation_year")));
-                }
-                students.add(studentids);
-                students.add(classs);
-                students.add(numbers);
-                students.add(names);
-                students.add(nameReadings);
-                students.add(genders);
-                students.add(enrollmentStatuss);
-                students.add(mediationStatuss);
-                students.add(DJTs1);
-                students.add(DJTs2);
-                students.add(DJTs3);
-                students.add(graduationYears);
-
-                request.setAttribute("students", students);
-                request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
                 
             } else if ("getInputData".equals(action)) {
             	String sql1 = "SELECT occupation FROM occupations_tbl;";
