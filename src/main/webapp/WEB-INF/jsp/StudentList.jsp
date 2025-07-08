@@ -459,8 +459,8 @@
                                     <td>${students[2][i]}</td>
                                     <td>${students[3][i]}</td>
                                     <td>
-                                        <a href="#" class="action-btn" aria-label="学生詳細を表示">詳細</a>
-                                        <a href="#" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
+                                        <a href="StudentViewServlet?id=${students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
+                                        <a href="StudentDetailServlet?id=${students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
                                     </td>
                                 </tr>
                             </c:forEach>
