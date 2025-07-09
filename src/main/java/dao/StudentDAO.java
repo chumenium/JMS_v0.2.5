@@ -109,6 +109,31 @@ public class StudentDAO {
         return workplaces;
     }
 
+    public List<List<String>> getJobtypesWorkplaces() {
+        List<List<String>> jobtypesWorkplaces = new ArrayList<>();
+        String sql = "SELECT DISTINCT occupation FROM occupations_tbl WHERE occupation_id != 0";
+        String sql2 = "SELECT work_place FROM work_place_tbl ORDER BY id";
+        List<String> jobtypes = new ArrayList<>();
+        List<String> workplaces = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection()) {
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                jobtypes.add(rs.getString("occupation"));
+            }
+            PreparedStatement pstmt2 = conn.prepareStatement(sql2);
+            ResultSet rs2 = pstmt2.executeQuery();
+            while (rs2.next()) {
+                workplaces.add(rs2.getString("work_place"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        jobtypesWorkplaces.add(jobtypes);
+        jobtypesWorkplaces.add(workplaces);
+        return jobtypesWorkplaces;
+    }
+
     public static StudentBeans getStudentById(String id) {
         StudentBeans student = null;
         Connection conn = null;
@@ -116,8 +141,8 @@ public class StudentDAO {
         ResultSet rs = null;
         try {
             conn = DBConnection.getConnection();
-            String sql = "SELECT * FROM students_tbl WHERE student_id = ?";
-            ps = conn.prepareStatement(sql);
+            String sql = "SELECT student_id, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year, remarks FROM students_tbl s LEFT JOIN occupations_tbl o1 ON s.desired_job_type_1st_id = o1.occupation_id LEFT JOIN occupations_tbl o2 ON s.desired_job_type_2nd_id = o2.occupation_id LEFT JOIN occupations_tbl o3 ON s.desired_job_type_3rd_id = o3.occupation_id WHERE student_id = ?";
+            ps = conn.prepareStatement(sql);//"student_id, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year, remarks"
             ps.setString(1, id);
             rs = ps.executeQuery();
             if (rs.next()) {

@@ -47,8 +47,11 @@ public class StudentDetailServlet extends HttpServlet {
         
         // プルダウン用のデータを取得
         StudentDAO dropdownDAO = new StudentDAO();
-        request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
-        request.setAttribute("workplaces", dropdownDAO.getWorkplaces());
+        // request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
+        // request.setAttribute("workplaces", dropdownDAO.getWorkplaces());
+        List<List<String>> jobtypesWorkplaces = dropdownDAO.getJobtypesWorkplaces();
+        request.setAttribute("jobtypes", jobtypesWorkplaces.get(0));
+        request.setAttribute("workplaces", jobtypesWorkplaces.get(1));
         
         request.setAttribute("student", student);
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
