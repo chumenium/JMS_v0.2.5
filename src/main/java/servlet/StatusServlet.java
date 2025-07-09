@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import dao.DropdownDataDAO;
 
 /**
- * Servlet implementation class statusServlet
+ * Servlet implementation class StatusServlet
  */
 //@WebServlet("/StatusServlet")
 public class StatusServlet extends HttpServlet {
@@ -135,12 +135,53 @@ public class StatusServlet extends HttpServlet {
 	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
 	                        return;
 	                    }
-					DropdownDataDAO dropdownDAO = new DropdownDataDAO();
-					request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
+						DropdownDataDAO DropdownDataDAO = new DropdownDataDAO();
+	request.setAttribute("jobtypes", DropdownDataDAO.getJobtypes());
 	                    nextPage = "/WEB-INF/jsp/CreateStudent.jsp";
 	                    break;
+	                case "studentDetail":
+	                    // 権限チェック（教員、校長・教務部長、管理者、学生のみ）
+	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role) && !"student".equals(role))) {
+	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+	                        return;
+	                    }
+	                    nextPage = "/WEB-INF/jsp/studentDetail.jsp";
+	                    break;
+	                case "studentView":
+	                    // 権限チェック（教員、校長・教務部長、管理者、学生のみ）
+	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role) && !"student".equals(role))) {
+	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+	                        return;
+	                    }
+	                    nextPage = "/WEB-INF/jsp/studentView.jsp";
+	                    break;
+	                case "interviewExamInput":
+	                    // 権限チェック（全ユーザー）
+	                    if (role == null) {
+	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+	                        return;
+	                    }
+	                    nextPage = "/WEB-INF/jsp/InterviewExamInput.jsp";
+	                    break;
+	                case "selectionStage":
+	                    // 権限チェック（全ユーザー）
+	                    if (role == null) {
+	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+	                        return;
+	                    }
+	                    nextPage = "/WEB-INF/jsp/SelectionStage.jsp";
+	                    break;
+	                case "adminDatabase.jsp":
+	                    // 権限チェック（管理者のみ）
+	                    if (role == null || !"admin".equals(role)) {
+	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+	                        return;
+	                    }
+	                    nextPage = "/WEB-INF/jsp/adminDatabase.jsp";
+	                    break;
 	                default:
-	                    nextPage = "/index.jsp";
+	                    // デフォルトはダッシュボードに遷移
+	                    nextPage = "/WEB-INF/jsp/DashBoard.jsp";
 	                    break;
 	            }
 	        }

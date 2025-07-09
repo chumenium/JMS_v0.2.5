@@ -23,10 +23,16 @@ public class DBConnection {
   public static Connection getConnection() throws SQLException, ClassNotFoundException {
       Class.forName("com.mysql.cj.jdbc.Driver");
       
-      if (USE_FREE_DB) {
-          return DriverManager.getConnection(FREE_URL, FREE_USER, FREE_PASSWORD);
-      } else {
-          return DriverManager.getConnection(GCP_URL, GCP_USER, GCP_PASSWORD);
+      try {
+          if (USE_FREE_DB) {
+              return DriverManager.getConnection(FREE_URL, FREE_USER, FREE_PASSWORD);
+          } else {
+              return DriverManager.getConnection(GCP_URL, GCP_USER, GCP_PASSWORD);
+          }
+      } catch (SQLException e) {
+          System.err.println("データベース接続エラー: " + e.getMessage());
+          // フェイルオーバーを試行
+          return getConnectionWithFailover();
       }
   }
   

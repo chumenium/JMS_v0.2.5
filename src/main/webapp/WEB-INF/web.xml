@@ -173,4 +173,48 @@
     <url-pattern>/CreateCompanyServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- 学生詳細サーブレット -->
+  <servlet>
+    <servlet-name>StudentDetailServlet</servlet-name>
+    <servlet-class>servlet.StudentDetailServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>StudentDetailServlet</servlet-name>
+    <url-pattern>/StudentDetailServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 学生表示サーブレット -->
+  <servlet>
+    <servlet-name>StudentViewServlet</servlet-name>
+    <servlet-class>servlet.StudentViewServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>StudentViewServlet</servlet-name>
+    <url-pattern>/StudentViewServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 学生一覧サーブレット -->
+  <servlet>
+    <servlet-name>StudentListServlet</servlet-name>
+    <servlet-class>servlet.StudentListServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>StudentListServlet</servlet-name>
+    <url-pattern>/StudentListServlet</url-pattern>
+  </servlet-mapping>
+  
+  <!-- データベース管理サーブレット -->
+  <servlet>
+    <servlet-name>DatabaseManagementServlet</servlet-name>
+    <servlet-class>servlet.DatabaseManagementServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>DatabaseManagementServlet</servlet-name>
+    <url-pattern>/DatabaseManagementServlet</url-pattern>
+  </servlet-mapping>
+  
 </web-app>

@@ -17,12 +17,12 @@ import java.util.Map;
  */
 public class CompanyManagementServlet extends HttpServlet {
     
-    private CompanyDAO companyDAO;
+    	private CompanyDAO CompanyDAO;
     
     @Override
     public void init() throws ServletException {
-        companyDAO = new CompanyDAO();
-    }
+        		CompanyDAO = new CompanyDAO();
+    }   
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -43,12 +43,12 @@ public class CompanyManagementServlet extends HttpServlet {
         }
         
         // 企業一覧を取得
-        List<Map<String, Object>> companies = companyDAO.getAllCompanies();
+        		List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
         request.setAttribute("companies", companies);
         
         // 統計情報を取得
-        int totalCompanies = companyDAO.getCompanyCount();
-        int recruitmentCompanies = companyDAO.getRecruitmentCompanyCount();
+        		int totalCompanies = CompanyDAO.getCompanyCount();
+		int recruitmentCompanies = CompanyDAO.getRecruitmentCompanyCount();
         request.setAttribute("totalCompanies", totalCompanies);
         request.setAttribute("recruitmentCompanies", recruitmentCompanies);
         
@@ -112,7 +112,7 @@ public class CompanyManagementServlet extends HttpServlet {
         }
         
         // 企業を登録
-        boolean success = companyDAO.addCompany(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
+        		boolean success = CompanyDAO.addCompany(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
         
         if (success) {
             request.setAttribute("successMessage", "企業の登録が完了しました。");
@@ -151,7 +151,7 @@ public class CompanyManagementServlet extends HttpServlet {
         
         try {
             int companyId = Integer.parseInt(companyIdStr);
-            boolean success = companyDAO.updateCompany(companyId, companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
+            		boolean success = CompanyDAO.updateCompany(companyId, companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
             
             if (success) {
                 request.setAttribute("successMessage", "企業情報の更新が完了しました。");
@@ -180,7 +180,7 @@ public class CompanyManagementServlet extends HttpServlet {
         
         try {
             int companyId = Integer.parseInt(companyIdStr);
-            boolean success = companyDAO.deleteCompany(companyId);
+            		boolean success = CompanyDAO.deleteCompany(companyId);
             
             if (success) {
                 request.setAttribute("successMessage", "企業の削除が完了しました。");

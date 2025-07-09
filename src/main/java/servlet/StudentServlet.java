@@ -225,8 +225,8 @@ public class StudentServlet extends HttpServlet {
                     request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
                 } else {
                     request.setAttribute("errorMessage", "データ登録に失敗しました。" );
-                    StudentDAO dropdownDAO = new StudentDAO();
-                    request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
+                    	StudentDAO DropdownDAO = new StudentDAO();
+	request.setAttribute("jobtypes", DropdownDAO.getJobtypes());
                     request.getRequestDispatcher("/WEB-INF/jsp/CreateStudent.jsp").forward(request, response);
                 }
             //学生情報の詳細を取得する

@@ -65,32 +65,6 @@ public class CompanyDAO {
     }
     
     /**
-     * 企業情報を更新
-     */
-    public boolean updateCompany(int companyId, String companyName, String postCode, String address, 
-                               String tel, String mailAddress, String managerName, boolean recruitmentResults) {
-        String sql = "UPDATE companys_tbl SET company_name=?, post_code=?, address=?, tel=?, mail_address=?, manager_name=?, recruitment_results=? WHERE companys_id=?";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setString(1, companyName);
-            stmt.setString(2, postCode);
-            stmt.setString(3, address);
-            stmt.setString(4, tel);
-            stmt.setString(5, mailAddress);
-            stmt.setString(6, managerName);
-            stmt.setBoolean(7, recruitmentResults);
-            stmt.setInt(8, companyId);
-            
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    /**
      * 企業を削除
      */
     public boolean deleteCompany(int companyId) {
@@ -173,5 +147,138 @@ public class CompanyDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+    
+    /**
+     * 勤務地IDから勤務地名を取得
+     */
+    public String getWorkPlaceName(int workPlaceId) {
+        String sql = "SELECT work_place FROM work_place_tbl WHERE id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, workPlaceId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getString("work_place");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
+    /**
+     * 職種IDから職種名を取得
+     */
+    public String getOccupationName(int occupationId) {
+        String sql = "SELECT occupation FROM occupations_tbl WHERE occupation_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, occupationId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getString("occupation");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+    
+    /**
+     * 全勤務地一覧を取得
+     */
+    public List<String> getWorkPlaces() {
+        List<String> workPlaces = new ArrayList<>();
+        String sql = "SELECT work_place FROM work_place_tbl ORDER BY id";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                workPlaces.add(rs.getString("work_place"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return workPlaces;
+    }
+    
+    /**
+     * 全職種一覧を取得
+     */
+    public List<String> getOccupations() {
+        List<String> occupations = new ArrayList<>();
+        String sql = "SELECT occupation FROM occupations_tbl ORDER BY occupation_id";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                occupations.add(rs.getString("occupation"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return occupations;
+    }
+    
+    /**
+     * 企業情報を更新
+     */
+    public boolean updateCompany(int companyId, String companyName, String postCode, String address, 
+                               String tel, String mailAddress, String managerName, boolean recruitmentResults) {
+        String sql = "UPDATE companys_tbl SET company_name=?, post_code=?, address=?, tel=?, mail_address=?, manager_name=?, recruitment_results=? WHERE companys_id=?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, companyName);
+            stmt.setString(2, postCode);
+            stmt.setString(3, address);
+            stmt.setString(4, tel);
+            stmt.setString(5, mailAddress);
+            stmt.setString(6, managerName);
+            stmt.setBoolean(7, recruitmentResults);
+            stmt.setInt(8, companyId);
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * CompanyBeanを使用して企業情報を更新
+     */
+    public boolean updateCompany(beans.CompanyBean company) {
+        String sql = "UPDATE companys_tbl SET company_name=?, post_code=?, address=?, tel=?, mail_address=?, manager_name=?, recruitment_results=? WHERE companys_id=?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, company.getCompanyName());
+            stmt.setString(2, company.getPostCode());
+            stmt.setString(3, company.getAddress());
+            stmt.setString(4, company.getTel());
+            stmt.setString(5, company.getMailAddress());
+            stmt.setString(6, company.getManagerName());
+            stmt.setBoolean(7, company.getRecruitmentResults());
+            stmt.setInt(8, company.getCompanyId());
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 } 

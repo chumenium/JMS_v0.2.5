@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import beans.StudentBeans;
 import utils.DBConnection;
@@ -321,5 +323,39 @@ public class StudentDAO {
             try { if (conn != null) conn.close(); } catch (Exception e) {}
         }
         return occupationName;
+    }
+    
+    /**
+     * 全ての学生情報を取得
+     */
+    public List<Map<String, Object>> getAllStudents() {
+        List<Map<String, Object>> students = new ArrayList<>();
+        String sql = "SELECT * FROM students_tbl ORDER BY student_id";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Map<String, Object> student = new HashMap<>();
+                student.put("student_id", rs.getString("student_id"));
+                student.put("name", rs.getString("name"));
+                student.put("class", rs.getString("class"));
+                student.put("number", rs.getString("number"));
+                student.put("name_reading", rs.getString("name_reading"));
+                student.put("gender", rs.getString("gender"));
+                student.put("email", rs.getString("email"));
+                student.put("tel", rs.getString("tel"));
+                student.put("enrollment_status", rs.getString("enrollment_status"));
+                student.put("mediation_status", rs.getString("mediation_status"));
+                student.put("job_hunting_status", rs.getString("job_hunting_status"));
+                student.put("graduation_year", rs.getString("graduation_year"));
+                student.put("remarks", rs.getString("remarks"));
+                students.add(student);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return students;
     }
 } 

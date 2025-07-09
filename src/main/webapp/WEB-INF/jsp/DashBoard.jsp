@@ -529,6 +529,104 @@
                         </div>
                     <% } %>
 
+                    <!-- 学生一覧機能 -->
+                    <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
+                        <div class="feature-card">
+                            <span class="feature-icon">👥</span>
+                            <h3 class="feature-title">学生一覧</h3>
+                            <p class="feature-description">
+                                登録されている学生の一覧を確認し、詳細情報を閲覧できます。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/StudentListServlet" class="feature-link">
+                                学生一覧を表示
+                            </a>
+                        </div>
+                    <% } %>
+
+                    <!-- 学生詳細機能 -->
+                    <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
+                        <div class="feature-card">
+                            <span class="feature-icon">👤</span>
+                            <h3 class="feature-title">学生詳細</h3>
+                            <p class="feature-description">
+                                個別の学生情報の詳細確認と編集を行います。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/StudentDetailServlet" class="feature-link">
+                                学生詳細を表示
+                            </a>
+                        </div>
+                    <% } %>
+
+                    <!-- 企業一覧機能 -->
+                    <% if ("egd".equals(role) || "admin".equals(role)) { %>
+                        <div class="feature-card">
+                            <span class="feature-icon">🏭</span>
+                            <h3 class="feature-title">企業一覧</h3>
+                            <p class="feature-description">
+                                登録されている企業の一覧を確認し、詳細情報を閲覧できます。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/CompanyListServlet" class="feature-link">
+                                企業一覧を表示
+                            </a>
+                        </div>
+                    <% } %>
+
+                    <!-- 企業登録機能 -->
+                    <% if ("egd".equals(role) || "admin".equals(role)) { %>
+                        <div class="feature-card">
+                            <span class="feature-icon">🏢</span>
+                            <h3 class="feature-title">企業登録</h3>
+                            <p class="feature-description">
+                                新しい企業情報を登録し、求人情報を追加できます。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/CreateCompanyServlet" class="feature-link">
+                                企業登録画面を開く
+                            </a>
+                        </div>
+                    <% } %>
+
+                    <!-- 学生登録機能 -->
+                    <% if ("admin".equals(role)) { %>
+                        <div class="feature-card">
+                            <span class="feature-icon">📝</span>
+                            <h3 class="feature-title">学生登録</h3>
+                            <p class="feature-description">
+                                新しい学生情報を登録し、アカウントを作成できます。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/CreateStudentServlet" class="feature-link">
+                                学生登録画面を開く
+                            </a>
+                        </div>
+                    <% } %>
+
+                    <!-- 面接・試験入力機能 -->
+                    <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
+                        <div class="feature-card">
+                            <span class="feature-icon">📋</span>
+                            <h3 class="feature-title">面接・試験入力</h3>
+                            <p class="feature-description">
+                                面接や試験の日程・結果を記録し、管理できます。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/InterviewExamInputServlet" class="feature-link">
+                                面接・試験入力画面を開く
+                            </a>
+                        </div>
+                    <% } %>
+
+                    <!-- 選考段階管理機能 -->
+                    <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
+                        <div class="feature-card">
+                            <span class="feature-icon">📊</span>
+                            <h3 class="feature-title">選考段階管理</h3>
+                            <p class="feature-description">
+                                企業の選考プロセスの進捗を管理し、状況を追跡できます。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/SelectionStageServlet" class="feature-link">
+                                選考段階管理画面を開く
+                            </a>
+                        </div>
+                    <% } %>
+
                     <!-- 管理者DB機能 -->
                     <% if ("admin".equals(role)) { %>
                         <div class="feature-card">
