@@ -160,9 +160,9 @@ public class StudentDAO {
                 student.setEnrollmentStatus(rs.getString("enrollment_status"));
                 student.setAssistanceStatus(rs.getString("mediation_status"));
                 student.setJobHuntingStatus(rs.getString("job_hunting_status"));
-                student.setDesiredJobType1(rs.getString("desired_job_type_1st_id"));
-                student.setDesiredJobType2(rs.getString("desired_job_type_2nd_id"));
-                student.setDesiredJobType3(rs.getString("desired_job_type_3rd_id"));
+                student.setDesiredJobType1(rs.getString("1st"));
+                student.setDesiredJobType2(rs.getString("2nd"));
+                student.setDesiredJobType3(rs.getString("3rd"));
                 student.setGraduationYear(rs.getString("graduation_year"));
                 student.setRemarks(rs.getString("remarks"));
                 
