@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import utils.DBConnection;
 
 /**
@@ -35,12 +34,12 @@ public class InterviewDAO {
             stmt.setString(2, companyName);
             stmt.setString(3, jobTitle);
             stmt.setString(4, examType);
-            stmt.setDate(5, examDate);
+            stmt.setDate(5, new java.sql.Date(examDate.getTime()));
             stmt.setString(6, examVenue);
             stmt.setString(7, examStartTime);
             stmt.setString(8, examEndTime);
             stmt.setString(9, interviewType);
-            stmt.setDate(10, interviewDate);
+            stmt.setDate(10, new java.sql.Date(interviewDate.getTime()));
             stmt.setString(11, interviewVenue);
             stmt.setString(12, interviewStartTime);
             stmt.setString(13, interviewEndTime);
@@ -107,12 +106,12 @@ public class InterviewDAO {
             stmt.setString(1, companyName);
             stmt.setString(2, jobTitle);
             stmt.setString(3, examType);
-            stmt.setDate(4, examDate);
+            stmt.setDate(4, new java.sql.Date(examDate.getTime()));
             stmt.setString(5, examVenue);
             stmt.setString(6, examStartTime);
             stmt.setString(7, examEndTime);
             stmt.setString(8, interviewType);
-            stmt.setDate(9, interviewDate);
+            stmt.setDate(9, new java.sql.Date(interviewDate.getTime()));
             stmt.setString(10, interviewVenue);
             stmt.setString(11, interviewStartTime);
             stmt.setString(12, interviewEndTime);
@@ -199,7 +198,7 @@ public class InterviewDAO {
             
             stmt.setString(1, studentId);
             stmt.setInt(2, companyId);
-            stmt.setDate(3, interviewDate);
+            stmt.setDate(3, new java.sql.Date(interviewDate.getTime()));
             stmt.setString(4, interviewType);
             stmt.setString(5, status);
             stmt.setString(6, notes);

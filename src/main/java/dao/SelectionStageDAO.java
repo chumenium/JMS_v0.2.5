@@ -9,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import utils.DBConnection;
 
 /**
@@ -32,7 +31,7 @@ public class SelectionStageDAO {
             stmt.setString(2, companyName);
             stmt.setString(3, jobTitle);
             stmt.setString(4, currentStage);
-            stmt.setDate(5, applyDate);
+            stmt.setDate(5, new java.sql.Date(applyDate.getTime()));
             stmt.setString(6, notes);
             
             return stmt.executeUpdate() > 0;
