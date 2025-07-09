@@ -116,6 +116,16 @@ ALTER TABLE students_tbl
 
 ALTER TABLE students_tbl
   ADD job_hunting_status ENUM('未開始','準備中','活動中','内定済み','就職決定','就職辞退') after mediation_status;
+
+ALTER TABLE students_tbl ALTER COLUMN email SET DEFAULT '';
+ALTER TABLE students_tbl ALTER COLUMN tel SET DEFAULT '';
+ALTER TABLE students_tbl ALTER COLUMN remarks SET DEFAULT '';
+
+ALTER TABLE companys_tbl ALTER COLUMN post_code SET DEFAULT '';
+ALTER TABLE companys_tbl ALTER COLUMN address SET DEFAULT '';
+ALTER TABLE companys_tbl ALTER COLUMN tel SET DEFAULT '';
+ALTER TABLE companys_tbl ALTER COLUMN mail_address SET DEFAULT '';
+ALTER TABLE companys_tbl ALTER COLUMN manager_name SET DEFAULT '';
 -------------------------------------------
 
 テストデータ

@@ -167,9 +167,7 @@ public class StudentDAO {
                 student.setRemarks(rs.getString("remarks"));
                 
                 // 希望勤務地を取得
-                String workPlaceSql = "SELECT wp.work_place FROM students_work_place_tbl swp " +
-                                    "JOIN work_place_tbl wp ON swp.work_place_id = wp.id " +
-                                    "WHERE swp.student_id = ? LIMIT 1";
+                String workPlaceSql = "SELECT wp.work_place FROM students_work_place_tbl swp JOIN work_place_tbl wp ON swp.work_place_id = wp.id WHERE swp.student_id = ?";
                 PreparedStatement workPlacePs = conn.prepareStatement(workPlaceSql);
                 workPlacePs.setString(1, id);
                 ResultSet workPlaceRs = workPlacePs.executeQuery();
