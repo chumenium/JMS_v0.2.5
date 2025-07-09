@@ -34,10 +34,8 @@ public class StudentDetailServlet extends HttpServlet {
             return;
         }
         
-        // プルダウン用のデータを取得
+        // プルダウン用のデータを取得（処理速度短縮のためgetJobtypesWorkplaces()を使用）
         StudentDAO dropdownDAO = new StudentDAO();
-        // request.setAttribute("jobtypes", dropdownDAO.getJobtypes());
-        // request.setAttribute("workplaces", dropdownDAO.getWorkplaces());
         List<List<String>> jobtypesWorkplaces = dropdownDAO.getJobtypesWorkplaces();
         request.setAttribute("jobtypes", jobtypesWorkplaces.get(0));
         request.setAttribute("workplaces", jobtypesWorkplaces.get(1));
@@ -89,11 +87,6 @@ public class StudentDetailServlet extends HttpServlet {
             } catch (NumberFormatException e) {
                 // 既に職種名が設定されている場合は何もしない
             }
-            
-            // プルダウン用のデータを取得
-            StudentDAO DropdownDAO = new StudentDAO();
-            request.setAttribute("jobtypes", DropdownDAO.getJobtypes());
-            request.setAttribute("workplaces", DropdownDAO.getWorkplaces());
             
             request.setAttribute("student", student);
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
