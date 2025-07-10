@@ -411,11 +411,11 @@
                     </div>
                     <div class="form-group">
                         <label for="name">氏名 <span class="required">*</span></label>
-                        <input type="text" id="name" name="name" required placeholder="例: 山田太郎">
+                        <input type="text" id="name" name="name" maxlength="20" required placeholder="例: 山田太郎">
                     </div>
                     <div class="form-group">
                         <label for="kana">フリガナ <span class="required">*</span></label>
-                        <input type="text" id="kana" name="kana" required placeholder="例: ヤマダタロウ">
+                        <input type="text" id="kana" name="kana" maxlength="40" required placeholder="例: ヤマダタロウ">
                     </div>
                     <div class="form-group">
                         <label for="gender">性別 <span class="required">*</span></label>
