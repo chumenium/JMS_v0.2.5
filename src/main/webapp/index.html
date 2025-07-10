@@ -497,6 +497,21 @@
 
 <!--このテンプレート専用のスクリプト-->
 <script src="js/main.js"></script>
+<!-- プルダウン内のデータをセットさせるプログラムを動作させる -->
+<script>
+    fetch('/就活管理アプリ/StudentServlet', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            action: 'setDropdown',
+        })
+    })
+    .then(response => {
+        console.log('レスポンスステータス:', response.status);
 
+    })
+</script>
 </body>
 </html>

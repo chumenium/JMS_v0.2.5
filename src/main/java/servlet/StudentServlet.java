@@ -10,9 +10,11 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -95,6 +97,15 @@ public class StudentServlet extends HttpServlet {
     	}
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        if("setDropdown".equals(request.getParameter("action"))){
+            ServletContext sc = getServletContext();
+            StudentDAO dropdownDAO = new StudentDAO();
+            List<List<String>> jobtypesWorkplaces = dropdownDAO.getJobtypesWorkplaces();
+            sc.setAttribute("jobtypes", jobtypesWorkplaces.get(0));
+            sc.setAttribute("workplaces", jobtypesWorkplaces.get(1));
+            System.out.print("ドロップダウンのデータをセット");
+        }
         // セッションの確認
         jakarta.servlet.http.HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
@@ -657,8 +668,8 @@ public class StudentServlet extends HttpServlet {
                 }
             
             //-------------------------------完成-------------------------------
+
             }
-            
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("StudentManagement.jsp?error=db");

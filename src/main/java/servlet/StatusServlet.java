@@ -3,16 +3,14 @@ package servlet;
 import java.io.IOException;
 
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
-import dao.DropdownDataDAO;
 
 /**
- * Servlet implementation class StatusServlet
+ * Servlet implementation class statusServlet
  */
 //@WebServlet("/StatusServlet")
 public class StatusServlet extends HttpServlet {
@@ -38,13 +36,6 @@ public class StatusServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		try {
-			// セッションの確認
-			HttpSession session = request.getSession(false);
-			if (session == null || session.getAttribute("id") == null) {
-				response.sendRedirect(request.getContextPath() + "/login.html");
-				return;
-			}
-			
 			String view = request.getParameter("view");
 			if (view == null) {
 				view = request.getParameter("status");
@@ -57,12 +48,17 @@ public class StatusServlet extends HttpServlet {
 	        System.out.println("StatusServlet: context path = " + request.getContextPath());
 
 	        // セッション情報のデバッグ
-	        String username = (String) session.getAttribute("username");
-	        String role = (String) session.getAttribute("role");
-	        String id = (String) session.getAttribute("id");
-	        System.out.println("StatusServlet: session username = " + username);
-	        System.out.println("StatusServlet: session role = " + role);
-	        System.out.println("StatusServlet: session id = " + id);
+	        jakarta.servlet.http.HttpSession session = request.getSession(false);
+	        if (session != null) {
+	            String username = (String) session.getAttribute("username");
+	            String role = (String) session.getAttribute("role");
+	            String id = (String) session.getAttribute("id");
+	            System.out.println("StatusServlet: session username = " + username);
+	            System.out.println("StatusServlet: session role = " + role);
+	            System.out.println("StatusServlet: session id = " + id);
+	        } else {
+	            System.out.println("StatusServlet: session is null");
+	        }
 
 	        java.util.Map<String, String[]> paramMap = request.getParameterMap();
 	        for (String key : paramMap.keySet()) {
@@ -84,11 +80,6 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/3.jsp";
 	                    break;
 	                case "studentManagement":
-	                    // 権限チェック（教員、校長・教務部長、管理者のみ）
-	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role))) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
 	                    nextPage = "/WEB-INF/jsp/StudentManagement.jsp";
 	                    break;
 	                case "DashBoard":
@@ -97,91 +88,27 @@ public class StatusServlet extends HttpServlet {
 	                case "jobHunting":
 	                    nextPage = "/WEB-INF/jsp/jobHunting.jsp";
 	                    break;
-	                                case "CompanyManagement":
-                    // 権限チェック（就職指導部、管理者のみ）
-                    if (role == null || (!"egd".equals(role) && !"admin".equals(role))) {
-                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-                        return;
-                    }
-                    nextPage = "/WEB-INF/jsp/CompanyManagement.jsp";
-                    break;
+	                case "CompanyManagement":
+	                    nextPage = "/WEB-INF/jsp/CompanyManagement.jsp";
+	                    break;
 	                case "CompanyList":
-	                    // 権限チェック（就職指導部、管理者のみ）
-	                    if (role == null || (!"egd".equals(role) && !"admin".equals(role))) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
 	                    nextPage = "/WEB-INF/jsp/CompanyList.jsp";
 	                    break;
 	                case "applicantList":
-	                    // 権限チェック（教員、校長・教務部長、就職指導部、管理者のみ）
-	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"egd".equals(role) && !"admin".equals(role))) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
 	                    nextPage = "/WEB-INF/jsp/applicantList.jsp";
 	                    break;
 	                case "studentList":
-	                    // 権限チェック（教員、校長・教務部長、管理者のみ）
-	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role))) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
 	                    nextPage = "/WEB-INF/jsp/StudentList.jsp";
 	                    break;
 	                case "createStudent":
-	                    // 権限チェック（教員、校長・教務部長、管理者のみ）
-	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role))) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
-						DropdownDataDAO DropdownDataDAO = new DropdownDataDAO();
-	request.setAttribute("jobtypes", DropdownDataDAO.getJobtypes());
+						//DropdownDataDAO dropdownDAO = new DropdownDataDAO();
+						ServletContext sc = getServletContext();
+						request.setAttribute("jobtypes", sc.getAttribute("jobtypes"));
+						System.out.print("アプリケーションスコープのデータを使用");
 	                    nextPage = "/WEB-INF/jsp/CreateStudent.jsp";
 	                    break;
-	                case "studentDetail":
-	                    // 権限チェック（教員、校長・教務部長、管理者、学生のみ）
-	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role) && !"student".equals(role))) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
-	                    nextPage = "/WEB-INF/jsp/studentDetail.jsp";
-	                    break;
-	                case "studentView":
-	                    // 権限チェック（教員、校長・教務部長、管理者、学生のみ）
-	                    if (role == null || (!"teacher".equals(role) && !"headmaster".equals(role) && !"admin".equals(role) && !"student".equals(role))) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
-	                    nextPage = "/WEB-INF/jsp/studentView.jsp";
-	                    break;
-	                case "interviewExamInput":
-	                    // 権限チェック（全ユーザー）
-	                    if (role == null) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
-	                    nextPage = "/WEB-INF/jsp/InterviewExamInput.jsp";
-	                    break;
-	                case "selectionStage":
-	                    // 権限チェック（全ユーザー）
-	                    if (role == null) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
-	                    nextPage = "/WEB-INF/jsp/SelectionStage.jsp";
-	                    break;
-	                case "adminDatabase.jsp":
-	                    // 権限チェック（管理者のみ）
-	                    if (role == null || !"admin".equals(role)) {
-	                        response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-	                        return;
-	                    }
-	                    nextPage = "/WEB-INF/jsp/adminDatabase.jsp";
-	                    break;
 	                default:
-	                    // デフォルトはダッシュボードに遷移
-	                    nextPage = "/WEB-INF/jsp/DashBoard.jsp";
+	                    nextPage = "/index.jsp";
 	                    break;
 	            }
 	        }

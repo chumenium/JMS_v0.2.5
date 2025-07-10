@@ -4,9 +4,9 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,10 +35,12 @@ public class StudentDetailServlet extends HttpServlet {
         }
         
         // プルダウン用のデータを取得（処理速度短縮のためgetJobtypesWorkplaces()を使用）
-        StudentDAO dropdownDAO = new StudentDAO();
-        List<List<String>> jobtypesWorkplaces = dropdownDAO.getJobtypesWorkplaces();
-        request.setAttribute("jobtypes", jobtypesWorkplaces.get(0));
-        request.setAttribute("workplaces", jobtypesWorkplaces.get(1));
+        //StudentDAO dropdownDAO = new StudentDAO();
+        ServletContext sc = getServletContext();
+        //List<List<String>> jobtypesWorkplaces = dropdownDAO.getJobtypesWorkplaces();
+        request.setAttribute("jobtypes", sc.getAttribute("jobtypes"));
+        request.setAttribute("workplaces", sc.getAttribute("workplaces"));
+        System.out.print("アプリケーションスコープ内のデータを使用");
         
             String studentId = request.getParameter("id");
             String role = (String) session.getAttribute("role");
