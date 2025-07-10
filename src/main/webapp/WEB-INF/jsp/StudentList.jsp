@@ -451,16 +451,16 @@
                 </thead>
                 <tbody>
                     <c:choose>
-                        <c:when test="${not empty students and students[0].size() > 0}">
-                            <c:forEach var="i" begin="0" end="${students[0].size()-1}">
+                        <c:when test="${not empty applicationScope.students and applicationScope.students[0].size() > 0}">
+                            <c:forEach var="i" begin="0" end="${applicationScope.students[0].size()-1}">
                                 <tr>
-                                    <td>${students[0][i]}</td>
-                                    <td>${students[1][i]}</td>
-                                    <td>${students[2][i]}</td>
-                                    <td>${students[3][i]}</td>
+                                    <td>${applicationScope.students[0][i]}</td>
+                                    <td>${applicationScope.students[1][i]}</td>
+                                    <td>${applicationScope.students[2][i]}</td>
+                                    <td>${applicationScope.students[3][i]}</td>
                                     <td>
-                                        <a href="StudentViewServlet?id=${students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
-                                        <a href="StudentDetailServlet?id=${students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
+                                        <a href="StudentViewServlet?id=${applicationScope.students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
+                                        <a href="StudentDetailServlet?id=${applicationScope.students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
                                     </td>
                                 </tr>
                             </c:forEach>

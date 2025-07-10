@@ -333,9 +333,27 @@
             font-size: 18px;
         }
     }
+    .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #2C7744;
+        border-radius: 50%;
+        width: 64px;
+        height: 64px;
+        animation: spin 1s linear infinite;
+        margin: auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    #loading-overlay { display: flex; }
 </style>
 </head>
 <body class="create-student-page">
+    <!-- ローディングアニメーション -->
+    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.7); z-index:10000; align-items:center; justify-content:center;">
+        <div class="loader"></div>
+    </div>
     <div class="create-student-container">
         <!-- ページヘッダー -->
         <div class="page-header">
@@ -535,6 +553,7 @@
             const name = document.getElementById('name').value;
             const kana = document.getElementById('kana').value;
             const department = document.getElementById('department').value;
+            var loadingOverlay = document.getElementById('loading-overlay');
 
             // 必須項目チェック
             if (!studentId || !name || !kana || !department) {
@@ -549,6 +568,9 @@
                 alert('学籍番号は8桁の数字で自動生成されます。');
                 return;
             }
+
+            // バリデーション通過後にローディング表示
+            loadingOverlay.style.display = 'flex';
         });
 
   

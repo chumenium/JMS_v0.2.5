@@ -208,6 +208,13 @@
             transform: translateY(-1px);
             box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
         }
+        .btn-delete {
+            background: #ce3d3d;
+            color: #fff;
+        }
+        .btn-delete:hover {
+            background: #c42f2f;
+        }
         .btn-secondary {
             background: #6c757d;
             color: #fff;
@@ -313,6 +320,20 @@
             padding: 20px;
         }
     }
+    .loader {
+        border: 8px solid #f3f3f3;
+        border-top: 8px solid #2C7744;
+        border-radius: 50%;
+        width: 64px;
+        height: 64px;
+        animation: spin 1s linear infinite;
+        margin: auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    #loading-overlay { display: flex; }
     </style>
 </head>
 <body>
@@ -325,7 +346,7 @@
                 <h3>基本情報</h3>
                 <div class="info-item">
                     <span class="info-label">学生ID</span>
-                    <div class="info-value"><%= student != null ? student.getId() : "" %></div>
+                    <div class="info-value" id="student_id"><%= student != null ? student.getId() : "" %></div>
                 </div>
                 <div class="info-item">
                     <span class="info-label">氏名</span>
@@ -432,10 +453,68 @@
         <% } %>
 
         <div class="action-buttons">
+            <a class="btn btn-delete" id="btn-delete">削除</a>
             <a href="StudentDetailServlet?id=<%= student != null ? student.getId() : "" %>" class="btn btn-edit">編集</a>
             <a href="StudentServlet" class="btn btn-secondary">一覧に戻る</a>
         </div>
+        <!-- 削除確認ポップアップ -->
+        <div id="delete-confirm-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.35); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:#fff; color:#222; border-radius:10px; padding:32px 24px; min-width:280px; max-width:90vw; box-shadow:0 4px 24px rgba(0,0,0,0.18); text-align:center;">
+                <div style="font-size:18px; font-weight:600; margin-bottom:18px;">本当に削除しますか？</div>
+                <div style="margin-bottom:24px; color:#c42f2f; font-size:15px;">この操作は元に戻せません。</div>
+                <button id="confirm-delete-btn" class="btn btn-delete" style="margin-right:12px;">削除</button>
+                <button id="cancel-delete-btn" class="btn btn-secondary">キャンセル</button>
+            </div>
+        </div>
     </div>
+    <!-- ローディングアニメーション -->
+    <div id="loading-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.7); z-index:10000; align-items:center; justify-content:center;">
+        <div class="loader"></div>
+    </div>
+    <script>
+        var delete_btn = document.getElementById('btn-delete');
+        var modal = document.getElementById('delete-confirm-modal');
+        var confirmBtn = document.getElementById('confirm-delete-btn');
+        var cancelBtn = document.getElementById('cancel-delete-btn');
+        var loadingOverlay = document.getElementById('loading-overlay');
+
+        delete_btn.addEventListener('click', function() {
+            modal.style.display = 'flex';
+        });
+        cancelBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+        });
+        confirmBtn.addEventListener('click', function() {
+            modal.style.display = 'none';
+            loadingOverlay.style.display = 'flex';
+            delete_data();
+        });
+
+        function delete_data(){
+            fetch('/就活管理アプリ/StudentServlet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: new URLSearchParams({
+                        action: 'delete',
+                        student_id: '<%= student != null ? student.getId() : "" %>'
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = 'StudentServlet';
+                    } else {
+                        loadingOverlay.style.display = 'none';
+                        alert('削除に失敗しました');
+                    }
+                })
+                .catch(() => {
+                    loadingOverlay.style.display = 'none';
+                    alert('通信エラーが発生しました');
+                });
+        }
+    </script>
 </body>
 </html>
 
