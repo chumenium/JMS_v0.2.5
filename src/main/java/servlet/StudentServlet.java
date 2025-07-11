@@ -502,11 +502,19 @@ public class StudentServlet extends HttpServlet {
                 // 学生情報を削除する（`studentClass` で削除）
             	String student_id = request.getParameter("student_id");
 
+                //希望勤務地中間テーブルからデータ削除
+                String sql3 = "DELETE FROM students_work_place_tbl WHERE student_id = ?";
+                PreparedStatement stmt3 = conn.prepareStatement(sql3);
+                stmt3.setString(1, student_id);
+                int rowsInserted3 = stmt3.executeUpdate();
+
+                //学生テーブルから削除
                 String sql = "DELETE FROM students_tbl WHERE student_id = ?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
                 stmt.setString(1, student_id);
                 int rowsInserted1 = stmt.executeUpdate();
 
+                //ユーザテーブルから削除
                 String sql2 = "DELETE FROM users WHERE id = ?";
                 System.out.println(sql+sql2+","+student_id);
                 PreparedStatement stmt2 = conn.prepareStatement(sql2);

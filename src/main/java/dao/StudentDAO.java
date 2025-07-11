@@ -171,9 +171,11 @@ public class StudentDAO {
                 PreparedStatement workPlacePs = conn.prepareStatement(workPlaceSql);
                 workPlacePs.setString(1, id);
                 ResultSet workPlaceRs = workPlacePs.executeQuery();
-                if (workPlaceRs.next()) {
-                    student.setDesiredWorkPlace(workPlaceRs.getString("work_place"));
+                List<String> wps = new ArrayList<String>();
+                while (workPlaceRs.next()) {
+                    wps.add(workPlaceRs.getString("work_place"));
                 }
+                student.setDesiredWorkPlace(wps);
                 workPlaceRs.close();
                 workPlacePs.close();
             }
@@ -242,19 +244,24 @@ public class StudentDAO {
                 // 新しい希望勤務地を追加
                 String workPlaceSql = "SELECT id FROM work_place_tbl WHERE work_place = ?";
                 PreparedStatement workPlacePs = conn.prepareStatement(workPlaceSql);
-                workPlacePs.setString(1, student.getDesiredWorkPlace());
-                ResultSet workPlaceRs = workPlacePs.executeQuery();
-                if (workPlaceRs.next()) {
-                    int workPlaceId = workPlaceRs.getInt("id");
-                    String insertSql = "INSERT INTO students_work_place_tbl (student_id, work_place_id) VALUES (?, ?)";
-                    PreparedStatement insertPs = conn.prepareStatement(insertSql);
-                    insertPs.setString(1, student.getId());
-                    insertPs.setInt(2, workPlaceId);
-                    int insertCount = insertPs.executeUpdate();
-                    System.out.println("新規勤務地追加件数: " + insertCount);
-                    insertPs.close();
+                List<String> wps = student.getDesiredWorkPlace();
+                for(String wp : wps){
+                    System.out.println("student内希望勤務地"+wp);
+                    workPlacePs.setString(1, wp);
+                    ResultSet workPlaceRs = workPlacePs.executeQuery();
+                    if (workPlaceRs.next()) {
+                        int workPlaceId = workPlaceRs.getInt("id");
+                        System.out.println(workPlaceId);
+                        String insertSql = "INSERT INTO students_work_place_tbl (student_id, work_place_id) VALUES (?, ?)";
+                        PreparedStatement insertPs = conn.prepareStatement(insertSql);
+                        insertPs.setString(1, student.getId());
+                        insertPs.setInt(2, workPlaceId);
+                        int insertCount = insertPs.executeUpdate();
+                        System.out.println("新規勤務地追加件数: " + insertCount);
+                        insertPs.close();
+                    }
                 }
-                workPlaceRs.close();
+                //workPlaceRs.close();
                 workPlacePs.close();
             } else {
                 // 希望勤務地が空の場合は既存のデータを削除

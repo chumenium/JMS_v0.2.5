@@ -438,8 +438,11 @@
                     <div class="info-value"><%= student != null ? student.getDesiredJobType3() : "" %></div>
                 </div>
                 <div class="info-item">
+                    <% if(student != null && student.getDesiredWorkPlace() != null) { %>
                     <span class="info-label">希望勤務地</span>
-                    <div class="info-value"><%= student != null ? student.getDesiredWorkPlace() : "" %></div>
+                    <% for(String wp : student.getDesiredWorkPlace()) { %>
+                        <div class="info-value"><%= wp %></div>
+                    <% }} %>
                 </div>
             </div>
         </div>

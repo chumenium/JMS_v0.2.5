@@ -456,15 +456,34 @@
                     </div>
                     <div class="form-group">
                         <label for="desiredWorkPlace">希望勤務地</label>
-                        <select id="desiredWorkPlace" name="desiredWorkPlace">
-                            <option value="">選択してください</option>
-                            <% java.util.List<String> workplaces = (java.util.List<String>) request.getAttribute("workplaces");
-                               String selectedWp = student != null ? student.getDesiredWorkPlace() : "";
-                               if (workplaces != null) {
-                                 for (String wp : workplaces) { %>
-                                    <option value="<%= wp %>" <%= wp.equals(selectedWp) ? "selected" : "" %>><%= wp %></option>
-                            <%   } } %>
-                        </select>
+                        <% int l = 0 ;%>
+                        <% if(student != null && student.getDesiredWorkPlace() != null) { %>
+                            <% for(String selectedWp1 : student.getDesiredWorkPlace()) { %>
+                                <select id="<%= "desiredWorkPlace"+String.valueOf(l)%>" name="desiredWorkPlace<%= l %>">
+                                    <option value="<%= selectedWp1 %>"><%= selectedWp1 %></option>
+                                    <option value="">未設定</option>
+                                    <% java.util.List<String> workplaces = (java.util.List<String>) request.getAttribute("workplaces");
+                                    
+                                    if (workplaces != null) {
+                                        for (String wp : workplaces) { %>
+                                            <option value="<%= wp %>" ><%= wp %></option>
+                                    <%   } } %>
+                                </select>
+                            <% l+=1;%>
+                        <% } }%>
+                        <div id="workplace-container">
+                            <select id="<%= "desiredWorkPlace"+String.valueOf(l)%>" name="desiredWorkPlace<%= l %>">
+                                <% l+=1; %>
+                                <option value="">未設定</option>
+                                <% java.util.List<String> workplaces = (java.util.List<String>) request.getAttribute("workplaces");
+                                
+                                if (workplaces != null) {
+                                    for (String wp : workplaces) { %>
+                                        <option value="<%= wp %>" ><%= wp %></option>
+                                <%   } } %>
+                            </select>
+                        </div>
+                        <button type="button" id="add-workplace-btn">希望勤務地を増やす＋</button>
                     </div>
                 </div>
             </div>
@@ -479,10 +498,40 @@
             </div>
 
             <div class="action-buttons">
+                <input type="hidden" id="maxWorkPlaceIndex" name="number99" value="<%= l-1 %>">
                 <button type="submit" class="btn">更新</button>
                 <a href="StudentServlet" class="btn btn-secondary">一覧に戻る</a>
             </div>
         </form>
     </div>
+    <script>
+        document.getElementById('add-workplace-btn').addEventListener('click', function() {
+            var container = document.getElementById('workplace-container');
+            var maxIndexInput = document.getElementById('maxWorkPlaceIndex');
+            var currentIndex = parseInt(maxIndexInput.value, 10);
+
+            var newIndex = currentIndex + 1;
+            var selects = container.getElementsByTagName('select');
+            var maxIndex = -1;
+            for (var i = 0; i < selects.length; i++) {
+                var id = selects[i].id;
+                var match = id.match(/^desiredWorkPlace(\d+)$/);
+                if (match) {
+                    var num = parseInt(match[1], 10);
+                    if (num > maxIndex) maxIndex = num;
+                }
+            }
+            // 新しいselectを追加
+            var newIndex = maxIndex + 1;
+            var newSelect = selects[selects.length - 1].cloneNode(true);
+            newSelect.id = "desiredWorkPlace" + newIndex;
+            newSelect.name = "desiredWorkPlace" + newIndex;
+            newSelect.selectedIndex = 0;
+            container.appendChild(newSelect);
+            // hiddenの値を「新しい最大連番」に更新
+            maxIndexInput.value = newIndex;
+            console.log(maxIndexInput.value);
+        });
+    </script>
 </body>
 </html> 

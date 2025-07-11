@@ -1,6 +1,7 @@
 package beans;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class StudentBeans implements Serializable {
     private String id; // 学生ID
@@ -17,7 +18,7 @@ public class StudentBeans implements Serializable {
     private String desiredJobType1; // 希望職種1
     private String desiredJobType2; // 希望職種2
     private String desiredJobType3; // 希望職種3
-    private String desiredWorkPlace; // 希望勤務地
+    private List<String> desiredWorkPlace; // 希望勤務地
     private String graduationYear; // 卒業年
     private String remarks; // 備考
 
@@ -63,8 +64,8 @@ public class StudentBeans implements Serializable {
     public String getDesiredJobType3() { return desiredJobType3; }
     public void setDesiredJobType3(String desiredJobType3) { this.desiredJobType3 = desiredJobType3; }
 
-    public String getDesiredWorkPlace() { return desiredWorkPlace; }
-    public void setDesiredWorkPlace(String desiredWorkPlace) { this.desiredWorkPlace = desiredWorkPlace; }
+    public List<String> getDesiredWorkPlace() { return desiredWorkPlace; }
+    public void setDesiredWorkPlace(List<String> desiredWorkPlace) { this.desiredWorkPlace = desiredWorkPlace; }
 
     public String getGraduationYear() { return graduationYear; }
     public void setGraduationYear(String graduationYear) { this.graduationYear = graduationYear; }

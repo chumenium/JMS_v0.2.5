@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -147,7 +148,26 @@ public class StudentDetailServlet extends HttpServlet {
         String desiredJobType3 = request.getParameter("desiredJobType3");
         String graduationYear = request.getParameter("graduationYear");
         String remarks = request.getParameter("remarks");
-        String desiredWorkPlace = request.getParameter("desiredWorkPlace");
+
+        int maxnum = Integer.parseInt(request.getParameter("number99"));
+        //maxnum =- 1;
+        System.out.println(maxnum);
+        String desiredWorkPlace = "";
+        String wpid = "";
+        List<String> wps = new ArrayList<String>();
+        for(int l = 0;l < maxnum;l++){
+            wpid = "desiredWorkPlace"+String.valueOf(l);
+            //System.out.println(wpid);
+            desiredWorkPlace = request.getParameter(wpid);
+            //System.out.println(desiredWorkPlace);
+            if( ! desiredWorkPlace.equals("") && ! (desiredWorkPlace == null)){
+                System.out.println("でーたせっとするよおおおおおおおおおおおおおおおおおおおおお");
+                wps.add(desiredWorkPlace);
+            }else{
+                System.out.println("値なし");
+            }
+        }
+        
         
         // デバッグ用ログ
         System.out.println("=== フォームデータ受信 ===");
@@ -199,8 +219,10 @@ public class StudentDetailServlet extends HttpServlet {
         student.setDesiredJobType3(desiredJobType3);
         student.setGraduationYear(graduationYear);
         student.setRemarks(remarks);
-        student.setDesiredWorkPlace(desiredWorkPlace);
-        
+        student.setDesiredWorkPlace(wps);
+        for(String wp:wps){
+            System.out.println("test"+wp);
+        }
         try {
             // データベースを更新
             StudentDAO.updateStudent(student);
