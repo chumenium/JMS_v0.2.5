@@ -110,6 +110,9 @@ public class StatusServlet extends HttpServlet {
 	                default:
 	                    nextPage = "/index.jsp";
 	                    break;
+
+					
+
 	            }
 	        }
 

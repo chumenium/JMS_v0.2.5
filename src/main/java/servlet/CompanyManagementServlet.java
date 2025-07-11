@@ -102,6 +102,7 @@ public class CompanyManagementServlet extends HttpServlet {
         String tel = request.getParameter("tel");
         String mailAddress = request.getParameter("mail_address");
         String managerName = request.getParameter("manager_name");
+
         boolean recruitmentResults = "true".equals(request.getParameter("recruitment_results"));
         
         // バリデーション

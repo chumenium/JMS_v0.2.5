@@ -86,10 +86,12 @@ public class CompanyDAO {
      */
     public Map<String, Object> getCompanyById(int companyId) {
         String sql = "SELECT * FROM companys_tbl WHERE companys_id=?";
+        System.out.println("CompanyDAO: getCompanyById called with ID = " + companyId);
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
+            System.out.println("CompanyDAO: Database connection established");
             stmt.setInt(1, companyId);
             ResultSet rs = stmt.executeQuery();
             
@@ -103,9 +105,13 @@ public class CompanyDAO {
                 company.put("mail_address", rs.getString("mail_address"));
                 company.put("manager_name", rs.getString("manager_name"));
                 company.put("recruitment_results", rs.getBoolean("recruitment_results"));
+                System.out.println("CompanyDAO: Found company data = " + company);
                 return company;
+            } else {
+                System.out.println("CompanyDAO: No company found with ID = " + companyId);
             }
         } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("CompanyDAO: Error in getCompanyById: " + e.getMessage());
             e.printStackTrace();
         }
         return null;

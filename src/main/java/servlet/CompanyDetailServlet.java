@@ -25,56 +25,130 @@ public class CompanyDetailServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        // 詳細なデバッグ情報
+        System.out.println("=== CompanyDetailServlet Debug Info ===");
+        System.out.println("Request URL: " + request.getRequestURL());
+        System.out.println("Request URI: " + request.getRequestURI());
+        System.out.println("Context Path: " + request.getContextPath());
+        System.out.println("Servlet Path: " + request.getServletPath());
+        System.out.println("Query String: " + request.getQueryString());
+        System.out.println("Method: " + request.getMethod());
+        
+        // パラメータ情報
+        java.util.Enumeration<String> paramNames = request.getParameterNames();
+        System.out.println("Parameters:");
+        while (paramNames.hasMoreElements()) {
+            String paramName = paramNames.nextElement();
+            String paramValue = request.getParameter(paramName);
+            System.out.println("  " + paramName + " = " + paramValue);
+        }
+        
         // セッション確認
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("id") == null) {
+            System.out.println("CompanyDetailServlet: Session invalid, redirecting to login");
             response.sendRedirect(request.getContextPath() + "/login.html");
             return;
         }
         
         // 権限チェック（就職指導部・システム管理者のみ）
         String role = (String) session.getAttribute("role");
+        System.out.println("CompanyDetailServlet: User role = " + role);
         if (role == null || (!role.equals("egd") && !role.equals("admin"))) {
+            System.out.println("CompanyDetailServlet: Access denied, redirecting to 403");
             response.sendRedirect(request.getContextPath() + "/error/403.html");
             return;
         }
         
         String companyIdStr = request.getParameter("companyId");
+        System.out.println("CompanyDetailServlet: companyId parameter = " + companyIdStr);
         if (companyIdStr == null || companyIdStr.trim().isEmpty()) {
+            System.out.println("CompanyDetailServlet: No companyId provided, redirecting to CompanyManagement");
             response.sendRedirect(request.getContextPath() + "/StatusServlet?view=CompanyManagement");
             return;
         }
         
         try {
             int companyId = Integer.parseInt(companyIdStr);
+            System.out.println("CompanyDetailServlet: Parsed companyId = " + companyId);
             
             // 企業情報を取得
             Map<String, Object> companyData = CompanyDAO.getCompanyById(companyId);
+            System.out.println("CompanyDetailServlet: Retrieved company data = " + companyData);
+            
             if (companyData == null) {
+                System.out.println("CompanyDetailServlet: Company not found");
                 request.setAttribute("errorMessage", "指定された企業が見つかりません。");
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/error/404.html");
                 dispatcher.forward(request, response);
                 return;
             }
             
-            // MapからCompanyBeanに変換
+            // MapからCompanyBeanに変換（null安全）
             CompanyBean company = new CompanyBean();
-            company.setCompanyId((Integer) companyData.get("companys_id"));
-            company.setCompanyName((String) companyData.get("company_name"));
-            company.setPostCode((String) companyData.get("post_code"));
-            company.setAddress((String) companyData.get("address"));
-            company.setTel((String) companyData.get("tel"));
-            company.setMailAddress((String) companyData.get("mail_address"));
-            company.setManagerName((String) companyData.get("manager_name"));
-            company.setRecruitmentResults((Boolean) companyData.get("recruitment_results"));
             
-            			// 勤務地・職種名を取得
-			String workPlaceName = CompanyDAO.getWorkPlaceName(company.getWorkPlaceId());
-			String occupationName = CompanyDAO.getOccupationName(company.getOccupationId());
-			
-			// プルダウン用データを取得
-			List<String> workPlaces = CompanyDAO.getWorkPlaces();
-			List<String> occupations = CompanyDAO.getOccupations();
+            // null安全な値設定
+            Integer companyIdFromDb = (Integer) companyData.get("companys_id");
+            if (companyIdFromDb != null) {
+                company.setCompanyId(companyIdFromDb);
+            }
+            
+            String companyName = (String) companyData.get("company_name");
+            company.setCompanyName(companyName != null ? companyName : "");
+            
+            String postCode = (String) companyData.get("post_code");
+            company.setPostCode(postCode != null ? postCode : "");
+            
+            String address = (String) companyData.get("address");
+            company.setAddress(address != null ? address : "");
+            
+            String tel = (String) companyData.get("tel");
+            company.setTel(tel != null ? tel : "");
+            
+            String mailAddress = (String) companyData.get("mail_address");
+            company.setMailAddress(mailAddress != null ? mailAddress : "");
+            
+            String managerName = (String) companyData.get("manager_name");
+            company.setManagerName(managerName != null ? managerName : "");
+            
+            Boolean recruitmentResults = (Boolean) companyData.get("recruitment_results");
+            company.setRecruitmentResults(recruitmentResults != null ? recruitmentResults : false);
+            
+            // 勤務地・職種IDを設定（データベースから取得した場合）
+            if (companyData.get("work_place_id") != null) {
+                company.setWorkPlaceId((Integer) companyData.get("work_place_id"));
+            }
+            if (companyData.get("occupation_id") != null) {
+                company.setOccupationId((Integer) companyData.get("occupation_id"));
+            }
+            
+            System.out.println("CompanyDetailServlet: Created CompanyBean = " + company);
+            
+            // 勤務地・職種名を取得
+            String workPlaceName = "";
+            String occupationName = "";
+            try {
+                if (company.getWorkPlaceId() > 0) {
+                    workPlaceName = CompanyDAO.getWorkPlaceName(company.getWorkPlaceId());
+                }
+                if (company.getOccupationId() > 0) {
+                    occupationName = CompanyDAO.getOccupationName(company.getOccupationId());
+                }
+            } catch (Exception e) {
+                System.out.println("CompanyDetailServlet: Error getting place/occupation names: " + e.getMessage());
+            }
+            
+            // プルダウン用データを取得
+            List<String> workPlaces = null;
+            List<String> occupations = null;
+            try {
+                workPlaces = CompanyDAO.getWorkPlaces();
+                occupations = CompanyDAO.getOccupations();
+            } catch (Exception e) {
+                System.out.println("CompanyDetailServlet: Error getting dropdown data: " + e.getMessage());
+                workPlaces = new java.util.ArrayList<>();
+                occupations = new java.util.ArrayList<>();
+            }
             
             // リクエストスコープに設定
             request.setAttribute("company", company);
@@ -88,12 +162,21 @@ public class CompanyDetailServlet extends HttpServlet {
             boolean isEditMode = "edit".equals(mode);
             request.setAttribute("isEditMode", isEditMode);
             
+            System.out.println("CompanyDetailServlet: Forwarding to JSP, editMode = " + isEditMode);
+            
             // JSPにフォワード
             RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/companyDetail.jsp");
             dispatcher.forward(request, response);
             
         } catch (NumberFormatException e) {
+            System.out.println("CompanyDetailServlet: NumberFormatException: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/StatusServlet?view=CompanyManagement");
+        } catch (Exception e) {
+            System.out.println("CompanyDetailServlet: Unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "システムエラーが発生しました: " + e.getMessage());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/error/500.html");
+            dispatcher.forward(request, response);
         }
     }
     
@@ -115,6 +198,48 @@ public class CompanyDetailServlet extends HttpServlet {
             return;
         }
         
+        // アクションを取得
+        String action = request.getParameter("action");
+        
+        if ("delete".equals(action)) {
+            // 削除処理
+            handleDelete(request, response);
+        } else {
+            // 更新処理
+            handleUpdate(request, response);
+        }
+    }
+    
+    /**
+     * 企業削除処理
+     */
+    private void handleDelete(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        try {
+            int companyId = Integer.parseInt(request.getParameter("companyId"));
+            
+            // 企業削除
+            boolean success = CompanyDAO.deleteCompany(companyId);
+            
+            if (success) {
+                // 削除成功 - 企業一覧にリダイレクト
+                response.sendRedirect(request.getContextPath() + "/CompanyListServlet?message=deleted");
+            } else {
+                // 削除失敗 - エラーメッセージと共に詳細画面に戻る
+                request.setAttribute("errorMessage", "企業の削除に失敗しました。");
+                response.sendRedirect(request.getContextPath() + "/CompanyDetailServlet?companyId=" + companyId + "&error=delete_failed");
+            }
+            
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/StatusServlet?view=CompanyManagement");
+        }
+    }
+    
+    /**
+     * 企業更新処理
+     */
+    private void handleUpdate(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
         try {
             // フォームデータを取得
             int companyId = Integer.parseInt(request.getParameter("companyId"));
@@ -143,8 +268,8 @@ public class CompanyDetailServlet extends HttpServlet {
             company.setWorkPlaceId(workPlaceId);
             company.setOccupationId(occupationId);
             
-            			// 更新処理
-			boolean success = CompanyDAO.updateCompany(company);
+            // 更新処理
+            boolean success = CompanyDAO.updateCompany(company);
             
             if (success) {
                 request.setAttribute("successMessage", "企業情報を更新しました。");
@@ -157,6 +282,11 @@ public class CompanyDetailServlet extends HttpServlet {
             
         } catch (NumberFormatException e) {
             request.setAttribute("errorMessage", "入力データに不正な値が含まれています。");
+            doGet(request, response);
+        } catch (Exception e) {
+            System.out.println("CompanyDetailServlet: Update error: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "更新処理中にエラーが発生しました: " + e.getMessage());
             doGet(request, response);
         }
     }

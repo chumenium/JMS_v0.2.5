@@ -472,7 +472,7 @@
                         <tbody>
                             <% if (companies != null) { for (java.util.Map<String, Object> company : companies) { %>
                             <tr>
-                              <td><%= company.get("company_id") %></td>
+                              <td><%= company.get("companys_id") %></td>
                               <td><%= company.get("company_name") %></td>
                               <td><%= company.get("post_code") %></td>
                               <td><%= company.get("address") %></td>
@@ -487,12 +487,11 @@
                                 <% } %>
                               </td>
                               <td>
-                                <a href="CompanyDetailServlet?companyId=<%= company.get("company_id") %>&mode=edit" class="table-action-btn edit">
-                                  <i class="fas fa-edit"></i>編集
+                                <a href="CompanyDetailServlet?companyId=<%= company.get("companys_id") %>" class="table-action-btn" style="background-color: #28a745; color: white;">
+                                  <i class="fas fa-eye"></i>詳細
                                 </a>
-                                <% String cid = String.valueOf(company.get("company_id")); %>
-                                <a href="#" class="table-action-btn delete" onclick="deleteCompany('<%= cid %>')">
-                                  <i class="fas fa-trash"></i>削除
+                                <a href="CompanyDetailServlet?companyId=<%= company.get("companys_id") %>&mode=edit" class="table-action-btn edit">
+                                  <i class="fas fa-edit"></i>編集
                                 </a>
                               </td>
                             </tr>
