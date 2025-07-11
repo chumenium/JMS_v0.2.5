@@ -1,38 +1,31 @@
 <!--*
 ：：：色のテーマは緑：：：
-就職管理画面
+就活情報検索画面
 
 
-**********
+******教員-生徒-どちらにも表示されるページ****
 
-<!--* 画面：就職管理画面
-        	
 許可されている権限：
 ・教員：teacher
 ・校長・教務部長：headmaster
+・就職指導部：egd
 ・システム管理者：admin
- 
+・学生：student
+
 ▼▼▼▼
 *-->
 
-
-<!--確認まだ-->
-
 <!--KCS_JMS_PROJECT-->
 
+<!-- 就活情報検索画面用 -->
 
-<!-- 就職管理画面用 -->
-
-
-
-<!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
 <% 
   String username = (String) session.getAttribute("username"); 
   String role     = (String) session.getAttribute("role"); 
   
   // デバッグ用：セッション情報をコンソールに出力
-  System.out.println("StudentManagement.jsp - username: " + username);
-  System.out.println("StudentManagement.jsp - role: " + role);
+  System.out.println("jobHuntingSearch.jsp - username: " + username);
+  System.out.println("jobHuntingSearch.jsp - role: " + role);
   
   // nullチェック
   if (username == null) {
@@ -42,40 +35,39 @@
     role = "guest";
   }
   
-  // リクエストスコープからプルダウン用データを取得
-  java.util.List<String> classList = (java.util.List<String>) request.getAttribute("classList");
-  java.util.List<String> enrollmentStatusList = (java.util.List<String>) request.getAttribute("enrollmentStatusList");
-  java.util.List<String> assistanceList = (java.util.List<String>) request.getAttribute("assistanceList");
-  java.util.List<String> firstChoiceIndustryList = (java.util.List<String>) request.getAttribute("firstChoiceIndustryList");
-  java.util.List<Integer> graduationYearList = (java.util.List<Integer>) request.getAttribute("graduationYearList");
+  // リクエストスコープから検索結果を取得
+  java.util.List<java.util.Map<String, Object>> searchResults = 
+    (java.util.List<java.util.Map<String, Object>>) request.getAttribute("searchResults");
   
   // エラーメッセージを取得
   String errorMessage = (String) request.getAttribute("errorMessage");
+  String successMessage = (String) request.getAttribute("successMessage");
 %>
-<!--▲▲▲▲▲-->
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>JMSアプリ - 就職管理画面</title>
+<title>JMSアプリ - 就活情報検索</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
 
 <style>
-    /* システム上見やすさを追求した学生管理画面デザイン */
+    /* システム上見やすさを追求した就活情報検索画面デザイン */
     
     /* 全体の設定 */
-    .student-management-page {
+    .job-hunting-search-page {
         background: #f8f9fa;
         color: #2c3e50;
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         line-height: 1.6;
     }
 
-    .student-management-container {
+    .job-hunting-search-container {
         max-width: 1400px;
         margin: 0 auto;
         padding: 24px;
@@ -145,8 +137,8 @@
         font-weight: 600;
     }
 
-    /* クイックアクション - 視認性と操作性の向上 */
-    .quick-actions {
+    /* 検索フォーム - 視認性と操作性の向上 */
+    .search-form {
         background: white;
         border-radius: 12px;
         padding: 32px;
@@ -157,7 +149,7 @@
         overflow: hidden;
     }
 
-    .quick-actions::before {
+    .search-form::before {
         content: '';
         position: absolute;
         top: 0;
@@ -167,7 +159,7 @@
         background: linear-gradient(90deg, #2C7744, #5CA564);
     }
 
-    .quick-actions h3 {
+    .search-form h3 {
         font-size: 20px;
         color: #2c3e50;
         margin-bottom: 24px;
@@ -175,151 +167,50 @@
         font-weight: 700;
     }
 
-    .action-buttons {
+    .form-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
     }
 
-    .action-btn {
-        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 8px;
-        text-decoration: none;
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .form-group label {
         font-weight: 600;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        transition: all 0.2s ease;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
-        position: relative;
-        overflow: hidden;
-    }
-
-    .action-btn:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-
-    .action-btn.secondary {
-        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
-    }
-
-    .action-btn.secondary:hover {
-        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
-    }
-
-    /* メインコンテンツ - 情報階層の改善 */
-    .management-main {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-        gap: 24px;
-        margin-bottom: 32px;
-        max-width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-
-    /* 機能カード - 視認性と操作性の向上 */
-    .management-card {
-        background: white;
-        border-radius: 12px;
-        padding: 32px;
-        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-        border: 1px solid #e9ecef;
-        transition: all 0.2s ease;
-        position: relative;
-        overflow: hidden;
-        text-align: center;
-    }
-
-    .management-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #2C7744, #5CA564);
-    }
-
-    .management-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-        border-color: #2C7744;
-    }
-
-    .card-icon {
-        font-size: 48px;
-        margin-bottom: 20px;
-        display: block;
-        opacity: 0.9;
-    }
-
-    .card-title {
-        font-size: 20px;
-        font-weight: 700;
         color: #2c3e50;
-        margin-bottom: 12px;
-        line-height: 1.3;
-    }
-
-    .card-description {
-        color: #6c757d;
-        margin-bottom: 24px;
-        line-height: 1.6;
-        font-size: 16px;
-    }
-
-    .card-stats {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 24px;
-        padding: 20px;
-        background: linear-gradient(135deg, rgba(44, 119, 68, 0.05), rgba(92, 165, 100, 0.05));
-        border-radius: 8px;
-        border: 1px solid rgba(44, 119, 68, 0.1);
-    }
-
-    .stat-item {
-        text-align: center;
-        position: relative;
-    }
-
-    .stat-item:not(:last-child)::after {
-        content: '';
-        position: absolute;
-        right: -50%;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 1px;
-        height: 30px;
-        background: linear-gradient(to bottom, transparent, rgba(44, 119, 68, 0.3), transparent);
-    }
-
-    .stat-number {
-        font-size: 24px;
-        font-weight: 700;
-        color: #2C7744;
-        display: block;
-    }
-
-    .stat-label {
         font-size: 14px;
-        color: #6c757d;
-        margin-top: 6px;
-        font-weight: 500;
     }
 
-    .card-link {
+    .form-group input,
+    .form-group select {
+        padding: 12px 16px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        background: #ffffff;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #2C7744;
+        box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
+    }
+
+    .search-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .search-btn {
         background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
         color: white;
         padding: 14px 28px;
@@ -331,22 +222,147 @@
         transition: all 0.2s ease;
         border: none;
         cursor: pointer;
-        width: 100%;
-        text-align: center;
-        box-sizing: border-box;
         box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
     }
 
-    .card-link:hover {
+    .search-btn:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
         color: white;
         text-decoration: none;
     }
 
+    .search-btn.secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+    }
+
+    .search-btn.secondary:hover {
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+    }
+
+    /* 検索結果 - 視認性と操作性の向上 */
+    .search-results {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
+        margin-bottom: 32px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .search-results::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #2C7744, #5CA564);
+    }
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    .results-title {
+        font-size: 20px;
+        color: #2c3e50;
+        font-weight: 700;
+    }
+
+    .results-count {
+        font-size: 14px;
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 16px;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 16px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .results-table th {
+        background: linear-gradient(135deg, rgba(44, 119, 68, 0.1), rgba(92, 165, 100, 0.1));
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+
+    .results-table tr:hover {
+        background: rgba(44, 119, 68, 0.05);
+    }
+
+    .action-btn {
+        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 14px;
+        display: inline-block;
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(44, 119, 68, 0.2);
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(44, 119, 68, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .action-btn.secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        box-shadow: 0 2px 4px rgba(108, 117, 125, 0.2);
+    }
+
+    .action-btn.secondary:hover {
+        box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+    }
+
+    /* メッセージ表示 */
+    .message {
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
     /* レスポンシブ対応の強化 */
     @media (max-width: 768px) {
-        .student-management-container {
+        .job-hunting-search-container {
             padding: 16px;
         }
         
@@ -362,35 +378,31 @@
             font-size: 16px;
         }
         
-        .management-main {
+        .form-grid {
             grid-template-columns: 1fr;
             gap: 16px;
         }
         
-        .action-buttons {
-            grid-template-columns: 1fr;
-        }
-        
-        .quick-actions {
+        .search-form {
             padding: 24px;
         }
         
-        .management-card {
+        .search-results {
             padding: 24px;
         }
         
-        .card-stats {
-            flex-direction: column;
-            gap: 12px;
+        .results-table {
+            font-size: 14px;
         }
         
-        .stat-item:not(:last-child)::after {
-            display: none;
+        .results-table th,
+        .results-table td {
+            padding: 12px 8px;
         }
     }
 
     @media (max-width: 480px) {
-        .student-management-container {
+        .job-hunting-search-container {
             padding: 12px;
         }
         
@@ -402,74 +414,85 @@
             font-size: 20px;
         }
         
-        .quick-actions {
+        .search-form {
             padding: 20px;
         }
         
-        .management-card {
+        .search-results {
             padding: 20px;
         }
         
-        .card-title {
-            font-size: 18px;
+        .search-buttons {
+            flex-direction: column;
+        }
+        
+        .search-btn {
+            width: 100%;
+            text-align: center;
         }
     }
 
     /* アクセシビリティの向上 */
-    .action-btn:focus,
-    .card-link:focus {
+    .search-btn:focus,
+    .action-btn:focus {
         outline: 3px solid #2C7744;
         outline-offset: 2px;
     }
 
-    .management-card:focus-within {
+    .form-group input:focus,
+    .form-group select:focus {
         outline: 2px solid #2C7744;
         outline-offset: 2px;
     }
 
     /* 高コントラストモード対応 */
     @media (prefers-contrast: high) {
-        .management-card {
+        .search-form,
+        .search-results {
             border: 2px solid #2c3e50;
         }
         
-        .action-btn,
-        .card-link {
+        .search-btn,
+        .action-btn {
             border: 2px solid #2c3e50;
         }
     }
 
     /* ダークモード対応 */
     @media (prefers-color-scheme: dark) {
-        .student-management-page {
+        .job-hunting-search-page {
             background: #1a1a1a;
             color: #ffffff;
         }
         
-        .student-management-container {
+        .job-hunting-search-container {
             background: #2d2d2d;
         }
         
-        .quick-actions,
-        .management-card {
+        .search-form,
+        .search-results {
             background: #3d3d3d;
             border-color: #4d4d4d;
             color: #ffffff;
         }
         
-        .card-title {
+        .form-group input,
+        .form-group select {
+            background: #4d4d4d;
+            border-color: #5d5d5d;
             color: #ffffff;
         }
         
-        .card-description {
-            color: #cccccc;
+        .results-table th {
+            background: rgba(44, 119, 68, 0.2);
+            color: #ffffff;
         }
     }
 
     /* アニメーションの最適化 */
     .page-header,
-    .quick-actions,
-    .management-card {
+    .search-form,
+    .search-results {
         animation: fadeInUp 0.4s ease forwards;
     }
 
@@ -485,35 +508,35 @@
     }
 
     /* ダッシュボード用ヘッダー調整 */
-    .student-management-page header {
+    .job-hunting-search-page header {
         position: relative;
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(10px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     }
 
-    .student-management-page #mainimg {
+    .job-hunting-search-page #mainimg {
         display: none;
     }
 
-    .student-management-page main {
+    .job-hunting-search-page main {
         margin-top: 0;
     }
 
     /* テキストスライドショー用の調整 */
-    .student-management-page .text-slide-wrapper {
+    .job-hunting-search-page .text-slide-wrapper {
         margin-top: 0;
         margin-bottom: 0;
     }
 
-    .student-management-page .text-slide {
+    .job-hunting-search-page .text-slide {
         font-size: 8vw;
         opacity: 0.08;
     }
 </style>
 
 </head>
-<body class="student-management-page">
+<body class="job-hunting-search-page">
 <% 
   // 権限名を日本語に変換
   String roleDisplay = "";
@@ -560,112 +583,182 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <div class="student-management-container">
+        <div class="job-hunting-search-container">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
-                <h1 class="page-title">就活管理</h1>
-                <p class="page-subtitle">就活の選考ステージ登録や試験面接情報の入力、書類チェック、<br>受験予定者抽出、活動報告自動出力などの画面に遷移できます。</p>
+                <h1 class="page-title">就活情報検索</h1>
+                <p class="page-subtitle">企業情報や選考状況を検索できます</p>
                 <nav class="breadcrumb" aria-label="パンくずリスト">
                     <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
                     <span class="separator" aria-hidden="true">/</span>
-                    <span>就活管理</span>
+                    <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a>
+                    <span class="separator" aria-hidden="true">/</span>
+                    <span>就活情報検索</span>
                 </nav>
             </header>
 
             <!-- メッセージ表示 -->
-            <% if (request.getAttribute("successMessage") != null) { %>
-                <div class="message success-message" style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
-                    ✅ <%= request.getAttribute("successMessage") %>
+            <% if (successMessage != null) { %>
+                <div class="message success-message">
+                    ✅ <%= successMessage %>
                 </div>
             <% } %>
-            <% if (request.getAttribute("errorMessage") != null) { %>
-                <div class="message error-message" style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
-                    ❌ <%= request.getAttribute("errorMessage") %>
+            <% if (errorMessage != null) { %>
+                <div class="message error-message">
+                    ❌ <%= errorMessage %>
                 </div>
             <% } %>
 
-            <!-- 操作一覧 -->
-            <section class="quick-actions" role="region" aria-label="操作一覧">
-                <h2>🚀 操作一覧</h2>
-                <div class="action-buttons">
-                    <a href="CompanyServlet" class="action-btn" aria-label="企業一覧画面へ">
-                        <i class="fas fa-list" aria-hidden="true"></i>企業一覧を表示
-                    </a>
-                    <a href="JobHuntingSearchServlet" class="action-btn" aria-label="就活情報検索画面へ">
-                        <i class="fas fa-search" aria-hidden="true"></i>就活情報検索
-                    </a>
-                    <a href="StatusServlet?view=InterviewExamInput.jsp" class="action-btn secondary" aria-label="選考ステージ登録画面へ">
-                        <i class="fas fa-edit" aria-hidden="true"></i>選考ステージ登録
-                    </a>
-                    <a href="StatusServlet?view=         " class="action-btn secondary" aria-label="試験面接情報入力画面へ">
-                        <i class="fas fa-exam" aria-hidden="true"></i>試験面接情報入力
-                    </a>
-                    <a href="StatusServlet?view=       " class="action-btn secondary" aria-label="書類提出チェック画面へ">
-                        <i class="fas fa-Document submission" aria-hidden="true"></i>書類提出チェック
-                    </a>
-                     <a href="StatusServlet?view=      " class="action-btn secondary" aria-label="受験予定者抽出画面へ">
-                        <i class="fas fa-Examination" aria-hidden="true"></i>受験予定者抽出
-                    </a>
-                     <a href="StatusServlet?view=        " class="action-btn secondary" aria-label="活動報告自動出力画面へ">
-                        <i class="fas fa-Activity Report" aria-hidden="true"></i>活動報告自動出力画面
-                    </a>
-                </div>
-            </section>
-
-            <!-- メインコンテンツ -->
-            <section class="management-main" role="region" aria-label="管理機能">
-                
-                <!-- 企業一覧管理 -->
-                <article class="management-card" role="article">
-                    <span class="card-icon" aria-hidden="true">📋</span>
-                    <h3 class="card-title">企業一覧管理</h3>
-                    <p class="card-description">
-                        登録されている企業の一覧を表示し、詳細情報の確認を行えます。
-                    </p>
-                    <div class="card-stats" role="group" aria-label="学生統計">
-                        <div class="stat-item">
-                            <span class="stat-number">250</span>
-                            <span class="stat-label">総企業数</span>
+            <!-- 検索フォーム -->
+            <section class="search-form" role="region" aria-label="検索フォーム">
+                <h3>🔍 検索条件</h3>
+                <form action="JobHuntingSearchServlet" method="get">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="companyName">企業名</label>
+                            <input type="text" id="companyName" name="companyName" placeholder="企業名を入力">
                         </div>
-                        <div class="stat-item">
-                            <span class="stat-number">67</span>
-                            <span class="stat-label">募集中企業</span>
+                        
+                        <div class="form-group">
+                            <label for="jobTitle">職種</label>
+                            <select id="jobTitle" name="jobTitle">
+                                <option value="">全ての職種</option>
+                                <option value="システムエンジニア">システムエンジニア</option>
+                                <option value="プログラマー">プログラマー</option>
+                                <option value="インフラエンジニア">インフラエンジニア</option>
+                                <option value="システム運用保守">システム運用保守</option>
+                                <option value="ITコンサルタント">ITコンサルタント</option>
+                                <option value="ゲームクリエイター">ゲームクリエイター</option>
+                                <option value="WEBデザイナー">WEBデザイナー</option>
+                                <option value="フロントエンドエンジニア">フロントエンドエンジニア</option>
+                                <option value="バックエンドエンジニア">バックエンドエンジニア</option>
+                                <option value="組込開発エンジニア">組込開発エンジニア</option>
+                                <option value="販売・営業">販売・営業</option>
+                                <option value="事務職">事務職</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="selectionStage">選考段階</label>
+                            <select id="selectionStage" name="selectionStage">
+                                <option value="">全ての段階</option>
+                                <option value="エントリー中">エントリー中</option>
+                                <option value="書類選考">書類選考</option>
+                                <option value="筆記試験">筆記試験</option>
+                                <option value="適性検査">適性検査</option>
+                                <option value="1次面接">1次面接</option>
+                                <option value="2次面接">2次面接</option>
+                                <option value="最終面接">最終面接</option>
+                                <option value="内定">内定</option>
+                                <option value="不採用">不採用</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="activityStatus">活動状況</label>
+                            <select id="activityStatus" name="activityStatus">
+                                <option value="">全ての状況</option>
+                                <option value="検討中">検討中</option>
+                                <option value="エントリー中">エントリー中</option>
+                                <option value="選考中">選考中</option>
+                                <option value="内定承諾">内定承諾</option>
+                                <option value="内定保留">内定保留</option>
+                                <option value="内定辞退">内定辞退</option>
+                                <option value="不採用">不採用</option>
+                                <option value="選考中止">選考中止</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="studentName">学生名</label>
+                            <input type="text" id="studentName" name="studentName" placeholder="学生名を入力">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateFrom">期間（開始）</label>
+                            <input type="date" id="dateFrom" name="dateFrom">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dateTo">期間（終了）</label>
+                            <input type="date" id="dateTo" name="dateTo">
                         </div>
                     </div>
-                    <a href="CompanyServlet" class="card-link" aria-label="学生一覧を表示">
-                        企業一覧を表示
-                    </a>
-                </article>
-
-                <!-- 選考ステージ登録 -->
-                <article class="management-card" role="article">
-                    <span class="card-icon" aria-hidden="true">🚶‍♂️‍➡️</span>
-                    <h3 class="card-title">選考ステージ登録</h3>
-                    <p class="card-description">
-                        選考ステージを登録し、企業情報を追加できます。
-                    </p>
-                    <div class="card-stats" role="group" aria-label="登録統計">
-                        <div class="stat-item">
-                            <span class="stat-number">43</span>
-                            <span class="stat-label">今月登録</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">5</span>
-                            <span class="stat-label">未完了</span>
-                        </div>
+                    
+                    <div class="search-buttons">
+                        <button type="submit" class="search-btn">
+                            🔍 検索実行
+                        </button>
+                        <button type="reset" class="search-btn secondary">
+                            🔄 条件クリア
+                        </button>
                     </div>
-                    <a href="StatusServlet?view=InterviewExamInput.jsp" class="card-link" aria-label="選考ステージを登録">
-                        選考ステージを登録
-                    </a>
-                </article>
+                </form>
             </section>
+
+            <!-- 検索結果 -->
+            <% if (searchResults != null && !searchResults.isEmpty()) { %>
+                <section class="search-results" role="region" aria-label="検索結果">
+                    <div class="results-header">
+                        <h3 class="results-title">📊 検索結果</h3>
+                        <span class="results-count"><%= searchResults.size() %>件の結果</span>
+                    </div>
+                    
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>企業名</th>
+                                <th>職種</th>
+                                <th>学生名</th>
+                                <th>選考段階</th>
+                                <th>活動状況</th>
+                                <th>報告日</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (java.util.Map<String, Object> result : searchResults) { %>
+                                <tr>
+                                    <td><%= result.get("company_name") != null ? result.get("company_name") : "-" %></td>
+                                    <td><%= result.get("job_title") != null ? result.get("job_title") : "-" %></td>
+                                    <td><%= result.get("student_name") != null ? result.get("student_name") : "-" %></td>
+                                    <td><%= result.get("selection_stage") != null ? result.get("selection_stage") : "-" %></td>
+                                    <td><%= result.get("activity_status") != null ? result.get("activity_status") : "-" %></td>
+                                    <td><%= result.get("report_date") != null ? result.get("report_date") : "-" %></td>
+                                    <td>
+                                        <a href="StatusServlet?view=InterviewExamInput.jsp&companyId=<%= result.get("company_id") %>&studentId=<%= result.get("student_id") %>&companyName=<%= result.get("company_name") != null ? result.get("company_name") : "" %>&studentName=<%= result.get("student_name") != null ? result.get("student_name") : "" %>" 
+                                           class="action-btn" aria-label="選考ステージ登録">
+                                            選考登録
+                                        </a>
+                                        <a href="SelectionStageServlet?id=<%= result.get("activity_id") %>" 
+                                           class="action-btn secondary" aria-label="詳細表示">
+                                            詳細
+                                        </a>
+                                    </td>
+                                </tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </section>
+            <% } else if (searchResults != null && searchResults.isEmpty()) { %>
+                <section class="search-results" role="region" aria-label="検索結果">
+                    <div class="results-header">
+                        <h3 class="results-title">📊 検索結果</h3>
+                        <span class="results-count">0件の結果</span>
+                    </div>
+                    <p style="text-align: center; padding: 40px; color: #6c757d;">
+                        条件に一致する就活情報が見つかりませんでした。<br>
+                        検索条件を変更して再度お試しください。
+                    </p>
+                </section>
+            <% } %>
         </div>
     </main>
 
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->
     <div class="text-slide-wrapper">
         <div class="text-slide">
-            <span>Student Management System</span>
+            <span>Job Hunting Search System</span>
         </div>
     </div>
     <!--▲▲▲▲▲ここまで「テキストスライドショー」-->
@@ -766,34 +859,48 @@
 <script src="js/main.js"></script>
 
 <script>
-// 学生管理画面の最適化されたJavaScript
+// 就活情報検索画面の最適化されたJavaScript
 
 // アクセシビリティの向上
 document.addEventListener('DOMContentLoaded', () => {
+    // フォームのバリデーション
+    const searchForm = document.querySelector('form[action="JobHuntingSearchServlet"]');
+    if (searchForm) {
+        searchForm.addEventListener('submit', (e) => {
+            const companyName = document.getElementById('companyName').value.trim();
+            const studentName = document.getElementById('studentName').value.trim();
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+            
+            // 最低1つの検索条件が必要
+            if (!companyName && !studentName && !dateFrom && !dateTo) {
+                e.preventDefault();
+                alert('最低1つの検索条件を入力してください。');
+                return false;
+            }
+            
+            // 日付範囲の検証
+            if (dateFrom && dateTo && dateFrom > dateTo) {
+                e.preventDefault();
+                alert('開始日は終了日より前の日付を選択してください。');
+                return false;
+            }
+        });
+    }
+
+    // フォームのリセット機能
+    const resetBtn = document.querySelector('button[type="reset"]');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            setTimeout(() => {
+                // リセット後の処理
+                console.log('検索条件をクリアしました');
+            }, 100);
+        });
+    }
+
     // キーボードナビゲーションの改善
-    const actionButtons = document.querySelectorAll('.action-btn');
-    actionButtons.forEach(button => {
-        button.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                button.click();
-            }
-        });
-    });
-
-    // カードリンクのキーボード操作
-    const cardLinks = document.querySelectorAll('.card-link');
-    cardLinks.forEach(link => {
-        link.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                link.click();
-            }
-        });
-    });
-
-    // フォーカス管理の改善
-    const focusableElements = document.querySelectorAll('a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const focusableElements = document.querySelectorAll('input, select, button, a');
     focusableElements.forEach(element => {
         element.addEventListener('focus', () => {
             element.style.outline = '2px solid #2C7744';
@@ -806,40 +913,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 統計データのアニメーション
-    const statNumbers = document.querySelectorAll('.stat-number');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                const target = entry.target;
-                const finalValue = parseInt(target.textContent);
-                animateNumber(target, 0, finalValue, 1000);
-                observer.unobserve(target);
+    // 検索結果テーブルの改善
+    const tableRows = document.querySelectorAll('.results-table tbody tr');
+    tableRows.forEach(row => {
+        row.addEventListener('click', (e) => {
+            // リンク以外のクリックで行全体をハイライト
+            if (!e.target.closest('a')) {
+                row.style.backgroundColor = 'rgba(44, 119, 68, 0.1)';
+                setTimeout(() => {
+                    row.style.backgroundColor = '';
+                }, 200);
             }
         });
     });
-
-    statNumbers.forEach(stat => observer.observe(stat));
 });
-
-// 数値アニメーション関数
-function animateNumber(element, start, end, duration) {
-    const startTime = performance.now();
-    
-    function updateNumber(currentTime) {
-        const elapsed = currentTime - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        
-        const current = Math.floor(start + (end - start) * progress);
-        element.textContent = current;
-        
-        if (progress < 1) {
-            requestAnimationFrame(updateNumber);
-        }
-    }
-    
-    requestAnimationFrame(updateNumber);
-}
 
 // パフォーマンス最適化
 window.addEventListener('load', () => {
@@ -857,42 +944,22 @@ window.addEventListener('load', () => {
     });
 
     images.forEach(img => imageObserver.observe(img));
-
-    // スムーズスクロール
-    const smoothScrollLinks = document.querySelectorAll('a[href^="#"]');
-    smoothScrollLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const targetId = link.getAttribute('href').substring(1);
-            const targetElement = document.getElementById(targetId);
-            
-            if (targetElement) {
-                targetElement.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        });
-    });
 });
 
 // エラーハンドリング
 window.addEventListener('error', (e) => {
     console.error('JavaScript error:', e.error);
-    // エラーが発生した場合のフォールバック処理
 });
 
 // ページの可視性変更時の処理
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
-        // ページが非表示になった時の処理
         console.log('Page hidden');
     } else {
-        // ページが表示された時の処理
         console.log('Page visible');
     }
 });
 </script>
 
 </body>
-</html>
+</html> 

@@ -77,21 +77,16 @@ public class InterviewExamInputServlet extends HttpServlet {
             return;
         }
         
-        String action = request.getParameter("action");
-        
-        if ("add".equals(action)) {
-            // 面接・試験記録追加処理
-            handleAddInterviewExam(request, response);
-        } else if ("update".equals(action)) {
-            // 面接・試験記録更新処理
-            handleUpdateInterviewExam(request, response);
-        } else if ("delete".equals(action)) {
-            // 面接・試験記録削除処理
-            handleDeleteInterviewExam(request, response);
-        } else {
-            // デフォルトは面接・試験入力ページにフォワード
-            doGet(request, response);
+        // 権限チェック
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!role.equals("admin") && !role.equals("teacher") && 
+                           !role.equals("headmaster") && !role.equals("egd") && !role.equals("student"))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
         }
+        
+        // 選考ステージ登録処理
+        handleSelectionStageRegistration(request, response);
     }
     
     private void handleAddInterviewExam(HttpServletRequest request, HttpServletResponse response) 
@@ -149,6 +144,72 @@ public class InterviewExamInputServlet extends HttpServlet {
             throws ServletException, IOException {
         // TODO: 面接・試験記録削除の実装
         // 現在は基本的なフォワードのみ
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp");
+        dispatcher.forward(request, response);
+    }
+    
+    /**
+     * 選考ステージ登録処理
+     */
+    private void handleSelectionStageRegistration(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        try {
+            // リクエストパラメータを取得
+            String companyId = request.getParameter("companyId");
+            String studentId = request.getParameter("studentId");
+            String companyName = request.getParameter("companyName");
+            String studentName = request.getParameter("studentName");
+            String jobTitle = request.getParameter("jobTitle");
+            String examType = request.getParameter("examType");
+            String examDate = request.getParameter("examDate");
+            String examVenue = request.getParameter("examVenue");
+            String examStartTime = request.getParameter("examStartTime");
+            String examEndTime = request.getParameter("examEndTime");
+            String interviewDate = request.getParameter("interviewDate");
+            String interviewVenue = request.getParameter("interviewVenue");
+            String interviewFormat = request.getParameter("interviewFormat");
+            String interviewerCount = request.getParameter("interviewerCount");
+            
+            // デバッグ用ログ
+            System.out.println("=== 選考ステージ登録開始 ===");
+            System.out.println("企業ID: " + companyId);
+            System.out.println("学生ID: " + studentId);
+            System.out.println("企業名: " + companyName);
+            System.out.println("学生名: " + studentName);
+            System.out.println("職種: " + jobTitle);
+            System.out.println("試験種別: " + examType);
+            System.out.println("試験日: " + examDate);
+            System.out.println("試験会場: " + examVenue);
+            System.out.println("試験開始時間: " + examStartTime);
+            System.out.println("試験終了時間: " + examEndTime);
+            System.out.println("面接日: " + interviewDate);
+            System.out.println("面接会場: " + interviewVenue);
+            System.out.println("面接形式: " + interviewFormat);
+            System.out.println("面接官人数: " + interviewerCount);
+            
+            // バリデーション
+            if (companyName == null || companyName.trim().isEmpty() ||
+                studentName == null || studentName.trim().isEmpty() ||
+                examType == null || examType.trim().isEmpty() ||
+                interviewFormat == null || interviewFormat.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "必須項目が入力されていません。");
+                doGet(request, response);
+                return;
+            }
+            
+            // TODO: データベースへの登録処理を実装
+            // 現在は成功メッセージを表示
+            request.setAttribute("successMessage", "選考ステージの登録が完了しました。");
+            
+            System.out.println("=== 選考ステージ登録完了 ===");
+            
+        } catch (Exception e) {
+            System.err.println("選考ステージ登録エラー: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "システムエラーが発生しました: " + e.getMessage());
+        }
+        
+        // 選考ステージ登録ページにフォワード
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp");
         dispatcher.forward(request, response);
     }

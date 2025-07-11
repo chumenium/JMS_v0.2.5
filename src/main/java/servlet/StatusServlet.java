@@ -107,6 +107,9 @@ public class StatusServlet extends HttpServlet {
 						System.out.print("アプリケーションスコープのデータを使用");
 	                    nextPage = "/WEB-INF/jsp/CreateStudent.jsp";
 	                    break;
+	                case "InterviewExamInput.jsp":
+	                    nextPage = "/WEB-INF/jsp/InterviewExamInput.jsp";
+	                    break;
 	                default:
 	                    nextPage = "/index.jsp";
 	                    break;

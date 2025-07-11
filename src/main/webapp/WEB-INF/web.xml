@@ -217,4 +217,15 @@
     <url-pattern>/DatabaseManagementServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- 就活情報検索サーブレット -->
+  <servlet>
+    <servlet-name>JobHuntingSearchServlet</servlet-name>
+    <servlet-class>servlet.JobHuntingSearchServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>JobHuntingSearchServlet</servlet-name>
+    <url-pattern>/JobHuntingSearchServlet</url-pattern>
+  </servlet-mapping>
+  
 </web-app>
