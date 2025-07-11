@@ -113,8 +113,13 @@ public class StatusServlet extends HttpServlet {
 	                default:
 	                    nextPage = "/index.jsp";
 	                    break;
-
-					
+					case "CompanyDetail":
+						nextPage = "/WEB-INF/jsp/CompanyDetail.jsp";
+						break;
+					case "CreateCompany":
+						nextPage = "/WEB-INF/jsp/CreateCompany.jsp";
+						break;
+						
 
 	            }
 	        }
