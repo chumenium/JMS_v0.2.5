@@ -173,6 +173,7 @@
     <url-pattern>/CreateCompanyServlet</url-pattern>
   </servlet-mapping>
   
+  
   <!-- 学生詳細サーブレット -->
   <servlet>
     <servlet-name>StudentDetailServlet</servlet-name>

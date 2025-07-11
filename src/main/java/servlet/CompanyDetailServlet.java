@@ -217,20 +217,25 @@ public class CompanyDetailServlet extends HttpServlet {
             throws ServletException, IOException {
         try {
             int companyId = Integer.parseInt(request.getParameter("companyId"));
+            System.out.println("CompanyDetailServlet: handleDelete called with companyId = " + companyId);
             
             // 企業削除
             boolean success = CompanyDAO.deleteCompany(companyId);
+            System.out.println("CompanyDetailServlet: deleteCompany result = " + success);
             
             if (success) {
                 // 削除成功 - 企業一覧にリダイレクト
+                System.out.println("CompanyDetailServlet: Delete successful, redirecting to CompanyListServlet");
                 response.sendRedirect(request.getContextPath() + "/CompanyListServlet?message=deleted");
             } else {
                 // 削除失敗 - エラーメッセージと共に詳細画面に戻る
+                System.out.println("CompanyDetailServlet: Delete failed");
                 request.setAttribute("errorMessage", "企業の削除に失敗しました。");
                 response.sendRedirect(request.getContextPath() + "/CompanyDetailServlet?companyId=" + companyId + "&error=delete_failed");
             }
             
         } catch (NumberFormatException e) {
+            System.out.println("CompanyDetailServlet: NumberFormatException in handleDelete: " + e.getMessage());
             response.sendRedirect(request.getContextPath() + "/StatusServlet?view=CompanyManagement");
         }
     }

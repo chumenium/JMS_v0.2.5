@@ -69,13 +69,17 @@ public class CompanyDAO {
      */
     public boolean deleteCompany(int companyId) {
         String sql = "DELETE FROM companys_tbl WHERE companys_id=?";
+        System.out.println("CompanyDAO: deleteCompany called with ID = " + companyId);
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, companyId);
-            return stmt.executeUpdate() > 0;
+            int result = stmt.executeUpdate();
+            System.out.println("CompanyDAO: DELETE executed, affected rows = " + result);
+            return result > 0;
         } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("CompanyDAO: Error in deleteCompany: " + e.getMessage());
             e.printStackTrace();
             return false;
         }
