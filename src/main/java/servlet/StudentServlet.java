@@ -296,7 +296,10 @@ public class StudentServlet extends HttpServlet {
                 student.put("desired_job_type_3rd_id", Integer.parseInt(desired_job_type_3rd));
                 student.put("graduation_year", graduation_year);
                 student.put("remarks", remarks);
-                
+                if(remarks == null){
+                    remarks = "";
+                    System.out.print("remarksはNULL");
+                }
                 // students_tblへのinsert
                 String studentQuery = "INSERT INTO students_tbl (student_id, department, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, desired_job_type_1st_id, desired_job_type_2nd_id, desired_job_type_3rd_id, graduation_year, remarks) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement studentStatement = conn.prepareStatement(studentQuery);
@@ -317,7 +320,6 @@ public class StudentServlet extends HttpServlet {
                 studentStatement.setInt(15, Integer.parseInt(desired_job_type_3rd));
                 studentStatement.setInt(16, graduation_year);
                 studentStatement.setString(17, remarks);
-                
                 int rowsInserted2 = studentStatement.executeUpdate();
                 
                 if (rowsInserted1 > 0 && rowsInserted2 > 0) {

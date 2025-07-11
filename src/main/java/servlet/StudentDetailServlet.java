@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -37,7 +38,6 @@ public class StudentDetailServlet extends HttpServlet {
         // プルダウン用のデータを取得（処理速度短縮のためgetJobtypesWorkplaces()を使用）
         //StudentDAO dropdownDAO = new StudentDAO();
         ServletContext sc = getServletContext();
-        //List<List<String>> jobtypesWorkplaces = dropdownDAO.getJobtypesWorkplaces();
         request.setAttribute("jobtypes", sc.getAttribute("jobtypes"));
         request.setAttribute("workplaces", sc.getAttribute("workplaces"));
         System.out.print("アプリケーションスコープ内のデータを使用");
@@ -163,22 +163,23 @@ public class StudentDetailServlet extends HttpServlet {
         System.out.println("desiredWorkPlace: " + desiredWorkPlace);
         System.out.println("remarks: " + remarks);
         
+        //最初から職種IDを取得するのでコメントアウト
         // 職種名を職種IDに変換
-        if (desiredJobType1 != null && !desiredJobType1.isEmpty()) {
-            String originalJobType1 = desiredJobType1;
-            desiredJobType1 = getOccupationIdByName(desiredJobType1);
-            System.out.println("職種1変換: " + originalJobType1 + " -> " + desiredJobType1);
-        }
-        if (desiredJobType2 != null && !desiredJobType2.isEmpty()) {
-            String originalJobType2 = desiredJobType2;
-            desiredJobType2 = getOccupationIdByName(desiredJobType2);
-            System.out.println("職種2変換: " + originalJobType2 + " -> " + desiredJobType2);
-        }
-        if (desiredJobType3 != null && !desiredJobType3.isEmpty()) {
-            String originalJobType3 = desiredJobType3;
-            desiredJobType3 = getOccupationIdByName(desiredJobType3);
-            System.out.println("職種3変換: " + originalJobType3 + " -> " + desiredJobType3);
-        }
+        // if (desiredJobType1 != null && !desiredJobType1.isEmpty()) {
+        //     String originalJobType1 = desiredJobType1;
+        //     desiredJobType1 = getOccupationIdByName(desiredJobType1);
+        //     System.out.println("職種1変換: " + originalJobType1 + " -> " + desiredJobType1);
+        // }
+        // if (desiredJobType2 != null && !desiredJobType2.isEmpty()) {
+        //     String originalJobType2 = desiredJobType2;
+        //     desiredJobType2 = getOccupationIdByName(desiredJobType2);
+        //     System.out.println("職種2変換: " + originalJobType2 + " -> " + desiredJobType2);
+        // }
+        // if (desiredJobType3 != null && !desiredJobType3.isEmpty()) {
+        //     String originalJobType3 = desiredJobType3;
+        //     desiredJobType3 = getOccupationIdByName(desiredJobType3);
+        //     System.out.println("職種3変換: " + originalJobType3 + " -> " + desiredJobType3);
+        // }
         
         // StudentBeansに設定
         StudentBeans student = new StudentBeans();
@@ -204,9 +205,20 @@ public class StudentDetailServlet extends HttpServlet {
             // データベースを更新
             StudentDAO.updateStudent(student);
             System.out.println("データベース更新成功");
-            
+            ServletContext sc = getServletContext();
+            ArrayList<ArrayList<String>> students = (ArrayList<ArrayList<String>>)sc.getAttribute("students");
+            ArrayList<String> studentids = students.get(0);
+            ArrayList<String> enrollmentStatuss = students.get(3);
+            for(int i = 0;i < studentids.size();i++){
+                if(studentids.get(i).equals(studentId)){
+                    enrollmentStatuss.set(i,jobHuntingStatus);
+                }
+            }
             // 更新後、詳細画面にリダイレクト
-            response.sendRedirect(request.getContextPath() + "/StudentDetailServlet?id=" + studentId);
+            System.out.println("StudentViewServletにリダイレクト: " + request.getContextPath() + "/StudentViewServlet?id=" + studentId);
+            response.sendRedirect(request.getContextPath() + "/StudentViewServlet?id=" + studentId);
+            
+
             
         } catch (Exception e) {
             System.out.println("データベース更新エラー: " + e.getMessage());
