@@ -510,6 +510,39 @@
         font-size: 8vw;
         opacity: 0.08;
     }
+
+    /* ナビゲーションメニューの文字色修正 */
+    .student-management-page header nav ul li a {
+        color: #2c3e50 !important;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease;
+    }
+
+    .student-management-page header nav ul li a:hover {
+        color: #2C7744 !important;
+        text-decoration: underline;
+    }
+
+    .student-management-page header nav ul li {
+        color: #2c3e50 !important;
+        font-weight: 600;
+    }
+
+    /* ダークモード対応 */
+    @media (prefers-color-scheme: dark) {
+        .student-management-page header nav ul li a {
+            color: #ffffff !important;
+        }
+        
+        .student-management-page header nav ul li a:hover {
+            color: #5CA564 !important;
+        }
+        
+        .student-management-page header nav ul li {
+            color: #ffffff !important;
+        }
+    }
 </style>
 
 </head>

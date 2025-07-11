@@ -417,35 +417,41 @@
                     <div class="form-group">
                         <label for="desiredJobType1">希望職種1</label>
                         <select id="desiredJobType1" name="desiredJobType1">
-                            <option value="">選択してください</option>
+                            <option value="0">選択してください</option>
                             <% java.util.List<String> jobtypes = (java.util.List<String>) request.getAttribute("jobtypes");
                                String selected1 = student != null ? student.getDesiredJobType1() : "";
                                if (jobtypes != null) {
+                                 int i = 1;
                                  for (String jobtype : jobtypes) { %>
-                                    <option value="<%= jobtype %>" <%= jobtype.equals(selected1) ? "selected" : "" %>><%= jobtype %></option>
-                            <%   } } %>
+                                    <option value="<%= i %>" <%= jobtype.equals(selected1) ? "selected" : "" %>><%= jobtype %></option>
+                                    
+                            <%  i+=1; } } %>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="desiredJobType2">希望職種2</label>
                         <select id="desiredJobType2" name="desiredJobType2">
-                            <option value="">選択してください</option>
+                            <option value="0">選択してください</option>
                             <% String selected2 = student != null ? student.getDesiredJobType2() : "";
                                if (jobtypes != null) {
+                                int j = 1;
                                  for (String jobtype : jobtypes) { %>
-                                    <option value="<%= jobtype %>" <%= jobtype.equals(selected2) ? "selected" : "" %>><%= jobtype %></option>
-                            <%   } } %>
+                                    <option value="<%= j %>" <%= jobtype.equals(selected2) ? "selected" : "" %>><%= jobtype %></option>
+                                    
+                            <%  j+=1; } } %>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="desiredJobType3">希望職種3</label>
                         <select id="desiredJobType3" name="desiredJobType3">
-                            <option value="">選択してください</option>
+                            <option value="0">選択してください</option>
                             <% String selected3 = student != null ? student.getDesiredJobType3() : "";
                                if (jobtypes != null) {
+                                int k = 1;
                                  for (String jobtype : jobtypes) { %>
-                                    <option value="<%= jobtype %>" <%= jobtype.equals(selected3) ? "selected" : "" %>><%= jobtype %></option>
-                            <%   } } %>
+                                    <option value="<%= k %>" <%= jobtype.equals(selected3) ? "selected" : "" %>><%= jobtype %></option>
+                                    
+                            <%   k+=1;} } %>
                         </select>
                     </div>
                     <div class="form-group">

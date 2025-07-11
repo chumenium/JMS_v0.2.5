@@ -77,165 +77,162 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 
-<body>
+<body class="interview-exam-page">
 <div id="container">
-    <!--▼▼▼▼▼ここから「ヘッダー」-->
-    <header>
-        <h1 id="logo"><a href="javascript:void(0);" onclick="location.reload();"><img src="images/logo.png" alt="jms"></a></h1>
-        <nav>
-            <ul>
-                <% if (username != null) { %>
-                    <li>こんにちは、<%= username %>さん</li>
-                <% } else { %>
-                    <li><a href="login.html">ログイン</a></li>
-                <% } %>
-                <!-- 権限に応じた機能リンク -->
-                <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
-                <% } %>
-                <% if ("egd".equals(role) || "admin".equals(role)) { %>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
-                <% } %>
-                <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role) || "student".equals(role)) { %>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-                <% } %>
-                <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) { %>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
-                <% } %>
-                <% if ("admin".equals(role)) { %>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
-                <% } %>
-                <li><a href="extension.html">お問い合わせ</a></li>
-                <% if (username != null) { %>
-                    <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
-                <% } %>
-            </ul>
-        </nav>
-    </header>
-    <!--▲▲▲▲▲ここまで「ヘッダー」-->
-
     <main>
-        <div style="max-width: 800px; margin: 0 auto; padding: 24px;">
-            <h2 style="text-align: center; color: #2C7744; margin-bottom: 32px;">選考ステージ登録</h2>
+        <div class="interview-exam-container">
+            <!-- ページヘッダー -->
+            <header class="page-header" role="banner">
+                <h1 class="page-title">選考ステージ登録</h1>
+                <p class="page-subtitle">企業の選考情報を登録できます</p>
+                <nav class="breadcrumb" aria-label="パンくずリスト">
+                    <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
+                    <span class="separator" aria-hidden="true">/</span>
+                    <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a>
+                    <span class="separator" aria-hidden="true">/</span>
+                    <span>選考ステージ登録</span>
+                </nav>
+            </header>
 
             <!-- メッセージ表示 -->
             <% if (successMessage != null) { %>
-                <div style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
+                <div class="message success-message">
                     ✅ <%= successMessage %>
                 </div>
             <% } %>
             <% if (errorMessage != null) { %>
-                <div style="background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 8px; padding: 16px; margin-bottom: 24px; text-align: center; font-weight: 600;">
+                <div class="message error-message">
                     ❌ <%= errorMessage %>
                 </div>
             <% } %>
 
-            <form action="InterviewExamInputServlet" method="post" style="background: white; padding: 32px; border-radius: 12px; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);">
+            <!-- 登録フォーム -->
+            <section class="registration-form" role="region" aria-label="選考ステージ登録フォーム">
+                <h3 class="form-title">📝 選考情報入力</h3>
+                <form action="InterviewExamInputServlet" method="post">
                 <!-- 隠しフィールドで企業IDと学生IDを送信 -->
                 <input type="hidden" name="companyId" value="<%= companyId != null ? companyId : "" %>">
                 <input type="hidden" name="studentId" value="<%= studentId != null ? studentId : "" %>">
 
-                <div class="section">
-                    <label>企業名：</label>
-                    <input type="text" name="companyName" value="<%= companyName != null ? companyName : "" %>" required>
-                </div>
-
-                <div class="section">
-                    <label>学生名：</label>
-                    <input type="text" name="studentName" value="<%= studentName != null ? studentName : "" %>" required>
-                </div>
-
-                <div class="section">
-                    <label>職種：</label>
-                    <select name="jobTitle">
-                        <option value="">選択してください</option>
-                        <option value="インフラエンジニア">インフラエンジニア</option>
-                        <option value="アプリ開発エンジニア">アプリ開発エンジニア</option>
-                        <option value="セキュリティエンジニア">セキュリティエンジニア</option>
-                        <option value="ネットワークエンジニア">ネットワークエンジニア</option>
-                        <option value="PM補佐">PM補佐</option>
-                        <option value="サーバーエンジニア">サーバーエンジニア</option>
-                        <option value="データベース管理者">データベース管理者</option>
-                        <option value="ITサポート">ITサポート</option>
-                        <option value="ヘルプデスク">ヘルプデスク</option>
-                        <option value="品質管理／テスト">品質管理／テスト</option>
-                    </select>
-                </div>
-
-                <div class="section">
-                    <label>試験種別：</label>
-                    <div class="btn-group">
-                        <button type="button" class="examType-btn" id="examType-筆記" onclick="selectButton('examType','筆記')">筆記</button>
-                        <button type="button" class="examType-btn" id="examType-適性" onclick="selectButton('examType','適性')">適性</button>
-                        <button type="button" class="examType-btn" id="examType-なし" onclick="selectButton('examType','なし')">なし</button>
+                <!-- 基本情報セクション -->
+                <div class="form-section">
+                    <h4 class="section-title">🏢 基本情報</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="companyName">企業名 <span class="required">*</span></label>
+                            <input type="text" id="companyName" name="companyName" value="<%= companyName != null ? companyName : "" %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="studentName">学生名 <span class="required">*</span></label>
+                            <input type="text" id="studentName" name="studentName" value="<%= studentName != null ? studentName : "" %>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jobTitle">職種</label>
+                            <select id="jobTitle" name="jobTitle">
+                                <option value="">選択してください</option>
+                                <option value="インフラエンジニア">インフラエンジニア</option>
+                                <option value="アプリ開発エンジニア">アプリ開発エンジニア</option>
+                                <option value="セキュリティエンジニア">セキュリティエンジニア</option>
+                                <option value="ネットワークエンジニア">ネットワークエンジニア</option>
+                                <option value="PM補佐">PM補佐</option>
+                                <option value="サーバーエンジニア">サーバーエンジニア</option>
+                                <option value="データベース管理者">データベース管理者</option>
+                                <option value="ITサポート">ITサポート</option>
+                                <option value="ヘルプデスク">ヘルプデスク</option>
+                                <option value="品質管理／テスト">品質管理／テスト</option>
+                            </select>
+                        </div>
                     </div>
-                    <input type="hidden" name="examType" id="examTypeInput" required>
                 </div>
 
-                <div class="section">
-                    <label>試験日：</label>
-                    <input type="date" name="examDate">
-                </div>
-
-                <div class="section">
-                    <label>試験会場：</label>
-                    <select name="examVenue">
-                        <option value="">選択してください</option>
-                        <option value="校内">校内</option>
-                        <option value="企業本社">企業本社</option>
-                        <option value="オンライン">オンライン</option>
-                    </select>
-                </div>
-
-                <div class="section">
-                    <label>試験時間：</label>
-                    <input type="time" name="examStartTime"> ～ 
-                    <input type="time" name="examEndTime">
-                </div>
-
-                <div class="section">
-                    <label>面接日：</label>
-                    <input type="date" name="interviewDate">
-                </div>
-
-                <div class="section">
-                    <label>面接会場：</label>
-                    <select name="interviewVenue">
-                        <option value="">選択してください</option>
-                        <option value="校内">校内</option>
-                        <option value="企業本社">企業本社</option>
-                        <option value="オンライン">オンライン</option>
-                    </select>
-                </div>
-
-                <div class="section">
-                    <label>面接形式：</label>
-                    <div class="btn-group">
-                        <button type="button" class="interviewFormat-btn" id="interviewFormat-個人" onclick="selectButton('interviewFormat','個人')">個人</button>
-                        <button type="button" class="interviewFormat-btn" id="interviewFormat-集団" onclick="selectButton('interviewFormat','集団')">集団</button>
-                        <button type="button" class="interviewFormat-btn" id="interviewFormat-オンライン" onclick="selectButton('interviewFormat','オンライン')">オンライン</button>
+                <!-- 試験情報セクション -->
+                <div class="form-section">
+                    <h4 class="section-title">📝 試験情報</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>試験種別 <span class="required">*</span></label>
+                            <div class="btn-group">
+                                <button type="button" class="examType-btn" id="examType-筆記" onclick="selectButton('examType','筆記')">筆記</button>
+                                <button type="button" class="examType-btn" id="examType-適性" onclick="selectButton('examType','適性')">適性</button>
+                                <button type="button" class="examType-btn" id="examType-なし" onclick="selectButton('examType','なし')">なし</button>
+                            </div>
+                            <input type="hidden" name="examType" id="examTypeInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="examDate">試験日</label>
+                            <input type="date" id="examDate" name="examDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="examVenue">試験会場</label>
+                            <select id="examVenue" name="examVenue">
+                                <option value="">選択してください</option>
+                                <option value="校内">校内</option>
+                                <option value="企業本社">企業本社</option>
+                                <option value="オンライン">オンライン</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="examStartTime">試験開始時間</label>
+                            <input type="time" id="examStartTime" name="examStartTime">
+                        </div>
+                        <div class="form-group">
+                            <label for="examEndTime">試験終了時間</label>
+                            <input type="time" id="examEndTime" name="examEndTime">
+                        </div>
                     </div>
-                    <input type="hidden" name="interviewFormat" id="interviewFormatInput" required>
                 </div>
 
-                <div class="section">
-                    <label>面接官人数：</label>
-                    <select name="interviewerCount">
-                        <option value="">選択してください</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5名以上">5名以上</option>
-                    </select>
+                <!-- 面接情報セクション -->
+                <div class="form-section">
+                    <h4 class="section-title">🤝 面接情報</h4>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="interviewDate">面接日</label>
+                            <input type="date" id="interviewDate" name="interviewDate">
+                        </div>
+                        <div class="form-group">
+                            <label for="interviewVenue">面接会場</label>
+                            <select id="interviewVenue" name="interviewVenue">
+                                <option value="">選択してください</option>
+                                <option value="校内">校内</option>
+                                <option value="企業本社">企業本社</option>
+                                <option value="オンライン">オンライン</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>面接形式 <span class="required">*</span></label>
+                            <div class="btn-group">
+                                <button type="button" class="interviewFormat-btn" id="interviewFormat-個人" onclick="selectButton('interviewFormat','個人')">個人</button>
+                                <button type="button" class="interviewFormat-btn" id="interviewFormat-集団" onclick="selectButton('interviewFormat','集団')">集団</button>
+                                <button type="button" class="interviewFormat-btn" id="interviewFormat-オンライン" onclick="selectButton('interviewFormat','オンライン')">オンライン</button>
+                            </div>
+                            <input type="hidden" name="interviewFormat" id="interviewFormatInput" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="interviewerCount">面接官人数</label>
+                            <select id="interviewerCount" name="interviewerCount">
+                                <option value="">選択してください</option>
+                                <option value="1">1名</option>
+                                <option value="2">2名</option>
+                                <option value="3">3名</option>
+                                <option value="4">4名</option>
+                                <option value="5名以上">5名以上</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="section" style="text-align: center; margin-top: 32px;">
-                    <button type="submit" style="background: #2C7744; color: white; padding: 15px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">
-                        登録
+                <!-- ボタンセクション -->
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">
+                        📝 選考ステージを登録
                     </button>
+                    <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting" class="btn btn-secondary">
+                        🔙 戻る
+                    </a>
                 </div>
             </form>
+        </section>
         </div>
     </main>
 
@@ -395,68 +392,446 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 <style>
-/* ボタン選択時のスタイル */
-.examType-btn.selected,
-.interviewFormat-btn.selected {
-    background: #2C7744 !important;
-    color: white !important;
-    transform: scale(1.05);
-}
+    /* システム上見やすさを追求した選考ステージ登録画面デザイン */
+    
+    /* 全体の設定 */
+    .interview-exam-page {
+        background: #f8f9fa;
+        color: #2c3e50;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+    }
 
-.btn-group {
-    display: flex;
-    gap: 10px;
-    margin: 10px 0;
-}
+    .interview-exam-container {
+        max-width: 1400px;
+        width: 96vw;
+        margin: 0 auto;
+        padding: 40px 2vw;
+        min-height: 100vh;
+        background: #ffffff;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        box-sizing: border-box;
+    }
+    @media (max-width: 1400px) {
+        .interview-exam-container {
+            padding: 32px 1vw;
+        }
+    }
+    @media (max-width: 768px) {
+        .interview-exam-container {
+            padding: 16px 2vw;
+        }
+    }
+    @media (max-width: 480px) {
+        .interview-exam-container {
+            padding: 8px 1vw;
+        }
+    }
 
-.btn-group button {
-    padding: 10px 20px;
-    border: 2px solid #2C7744;
-    background: white;
-    color: #2C7744;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
+    /* ページヘッダー - 視認性向上 */
+    .page-header {
+        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+        border-radius: 12px;
+        padding: 32px;
+        margin-bottom: 32px;
+        box-shadow: 0 4px 20px rgba(44, 119, 68, 0.15);
+        color: #000000;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-.btn-group button:hover {
-    background: #2C7744;
-    color: white;
-}
+    .page-title {
+        font-size: 32px;
+        color: #000000;
+        margin-bottom: 12px;
+        font-weight: 700;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+    }
 
-.section {
-    margin-bottom: 20px;
-}
+    .page-subtitle {
+        font-size: 18px;
+        color: #000000;
+        margin-bottom: 24px;
+        line-height: 1.6;
+        font-weight: 600;
+    }
 
-.section label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-}
+    .breadcrumb {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 12px;
+        font-size: 14px;
+        color: #000000;
+        margin-top: 16px;
+    }
 
-.section input,
-.section select {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
+    .breadcrumb a {
+        color: #000000;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        font-weight: 600;
+    }
 
-.section button[type="submit"] {
-    background: #2C7744;
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-}
+    .breadcrumb a:hover {
+        background: rgba(255, 255, 255, 0.5);
+        transform: translateY(-1px);
+        color: #000000;
+    }
 
-.section button[type="submit"]:hover {
-    background: #5CA564;
-}
+    .breadcrumb .separator {
+        color: #000000;
+        font-weight: 600;
+    }
+
+    /* メッセージ表示 */
+    .message {
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 24px;
+        text-align: center;
+        font-weight: 600;
+    }
+
+    .success-message {
+        background: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+
+    .error-message {
+        background: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+
+    /* 登録フォーム - 視認性と操作性の向上 */
+    .registration-form {
+        background: white;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e9ecef;
+        margin-bottom: 24px;
+    }
+
+    .form-title {
+        font-size: 24px;
+        color: #2c3e50;
+        margin-bottom: 24px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    .form-section {
+        margin-bottom: 32px;
+        padding: 24px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .section-title {
+        font-size: 18px;
+        color: #2c3e50;
+        margin-bottom: 20px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 16px;
+    }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        min-height: 48px;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #2C7744;
+        box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
+    }
+
+    .required {
+        color: #e74c3c;
+        font-weight: 600;
+    }
+
+    /* ボタン選択時のスタイル */
+    .examType-btn.selected,
+    .interviewFormat-btn.selected {
+        background: #2C7744 !important;
+        color: white !important;
+        transform: scale(1.05);
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 10px;
+        margin: 10px 0;
+        flex-wrap: wrap;
+    }
+
+    .btn-group button {
+        padding: 12px 20px;
+        border: 2px solid #2C7744;
+        background: white;
+        color: #2C7744;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-weight: 600;
+        font-size: 14px;
+        min-width: 80px;
+    }
+
+    .btn-group button:hover {
+        background: #2C7744;
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    /* ボタン */
+    .form-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        margin-top: 32px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 14px 28px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+        min-width: 120px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+    
+    /* ダークモード対応 */
+    @media (prefers-color-scheme: dark) {
+        .interview-exam-page {
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .interview-exam-container {
+            background: #2d2d2d;
+        }
+        
+        .registration-form {
+            background: #3d3d3d;
+            border-color: #4d4d4d;
+            color: #ffffff;
+        }
+        
+        .form-section {
+            background: #3d3d3d;
+            border-color: #4d4d4d;
+        }
+        
+        .form-group input,
+        .form-group select {
+            background: #4d4d4d;
+            border-color: #5d5d5d;
+            color: #ffffff;
+        }
+        
+        .form-group label {
+            color: #ffffff;
+        }
+        
+        .section-title {
+            color: #ffffff;
+        }
+        
+        .btn-group button {
+            background: #4d4d4d;
+            border-color: #5d5d5d;
+            color: #ffffff;
+        }
+        
+        .btn-group button:hover {
+            background: #2C7744;
+            color: #ffffff;
+        }
+    }
+
+    /* レスポンシブ対応の強化 */
+    @media (max-width: 768px) {
+        .interview-exam-container {
+            padding: 16px;
+        }
+        
+        .page-header {
+            padding: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+        }
+        
+        .page-subtitle {
+            font-size: 16px;
+        }
+        
+        .registration-form {
+            padding: 24px;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        
+        .form-section {
+            padding: 20px;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+        }
+        
+        .btn-group button {
+            width: 100%;
+        }
+        
+        .form-buttons {
+            flex-direction: column;
+        }
+        
+        .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .interview-exam-container {
+            padding: 12px;
+        }
+        
+        .page-header {
+            padding: 20px;
+        }
+        
+        .page-title {
+            font-size: 20px;
+        }
+        
+        .registration-form {
+            padding: 20px;
+        }
+        
+        .form-section {
+            padding: 16px;
+        }
+    }
+
+    /* アクセシビリティの向上 */
+    .btn:focus,
+    .form-group input:focus,
+    .form-group select:focus,
+    .btn-group button:focus {
+        outline: 3px solid #2C7744;
+        outline-offset: 2px;
+    }
+
+    /* 高コントラストモード対応 */
+    @media (prefers-contrast: high) {
+        .registration-form,
+        .form-section {
+            border: 2px solid #2c3e50;
+        }
+        
+        .btn,
+        .btn-group button {
+            border: 2px solid #2c3e50;
+        }
+    }
+
+
+
+    /* アニメーションの最適化 */
+    .page-header,
+    .registration-form {
+        animation: fadeInUp 0.4s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 </style>
+
 
 </body>
 </html>

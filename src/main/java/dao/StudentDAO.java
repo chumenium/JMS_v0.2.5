@@ -219,30 +219,9 @@ public class StudentDAO {
             ps.setString(8, student.getEnrollmentStatus());
             ps.setString(9, student.getAssistanceStatus());
             ps.setString(10, student.getJobHuntingStatus());
-            
-            // 職種IDの処理（nullの場合はNULLとして設定）
-            if (student.getDesiredJobType1() != null && !student.getDesiredJobType1().isEmpty()) {
-                ps.setString(11, student.getDesiredJobType1());
-                System.out.println("職種1設定: " + student.getDesiredJobType1());
-            } else {
-                ps.setNull(11, java.sql.Types.INTEGER);
-                System.out.println("職種1設定: NULL");
-            }
-            if (student.getDesiredJobType2() != null && !student.getDesiredJobType2().isEmpty()) {
-                ps.setString(12, student.getDesiredJobType2());
-                System.out.println("職種2設定: " + student.getDesiredJobType2());
-            } else {
-                ps.setNull(12, java.sql.Types.INTEGER);
-                System.out.println("職種2設定: NULL");
-            }
-            if (student.getDesiredJobType3() != null && !student.getDesiredJobType3().isEmpty()) {
-                ps.setString(13, student.getDesiredJobType3());
-                System.out.println("職種3設定: " + student.getDesiredJobType3());
-            } else {
-                ps.setNull(13, java.sql.Types.INTEGER);
-                System.out.println("職種3設定: NULL");
-            }
-            
+            ps.setString(11, student.getDesiredJobType1());
+            ps.setString(12, student.getDesiredJobType2());
+            ps.setString(13, student.getDesiredJobType3());
             ps.setString(14, student.getGraduationYear());
             ps.setString(15, student.getRemarks());
             ps.setString(16, student.getId());
