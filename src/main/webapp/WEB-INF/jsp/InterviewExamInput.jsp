@@ -109,7 +109,7 @@
             <!-- 登録フォーム -->
             <section class="registration-form" role="region" aria-label="選考ステージ登録フォーム">
                 <h3 class="form-title">📝 選考情報入力</h3>
-                <form action="InterviewExamInputServlet" method="post">
+                <form action="InterviewExamInputServlet" method="post" id="selectionForm">
                 <!-- 隠しフィールドで企業IDと学生IDを送信 -->
                 <input type="hidden" name="companyId" value="<%= companyId != null ? companyId : "" %>">
                 <input type="hidden" name="studentId" value="<%= studentId != null ? studentId : "" %>">
@@ -145,79 +145,116 @@
                     </div>
                 </div>
 
-                <!-- 試験情報セクション -->
+                <!-- 選考ステージ管理セクション -->
                 <div class="form-section">
-                    <h4 class="section-title">📝 試験情報</h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>試験種別 <span class="required">*</span></label>
-                            <div class="btn-group">
-                                <button type="button" class="examType-btn" id="examType-筆記" onclick="selectButton('examType','筆記')">筆記</button>
-                                <button type="button" class="examType-btn" id="examType-適性" onclick="selectButton('examType','適性')">適性</button>
-                                <button type="button" class="examType-btn" id="examType-なし" onclick="selectButton('examType','なし')">なし</button>
-                            </div>
-                            <input type="hidden" name="examType" id="examTypeInput" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="examDate">試験日</label>
-                            <input type="date" id="examDate" name="examDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="examVenue">試験会場</label>
-                            <select id="examVenue" name="examVenue">
-                                <option value="">選択してください</option>
-                                <option value="校内">校内</option>
-                                <option value="企業本社">企業本社</option>
-                                <option value="オンライン">オンライン</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="examStartTime">試験開始時間</label>
-                            <input type="time" id="examStartTime" name="examStartTime">
-                        </div>
-                        <div class="form-group">
-                            <label for="examEndTime">試験終了時間</label>
-                            <input type="time" id="examEndTime" name="examEndTime">
-                        </div>
+                    <div class="section-header">
+                        <h4 class="section-title">📋 選考ステージ管理</h4>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="addSelectionStage()">
+                            ➕ ステージを追加
+                        </button>
                     </div>
-                </div>
-
-                <!-- 面接情報セクション -->
-                <div class="form-section">
-                    <h4 class="section-title">🤝 面接情報</h4>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="interviewDate">面接日</label>
-                            <input type="date" id="interviewDate" name="interviewDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="interviewVenue">面接会場</label>
-                            <select id="interviewVenue" name="interviewVenue">
-                                <option value="">選択してください</option>
-                                <option value="校内">校内</option>
-                                <option value="企業本社">企業本社</option>
-                                <option value="オンライン">オンライン</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>面接形式 <span class="required">*</span></label>
-                            <div class="btn-group">
-                                <button type="button" class="interviewFormat-btn" id="interviewFormat-個人" onclick="selectButton('interviewFormat','個人')">個人</button>
-                                <button type="button" class="interviewFormat-btn" id="interviewFormat-集団" onclick="selectButton('interviewFormat','集団')">集団</button>
-                                <button type="button" class="interviewFormat-btn" id="interviewFormat-オンライン" onclick="selectButton('interviewFormat','オンライン')">オンライン</button>
+                    
+                    <div id="selectionStagesContainer">
+                        <!-- 選考ステージが動的に追加される場所 -->
+                    </div>
+                    
+                    <div class="stage-template" id="stageTemplate" style="display: none;">
+                        <div class="stage-item" data-stage-index="">
+                            <div class="stage-header">
+                                <h5 class="stage-title">選考ステージ <span class="stage-number"></span></h5>
+                                <button type="button" class="remove-stage-btn" onclick="removeStage(this)" title="このステージを削除">
+                                    🗑️
+                                </button>
                             </div>
-                            <input type="hidden" name="interviewFormat" id="interviewFormatInput" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="interviewerCount">面接官人数</label>
-                            <select id="interviewerCount" name="interviewerCount">
-                                <option value="">選択してください</option>
-                                <option value="1">1名</option>
-                                <option value="2">2名</option>
-                                <option value="3">3名</option>
-                                <option value="4">4名</option>
-                                <option value="5名以上">5名以上</option>
-                            </select>
+                            
+                            <div class="stage-content">
+                                <div class="form-grid">
+                                    <div class="form-group">
+                                        <label>ステージ種別 <span class="required">*</span></label>
+                                        <select class="stage-type" name="stages[].type" required>
+                                            <option value="">選択してください</option>
+                                            <option value="説明会">説明会</option>
+                                            <option value="書類選考">書類選考</option>
+                                            <option value="筆記試験">筆記試験</option>
+                                            <option value="適性検査">適性検査</option>
+                                            <option value="1次面接">1次面接</option>
+                                            <option value="2次面接">2次面接</option>
+                                            <option value="3次面接">3次面接</option>
+                                            <option value="最終面接">最終面接</option>
+                                            <option value="グループディスカッション">グループディスカッション</option>
+                                            <option value="プレゼンテーション">プレゼンテーション</option>
+                                            <option value="実技試験">実技試験</option>
+                                            <option value="その他">その他</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>実施日</label>
+                                        <input type="date" class="stage-date" name="stages[].date">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>実施時間</label>
+                                        <div class="time-range">
+                                            <input type="time" class="stage-start-time" name="stages[].startTime">
+                                            <span class="time-separator">～</span>
+                                            <input type="time" class="stage-end-time" name="stages[].endTime">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>実施場所</label>
+                                        <select class="stage-venue" name="stages[].venue">
+                                            <option value="">選択してください</option>
+                                            <option value="校内">校内</option>
+                                            <option value="企業本社">企業本社</option>
+                                            <option value="オンライン">オンライン</option>
+                                            <option value="その他">その他</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>実施形式</label>
+                                        <select class="stage-format" name="stages[].format">
+                                            <option value="">選択してください</option>
+                                            <option value="個人">個人</option>
+                                            <option value="集団">集団</option>
+                                            <option value="オンライン">オンライン</option>
+                                            <option value="対面">対面</option>
+                                            <option value="ハイブリッド">ハイブリッド</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>担当者数</label>
+                                        <select class="stage-interviewer-count" name="stages[].interviewerCount">
+                                            <option value="">選択してください</option>
+                                            <option value="1">1名</option>
+                                            <option value="2">2名</option>
+                                            <option value="3">3名</option>
+                                            <option value="4">4名</option>
+                                            <option value="5名以上">5名以上</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group full-width">
+                                        <label>備考・特記事項</label>
+                                        <textarea class="stage-notes" name="stages[].notes" rows="3" 
+                                                  placeholder="特記事項があれば入力してください"></textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>ステータス</label>
+                                        <select class="stage-status" name="stages[].status">
+                                            <option value="予定">予定</option>
+                                            <option value="実施済み">実施済み</option>
+                                            <option value="合格">合格</option>
+                                            <option value="不合格">不合格</option>
+                                            <option value="辞退">辞退</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -334,44 +371,107 @@
 <script>
 // 選考ステージ登録画面のJavaScript
 
-// ボタン選択機能
-function selectButton(type, value) {
-    // 既存の選択をクリア
-    const buttons = document.querySelectorAll('.' + type + '-btn');
-    buttons.forEach(btn => {
-        btn.classList.remove('selected');
+let stageCounter = 0;
+
+// 選考ステージを追加
+function addSelectionStage() {
+    stageCounter++;
+    const container = document.getElementById('selectionStagesContainer');
+    const template = document.getElementById('stageTemplate');
+    const newStage = template.cloneNode(true);
+    
+    // テンプレートから実際の要素に変換
+    newStage.style.display = 'block';
+    newStage.classList.remove('stage-template');
+    newStage.classList.add('stage-item');
+    newStage.setAttribute('data-stage-index', stageCounter);
+    
+    // ステージ番号を設定
+    const stageNumber = newStage.querySelector('.stage-number');
+    if (stageNumber) {
+        stageNumber.textContent = stageCounter;
+    }
+    
+    // フォーム要素のname属性を更新
+    const formElements = newStage.querySelectorAll('input, select, textarea');
+    formElements.forEach(element => {
+        if (element.name) {
+            element.name = element.name.replace('[]', '[' + (stageCounter - 1) + ']');
+        }
     });
     
-    // 選択されたボタンをハイライト
-    const selectedButton = document.getElementById(type + '-' + value);
-    if (selectedButton) {
-        selectedButton.classList.add('selected');
-    }
+    // コンテナに追加
+    container.appendChild(newStage);
     
-    // 隠しフィールドに値を設定
-    const input = document.getElementById(type + 'Input');
-    if (input) {
-        input.value = value;
+    // アニメーション効果
+    newStage.style.opacity = '0';
+    newStage.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        newStage.style.transition = 'all 0.4s ease';
+        newStage.style.opacity = '1';
+        newStage.style.transform = 'translateY(0)';
+    }, 10);
+}
+
+// 選考ステージを削除
+function removeStage(button) {
+    const stageItem = button.closest('.stage-item');
+    if (stageItem) {
+        // 削除アニメーション
+        stageItem.classList.add('removing');
+        
+        setTimeout(() => {
+            stageItem.remove();
+            updateStageNumbers();
+        }, 300);
     }
+}
+
+// ステージ番号を更新
+function updateStageNumbers() {
+    const stages = document.querySelectorAll('.stage-item');
+    stages.forEach((stage, index) => {
+        const stageNumber = stage.querySelector('.stage-number');
+        if (stageNumber) {
+            stageNumber.textContent = index + 1;
+        }
+        
+        // フォーム要素のname属性を更新
+        const formElements = stage.querySelectorAll('input, select, textarea');
+        formElements.forEach(element => {
+            if (element.name) {
+                element.name = element.name.replace(/\[\d+\]/, '[' + index + ']');
+            }
+        });
+    });
 }
 
 // ページ読み込み時の初期化
 document.addEventListener('DOMContentLoaded', () => {
     // フォームのバリデーション
-    const form = document.querySelector('form[action="InterviewExamInputServlet"]');
+    const form = document.getElementById('selectionForm');
     if (form) {
         form.addEventListener('submit', (e) => {
-            const examType = document.getElementById('examTypeInput').value;
-            const interviewFormat = document.getElementById('interviewFormatInput').value;
+            const stages = document.querySelectorAll('.stage-item');
             
-            if (!examType) {
-                alert('試験種別を選択してください。');
+            if (stages.length === 0) {
+                alert('少なくとも1つの選考ステージを追加してください。');
                 e.preventDefault();
                 return false;
             }
             
-            if (!interviewFormat) {
-                alert('面接形式を選択してください。');
+            // 各ステージの必須項目チェック
+            let isValid = true;
+            stages.forEach((stage, index) => {
+                const typeSelect = stage.querySelector('.stage-type');
+                if (typeSelect && !typeSelect.value) {
+                    alert(`ステージ${index + 1}のステージ種別を選択してください。`);
+                    isValid = false;
+                }
+            });
+            
+            if (!isValid) {
                 e.preventDefault();
                 return false;
             }
@@ -388,7 +488,49 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    
+    // 初期ステージを自動追加
+    addSelectionStage();
 });
+
+// ドラッグ&ドロップでステージの順序を変更（オプション機能）
+function enableDragAndDrop() {
+    const container = document.getElementById('selectionStagesContainer');
+    if (!container) return;
+    
+    let draggedElement = null;
+    
+    container.addEventListener('dragstart', (e) => {
+        if (e.target.classList.contains('stage-item')) {
+            draggedElement = e.target;
+            e.target.style.opacity = '0.5';
+        }
+    });
+    
+    container.addEventListener('dragend', (e) => {
+        if (e.target.classList.contains('stage-item')) {
+            e.target.style.opacity = '1';
+        }
+    });
+    
+    container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const stageItem = e.target.closest('.stage-item');
+        if (stageItem && draggedElement && stageItem !== draggedElement) {
+            const rect = stageItem.getBoundingClientRect();
+            const midY = rect.top + rect.height / 2;
+            
+            if (e.clientY < midY) {
+                stageItem.parentNode.insertBefore(draggedElement, stageItem);
+            } else {
+                stageItem.parentNode.insertBefore(draggedElement, stageItem.nextSibling);
+            }
+        }
+    });
+}
+
+// ドラッグ&ドロップを有効化（必要に応じて）
+// enableDragAndDrop();
 </script>
 
 <style>
@@ -526,6 +668,10 @@ document.addEventListener('DOMContentLoaded', () => {
         margin-bottom: 24px;
         text-align: center;
         font-weight: 700;
+        padding: 16px;
+        background: linear-gradient(135deg, rgba(44, 119, 68, 0.1), rgba(92, 165, 100, 0.1));
+        border-radius: 8px;
+        border: 1px solid rgba(44, 119, 68, 0.2);
     }
 
     .form-section {
@@ -588,12 +734,146 @@ document.addEventListener('DOMContentLoaded', () => {
         font-weight: 600;
     }
 
-    /* ボタン選択時のスタイル */
-    .examType-btn.selected,
-    .interviewFormat-btn.selected {
-        background: #2C7744 !important;
-        color: white !important;
+    /* 選考ステージ管理のスタイル */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .btn-sm {
+        padding: 8px 16px;
+        font-size: 14px;
+        min-width: auto;
+    }
+
+    .stage-item {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .stage-item:hover {
+        border-color: #2C7744;
+        box-shadow: 0 4px 12px rgba(44, 119, 68, 0.15);
+    }
+
+    .stage-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 16px 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .stage-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2c3e50;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .stage-number {
+        background: #2C7744;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .remove-stage-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.2s ease;
+    }
+
+    .remove-stage-btn:hover {
+        background: #c82333;
         transform: scale(1.05);
+    }
+
+    .stage-content {
+        padding: 24px;
+    }
+
+    .time-range {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .time-separator {
+        color: #6c757d;
+        font-weight: 600;
+    }
+
+    .full-width {
+        grid-column: 1 / -1;
+    }
+
+    .stage-notes {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .stage-notes:focus {
+        outline: none;
+        border-color: #2C7744;
+        box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
+    }
+
+    /* ステージ追加アニメーション */
+    .stage-item {
+        animation: slideInUp 0.4s ease forwards;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ステージ削除アニメーション */
+    .stage-item.removing {
+        animation: slideOutDown 0.3s ease forwards;
+    }
+
+    @keyframes slideOutDown {
+        from {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        to {
+            opacity: 0;
+            transform: translateY(20px);
+        }
     }
 
     .btn-group {
@@ -718,6 +998,33 @@ document.addEventListener('DOMContentLoaded', () => {
             background: #2C7744;
             color: #ffffff;
         }
+        
+        .stage-item {
+            background: #3d3d3d;
+            border-color: #4d4d4d;
+        }
+        
+        .stage-header {
+            background: linear-gradient(135deg, #4d4d4d 0%, #3d3d3d 100%);
+            border-color: #4d4d4d;
+        }
+        
+        .stage-title {
+            color: #ffffff;
+        }
+        
+        .stage-notes {
+            background: #4d4d4d;
+            border-color: #5d5d5d;
+            color: #ffffff;
+        }
+        
+        .form-title {
+            color: #ffffff;
+            background: linear-gradient(135deg, rgba(44, 119, 68, 0.3), rgba(92, 165, 100, 0.3));
+            border-color: rgba(44, 119, 68, 0.5);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
     }
 
     /* レスポンシブ対応の強化 */
@@ -809,6 +1116,12 @@ document.addEventListener('DOMContentLoaded', () => {
         .btn,
         .btn-group button {
             border: 2px solid #2c3e50;
+        }
+        
+        .form-title {
+            border: 2px solid #2c3e50;
+            background: #ffffff;
+            color: #000000;
         }
     }
 
