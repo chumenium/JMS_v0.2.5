@@ -126,6 +126,61 @@
         transform: translateY(-1px);
         box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
     }
+    
+    /* すべて表示ボタン */
+    .show-all-btn {
+        background: linear-gradient(135deg, #6c757d 0%, #495057 100%) !important;
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2) !important;
+        color: white !important;
+        text-decoration: none !important;
+        padding: 12px 24px !important;
+        border-radius: 8px !important;
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        display: inline-block !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    .show-all-btn:hover {
+        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3) !important;
+        color: white !important;
+        text-decoration: none !important;
+        transform: translateY(-1px) !important;
+    }
+    
+    /* 検索中アニメーション */
+    .search-loading {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 8px;
+        margin: 16px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .loading-spinner {
+        width: 20px;
+        height: 20px;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #2C7744;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .search-loading span {
+        color: #2C7744;
+        font-weight: 600;
+        font-size: 16px;
+    }
 
     /* 学生一覧表 - 視認性と操作性の向上 */
     .student-table {
@@ -432,11 +487,18 @@
             </header>
 
             <!-- 検索バー -->
-            <form class="search-bar" method="post" action="StudentServlet">
+            <form class="search-bar" method="post" action="StudentServlet" id="searchForm">
                 <input type="hidden" name="action" value="search">
-                <input type="text" name="keyword" placeholder="氏名・学籍番号・クラスなどで検索..." aria-label="検索キーワード" value="${keyword != null ? keyword : ''}">
-                <button type="submit" aria-label="検索">🔍 検索</button>
+                <input type="text" name="keyword" placeholder="氏名・学籍番号・クラスなどで検索..." aria-label="検索キーワード" value="${keyword != null ? keyword : ''}" id="searchInput">
+                <button type="submit" aria-label="検索" id="searchButton">🔍 検索</button>
+                <a href="StudentServlet" class="show-all-btn" id="showAllButton" aria-label="すべて表示">📋 すべて表示</a>
             </form>
+            
+            <!-- 検索中アニメーション -->
+            <div id="searchLoading" class="search-loading" style="display: none;">
+                <div class="loading-spinner"></div>
+                <span>検索中...</span>
+            </div>
 
             <!-- 学生一覧表 -->
             <table class="student-table" aria-label="学生一覧">
@@ -451,16 +513,16 @@
                 </thead>
                 <tbody>
                     <c:choose>
-                        <c:when test="${not empty applicationScope.students and applicationScope.students[0].size() > 0}">
-                            <c:forEach var="i" begin="0" end="${applicationScope.students[0].size()-1}">
+                        <c:when test="${not empty students and students[0].size() > 0}">
+                            <c:forEach var="i" begin="0" end="${students[0].size()-1}">
                                 <tr>
-                                    <td>${applicationScope.students[0][i]}</td>
-                                    <td>${applicationScope.students[1][i]}</td>
-                                    <td>${applicationScope.students[2][i]}</td>
-                                    <td>${applicationScope.students[3][i]}</td>
+                                    <td>${students[0][i]}</td>
+                                    <td>${students[1][i]}</td>
+                                    <td>${students[2][i]}</td>
+                                    <td>${students[3][i]}</td>
                                     <td>
-                                        <a href="StudentViewServlet?id=${applicationScope.students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
-                                        <a href="StudentDetailServlet?id=${applicationScope.students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
+                                        <a href="StudentViewServlet?id=${students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
+                                        <a href="StudentDetailServlet?id=${students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
                                     </td>
                                 </tr>
                             </c:forEach>
@@ -612,17 +674,47 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 検索フォームの改善
-    const searchForm = document.querySelector('.search-bar form');
-    const searchInput = document.querySelector('.search-bar input[type="text"]');
+    const searchForm = document.getElementById('searchForm');
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const showAllButton = document.getElementById('showAllButton');
+    const searchLoading = document.getElementById('searchLoading');
     
     if (searchForm && searchInput) {
         // 検索ボタンのキーボード操作
-        const searchButton = searchForm.querySelector('button[type="submit"]');
         if (searchButton) {
             searchButton.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
                     searchForm.submit();
+                }
+            });
+        }
+        
+        // 検索中のアニメーション表示
+        searchForm.addEventListener('submit', () => {
+            if (searchInput.value.trim() !== '') {
+                searchLoading.style.display = 'flex';
+                searchButton.disabled = true;
+                showAllButton.disabled = true;
+            }
+        });
+        
+        // すべて表示ボタンの機能
+        if (showAllButton) {
+            showAllButton.addEventListener('click', (e) => {
+                // 検索中アニメーション表示
+                searchLoading.style.display = 'flex';
+                searchButton.disabled = true;
+                showAllButton.style.pointerEvents = 'none';
+                showAllButton.style.opacity = '0.6';
+            });
+            
+            // すべて表示ボタンのキーボード操作
+            showAllButton.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    showAllButton.click();
                 }
             });
         }

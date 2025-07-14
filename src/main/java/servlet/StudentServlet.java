@@ -662,7 +662,7 @@ public class StudentServlet extends HttpServlet {
                 ArrayList<ArrayList<String>> students = new ArrayList<>();
                 int totalCount = 0;
                 
-                try (Connection conn2 = DBConnection.getConnection()) {
+                //try (Connection conn2 = DBConnection.getConnection()) {
                     // 検索条件に基づくWHERE句の構築
                     String whereClause = "";
                     if (keyword != null && !keyword.trim().isEmpty()) {
@@ -671,7 +671,7 @@ public class StudentServlet extends HttpServlet {
                     
                     // 総件数取得
                     String countSql = "SELECT COUNT(*) FROM students_tbl" + whereClause;
-                    PreparedStatement countStmt = conn2.prepareStatement(countSql);
+                    PreparedStatement countStmt = conn.prepareStatement(countSql);
                     
                     if (!whereClause.isEmpty()) {
                         String likePattern = "%" + keyword + "%";
@@ -688,7 +688,7 @@ public class StudentServlet extends HttpServlet {
                     
                     // 学生データ取得
                     String sql = "SELECT student_id, name, department, class, job_hunting_status, number, name_reading, gender, enrollment_status, mediation_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year FROM students_tbl s LEFT JOIN occupations_tbl o1 ON s.desired_job_type_1st_id = o1.occupation_id LEFT JOIN occupations_tbl o2 ON s.desired_job_type_2nd_id = o2.occupation_id LEFT JOIN occupations_tbl o3 ON s.desired_job_type_3rd_id = o3.occupation_id";
-                    PreparedStatement stmt = conn2.prepareStatement(sql);
+                    PreparedStatement stmt = conn.prepareStatement(sql);
                     ResultSet rs = stmt.executeQuery();
                     //ArrayList<ArrayList<String>> students = new ArrayList<>();
                     ArrayList<String> studentids = new ArrayList<>();
@@ -741,16 +741,16 @@ public class StudentServlet extends HttpServlet {
                     students.add(classs2);
                     students.add(enrollmentStatuss2);
                     
-                } catch (Exception e) {
-                    System.err.println("Database error in search: " + e.getMessage());
-                    e.printStackTrace();
-                    // エラーが発生した場合でも空のリストを設定
-                    students.add(new ArrayList<>());
-                    students.add(new ArrayList<>());
-                    students.add(new ArrayList<>());
-                    students.add(new ArrayList<>());
-                    totalCount = 0;
-                }
+                // } catch (Exception e) {
+                //     System.err.println("Database error in search: " + e.getMessage());
+                //     e.printStackTrace();
+                //     // エラーが発生した場合でも空のリストを設定
+                //     students.add(new ArrayList<>());
+                //     students.add(new ArrayList<>());
+                //     students.add(new ArrayList<>());
+                //     students.add(new ArrayList<>());
+                //     totalCount = 0;
+                // }
                 
                 int totalPages = (int) Math.ceil((double) totalCount / pageSize);
                 request.setAttribute("students", students);
@@ -1004,8 +1004,10 @@ public class StudentServlet extends HttpServlet {
         //     // System.out.println("StudentServlet: 学生数 = " + students.get(0).size());
         //     // System.out.println("StudentServlet: 現在ページ = " + page);
         //     // System.out.println("StudentServlet: 総ページ数 = " + totalPages);
-            
-            request.getRequestDispatcher("/WEB-INF/jsp/StudentList.jsp").forward(request, response);
+        ServletContext sc = getServletContext();
+        request.setAttribute("students",(ArrayList<ArrayList<String>>) sc.getAttribute("students"));
+
+        request.getRequestDispatcher("/WEB-INF/jsp/StudentList.jsp").forward(request, response);
         // } catch (Exception e) {
         //     System.err.println("General error in StudentServlet doGet: " + e.getMessage());
         //     e.printStackTrace();
