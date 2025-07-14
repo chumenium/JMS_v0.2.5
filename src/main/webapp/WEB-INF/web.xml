@@ -229,4 +229,6 @@
     <url-pattern>/JobHuntingSearchServlet</url-pattern>
   </servlet-mapping>
   
+
+  
 </web-app>
