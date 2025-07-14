@@ -1,15 +1,18 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
 import dao.CompanyDAO;
-import java.util.List;
-import java.util.Map;
 
 /**
  * 企業管理サーブレット
@@ -43,14 +46,13 @@ public class CompanyManagementServlet extends HttpServlet {
         }
         
         // 企業一覧を取得
-        		List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+        ServletContext sc = getServletContext();
+        List<Map<String, Object>> companies = (List<Map<String, Object>>)sc.getAttribute("companies");
         request.setAttribute("companies", companies);
-        
+        List<Integer> numdata = CompanyDAO.getCompanyCountRecruitment();
         // 統計情報を取得
-        		int totalCompanies = CompanyDAO.getCompanyCount();
-		int recruitmentCompanies = CompanyDAO.getRecruitmentCompanyCount();
-        request.setAttribute("totalCompanies", totalCompanies);
-        request.setAttribute("recruitmentCompanies", recruitmentCompanies);
+        int totalCompanies = numdata.get(0);
+        int recruitmentCompanies = numdata.get(1);
         
         // 企業管理ページにフォワード
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/CompanyManagement.jsp");
@@ -113,9 +115,12 @@ public class CompanyManagementServlet extends HttpServlet {
         }
         
         // 企業を登録
-        		boolean success = CompanyDAO.addCompany(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
-        
+        boolean success = CompanyDAO.addCompany(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
         if (success) {
+            CompanyDAO CompanyDAO = new CompanyDAO();
+            List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+            ServletContext sc = getServletContext();
+            sc.setAttribute("companies", companies);
             request.setAttribute("successMessage", "企業の登録が完了しました。");
         } else {
             request.setAttribute("errorMessage", "企業の登録に失敗しました。");

@@ -122,6 +122,34 @@ public class CompanyDAO {
         return null;
     }
     
+        /**
+     * 企業数を取得
+     */
+    public List<Integer> getCompanyCountRecruitment() {
+        String sql = "SELECT COUNT(*) FROM companys_tbl";
+        String sql2 = "SELECT COUNT(*) FROM companys_tbl WHERE recruitment_results = true";
+        List<Integer> data = new ArrayList<>();
+        try (Connection conn = DBConnection.getConnection()){
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                data.add(rs.getInt(1));
+            }
+
+            PreparedStatement stmt2 = conn.prepareStatement(sql2);
+            ResultSet rs2 = stmt2.executeQuery();
+            if (rs2.next()) {
+                data.add(rs2.getInt(1));
+            }
+            return data;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
     /**
      * 企業数を取得
      */
