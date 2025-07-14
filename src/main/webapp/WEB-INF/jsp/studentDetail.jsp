@@ -2,6 +2,7 @@
 <%@ page import="beans.StudentBeans" %>
 <%
     StudentBeans student = (StudentBeans)request.getAttribute("student");
+    String role = (String) session.getAttribute("role"); 
 %>
 <!DOCTYPE html>
 <html lang="ja">
@@ -345,69 +346,35 @@
                     </div>
                     <div class="form-group">
                         <label for="name">氏名</label>
-                        <input type="text" id="name" name="name" value="<%= student != null ? student.getName() : "" %>" required>
+                        <%if("student".equals(role)){%>
+                            <input type="text" id="name" name="name" value="<%= student != null ? student.getName() : "" %>" required readonly>
+                        <%}else{%>
+                            <input type="text" id="name" name="name" value="<%= student != null ? student.getName() : "" %>" required>
+                        <%}%>
                     </div>
                     <div class="form-group">
                         <label for="nameKana">カナ</label>
-                        <input type="text" id="nameKana" name="nameKana" value="<%= student != null ? student.getNameKana() : "" %>">
+                        <%if("student".equals(role)){%>
+                            <input type="text" id="nameKana" name="nameKana" value="<%= student != null ? student.getNameKana() : "" %>" readonly>
+                        <%}else{%>
+                            <input type="text" id="nameKana" name="nameKana" value="<%= student != null ? student.getNameKana() : "" %>">
+                        <%}%>
                     </div>
                     <div class="form-group">
                         <label for="gender">性別</label>
-                        <select id="gender" name="gender">
+                        <%if("student".equals(role)){%>
+                            <input type="text" id="gender" name="gender" value="<%= student != null ? student.getGender() : "" %>" readonly>
+                        <%}else{%>
+                            <select id="gender" name="gender">
                             <option value="">選択してください</option>
                             <option value="男" <%= "男".equals(student != null ? student.getGender() : "") ? "selected" : "" %>>男</option>
                             <option value="女" <%= "女".equals(student != null ? student.getGender() : "") ? "selected" : "" %>>女</option>
+                        <%}%>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="graduationYear">卒業年</label>
                         <input type="text" id="graduationYear" name="graduationYear" value="<%= student != null ? student.getGraduationYear() : "" %>" readonly>
-                    </div>
-                </div>
-
-                <!-- 連絡先情報 -->
-                <div class="info-section">
-                    <h3>連絡先情報</h3>
-                    <div class="form-group">
-                        <label for="email">メールアドレス</label>
-                        <input type="email" id="email" name="email" value="<%= student != null ? student.getEmail() : "" %>">
-                    </div>
-                    <div class="form-group">
-                        <label for="tel">電話番号</label>
-                        <input type="tel" id="tel" name="tel" value="<%= student != null ? student.getTel() : "" %>">
-                    </div>
-                </div>
-
-                <!-- 在籍・就活状況 -->
-                <div class="info-section">
-                    <h3>在籍・就活状況</h3>
-                    <div class="form-group">
-                        <label for="enrollmentStatus">在籍状況</label>
-                        <select id="enrollmentStatus" name="enrollmentStatus">
-                            <option value="在籍" <%= "在籍".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>在籍</option>
-                            <option value="休学" <%= "休学".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>休学</option>
-                            <option value="卒業" <%= "卒業".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>卒業</option>
-                            <option value="退学" <%= "退学".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>退学</option>
-                            <option value="除籍" <%= "除籍".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>除籍</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="assistanceStatus">斡旋状況</label>
-                        <select id="assistanceStatus" name="assistanceStatus">
-                            <option value="受理" <%= "受理".equals(student != null ? student.getAssistanceStatus() : "") ? "selected" : "" %>>受理</option>
-                            <option value="辞退" <%= "辞退".equals(student != null ? student.getAssistanceStatus() : "") ? "selected" : "" %>>辞退</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="jobHuntingStatus">就活状況</label>
-                        <select id="jobHuntingStatus" name="jobHuntingStatus">
-                            <option value="未開始" <%= "未開始".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>未開始</option>
-                            <option value="準備中" <%= "準備中".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>準備中</option>
-                            <option value="活動中" <%= "活動中".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>活動中</option>
-                            <option value="内定済み" <%= "内定済み".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>内定済み</option>
-                            <option value="就職決定" <%= "就職決定".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>就職決定</option>
-                            <option value="就職辞退" <%= "就職辞退".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>就職辞退</option>
-                        </select>
                     </div>
                 </div>
 
@@ -486,6 +453,58 @@
                         <button type="button" id="add-workplace-btn">希望勤務地を増やす＋</button>
                     </div>
                 </div>
+                
+                <!-- 連絡先情報 -->
+                <div class="info-section">
+                    <h3>連絡先情報</h3>
+                    <div class="form-group">
+                        <label for="email">メールアドレス</label>
+                        <input type="email" id="email" name="email" value="<%= student != null ? student.getEmail() : "" %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="tel">電話番号</label>
+                        <input type="tel" id="tel" name="tel" value="<%= student != null ? student.getTel() : "" %>">
+                    </div>
+                </div>
+
+                <!-- 在籍・就活状況 -->
+                <div class="info-section">
+                    <h3>在籍・就活状況</h3>
+                    <div class="form-group">
+                        <label for="enrollmentStatus">在籍状況</label>
+                        <%if("student".equals(role)){%>
+                        <input type="text" id="enrollmentStatus" name="enrollmentStatus" value="<%= student != null ? student.getEnrollmentStatus() : "" %>" readonly>
+                        <%}else{%>
+                        <select id="enrollmentStatus" name="enrollmentStatus">
+                            <option value="在籍" <%= "在籍".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>在籍</option>
+                            <option value="休学" <%= "休学".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>休学</option>
+                            <option value="卒業" <%= "卒業".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>卒業</option>
+                            <option value="退学" <%= "退学".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>退学</option>
+                            <option value="除籍" <%= "除籍".equals(student != null ? student.getEnrollmentStatus() : "") ? "selected" : "" %>>除籍</option>
+                        </select>
+                        <%}%>
+                    </div>
+                    <div class="form-group">
+                        <label for="assistanceStatus">斡旋状況</label>
+                        <select id="assistanceStatus" name="assistanceStatus">
+                            <option value="受理" <%= "受理".equals(student != null ? student.getAssistanceStatus() : "") ? "selected" : "" %>>受理</option>
+                            <option value="辞退" <%= "辞退".equals(student != null ? student.getAssistanceStatus() : "") ? "selected" : "" %>>辞退</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="jobHuntingStatus">就活状況</label>
+                        <select id="jobHuntingStatus" name="jobHuntingStatus">
+                            <option value="未開始" <%= "未開始".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>未開始</option>
+                            <option value="準備中" <%= "準備中".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>準備中</option>
+                            <option value="活動中" <%= "活動中".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>活動中</option>
+                            <option value="内定済み" <%= "内定済み".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>内定済み</option>
+                            <option value="就職決定" <%= "就職決定".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>就職決定</option>
+                            <option value="就職辞退" <%= "就職辞退".equals(student != null ? student.getJobHuntingStatus() : "") ? "selected" : "" %>>就職辞退</option>
+                        </select>
+                    </div>
+                </div>
+
+                
             </div>
 
             <!-- 備考 -->
@@ -499,11 +518,35 @@
 
             <div class="action-buttons">
                 <input type="hidden" id="maxWorkPlaceIndex" name="number99" value="<%= l-1 %>">
-                <button type="submit" class="btn">更新</button>
+                <div id="updating-indicator" style="display:none; margin-top:10px; color:#007bff; font-weight:bold;">
+                    <span class="spinner"></span> 更新中...
+                </div>
+                <button type="submit" class="btn" id="updateBtn">更新</button>
+                <%if("student".equals(role)){%>
+                <a href="javascript:history.back()" class="btn btn-secondary">ダッシュボードに戻る</a>
+                <%}else{%>
                 <a href="StudentServlet" class="btn btn-secondary">一覧に戻る</a>
+                <%}%>
             </div>
         </form>
     </div>
+    <style>
+      .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 3px solid #cce3ff;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>
     <script>
         document.getElementById('add-workplace-btn').addEventListener('click', function() {
             var container = document.getElementById('workplace-container');
@@ -531,6 +574,10 @@
             // hiddenの値を「新しい最大連番」に更新
             maxIndexInput.value = newIndex;
             console.log(maxIndexInput.value);
+        });
+        // 更新ボタン押下時にアニメーション表示
+        document.getElementById('updateBtn').addEventListener('click', function() {
+          document.getElementById('updating-indicator').style.display = 'block';
         });
     </script>
 </body>

@@ -20,14 +20,21 @@
     }
 
     .student-list-container {
+        position: relative;
         max-width: 1400px;
         margin: 0 auto;
         padding: 24px;
-        min-height: 100vh;
+        min-height: calc(100vh - 300px);
         background: #ffffff;
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+        /* margin-bottom: 50px; */
     }
 
+    footer {
+        padding: 40px 20px;
+        clear: both;
+        margin-top: 150px;
+    }
     /* ページヘッダー - 視認性向上 */
     .page-header {
         background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
@@ -469,10 +476,7 @@
     </header>
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
-    <main>
-        <div>.</div>
-        <div>.</div>
-        <div>.</div>
+    <main style="padding-top: 70px; padding-bottom: 100px;">
         <div class="student-list-container">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
@@ -537,10 +541,9 @@
                     </c:choose>
                 </tbody>
             </table>
-
             <!-- ページネーション -->
             <nav class="pagination" aria-label="ページネーション">
-                <c:if test="${totalPages > 1}">
+                <c:if test="${totalPages gt 1}">
                     <c:forEach var="p" begin="1" end="${totalPages}">
                         <form method="get" action="StudentServlet" style="display:inline;">
                             <input type="hidden" name="page" value="${p}">

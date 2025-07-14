@@ -143,14 +143,15 @@ public class StudentDAO {
         ResultSet rs = null;
         try {
             conn = DBConnection.getConnection();
-            String sql = "SELECT student_id, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year, remarks FROM students_tbl s LEFT JOIN occupations_tbl o1 ON s.desired_job_type_1st_id = o1.occupation_id LEFT JOIN occupations_tbl o2 ON s.desired_job_type_2nd_id = o2.occupation_id LEFT JOIN occupations_tbl o3 ON s.desired_job_type_3rd_id = o3.occupation_id WHERE student_id = ?";
+            String sql = "SELECT student_id, department, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year, remarks FROM students_tbl s LEFT JOIN occupations_tbl o1 ON s.desired_job_type_1st_id = o1.occupation_id LEFT JOIN occupations_tbl o2 ON s.desired_job_type_2nd_id = o2.occupation_id LEFT JOIN occupations_tbl o3 ON s.desired_job_type_3rd_id = o3.occupation_id WHERE student_id = ?";
             ps = conn.prepareStatement(sql);//"student_id, class, number, name, name_reading, gender, email, tel, enrollment_status, mediation_status, job_hunting_status, o1.occupation AS 1st,o2.occupation AS 2nd,o3.occupation AS 3rd,graduation_year, remarks"
             ps.setString(1, id);
             rs = ps.executeQuery();
             if (rs.next()) {
                 student = new StudentBeans();
                 student.setId(rs.getString("student_id"));
-                student.setClassName(rs.getString("class"));
+                String dc = rs.getString("department") + rs.getString("class");
+                student.setClassName(dc);
                 student.setNumber(rs.getString("number"));
                 student.setName(rs.getString("name"));
                 student.setNameKana(rs.getString("name_reading"));
@@ -209,24 +210,26 @@ public class StudentDAO {
             conn.setAutoCommit(false);
             
             // students_tblを更新
-            String sql = "UPDATE students_tbl SET class=?, number=?, name=?, name_reading=?, gender=?, email=?, tel=?, enrollment_status=?, mediation_status=?, job_hunting_status=?, desired_job_type_1st_id=?, desired_job_type_2nd_id=?, desired_job_type_3rd_id=?, graduation_year=?, remarks=? WHERE student_id=?";
+            String sql = "UPDATE students_tbl SET department=?, class=?, number=?, name=?, name_reading=?, gender=?, email=?, tel=?, enrollment_status=?, mediation_status=?, job_hunting_status=?, desired_job_type_1st_id=?, desired_job_type_2nd_id=?, desired_job_type_3rd_id=?, graduation_year=?, remarks=? WHERE student_id=?";
             ps = conn.prepareStatement(sql);
-            ps.setString(1, student.getClassName());
-            ps.setString(2, student.getNumber());
-            ps.setString(3, student.getName());
-            ps.setString(4, student.getNameKana());
-            ps.setString(5, student.getGender());
-            ps.setString(6, student.getEmail());
-            ps.setString(7, student.getTel());
-            ps.setString(8, student.getEnrollmentStatus());
-            ps.setString(9, student.getAssistanceStatus());
-            ps.setString(10, student.getJobHuntingStatus());
-            ps.setString(11, student.getDesiredJobType1());
-            ps.setString(12, student.getDesiredJobType2());
-            ps.setString(13, student.getDesiredJobType3());
-            ps.setString(14, student.getGraduationYear());
-            ps.setString(15, student.getRemarks());
-            ps.setString(16, student.getId());
+            String className = student.getClassName();
+            ps.setString(1, className.substring(0, 2));
+            ps.setString(2, className.substring(className.length() - 2));
+            ps.setString(3, student.getNumber());
+            ps.setString(4, student.getName());
+            ps.setString(5, student.getNameKana());
+            ps.setString(6, student.getGender());
+            ps.setString(7, student.getEmail());
+            ps.setString(8, student.getTel());
+            ps.setString(9, student.getEnrollmentStatus());
+            ps.setString(10, student.getAssistanceStatus());
+            ps.setString(11, student.getJobHuntingStatus());
+            ps.setString(12, student.getDesiredJobType1());
+            ps.setString(13, student.getDesiredJobType2());
+            ps.setString(14, student.getDesiredJobType3());
+            ps.setString(15, student.getGraduationYear());
+            ps.setString(16, student.getRemarks());
+            ps.setString(17, student.getId());
             
             int updateCount = ps.executeUpdate();
             System.out.println("students_tbl更新件数: " + updateCount);

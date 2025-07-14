@@ -63,9 +63,12 @@ public class StudentDetailServlet extends HttpServlet {
                 dispatcher.forward(request, response);
                 return;
             }
-            
-            StudentBeans student = StudentDAO.getStudentById(studentId);
-            
+            StudentBeans student = null;
+            if(role.equals("student")){
+                student = (StudentBeans) session.getAttribute("student");
+            }else{
+                student = StudentDAO.getStudentById(studentId);
+            }
             if (student == null) {
                 request.setAttribute("error", "指定された学生が見つかりません。");
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/studentDetail.jsp");
@@ -226,6 +229,7 @@ public class StudentDetailServlet extends HttpServlet {
         try {
             // データベースを更新
             StudentDAO.updateStudent(student);
+            session.setAttribute("student",student);
             System.out.println("データベース更新成功");
             ServletContext sc = getServletContext();
             ArrayList<ArrayList<String>> students = (ArrayList<ArrayList<String>>)sc.getAttribute("students");
@@ -236,9 +240,15 @@ public class StudentDetailServlet extends HttpServlet {
                     enrollmentStatuss.set(i,jobHuntingStatus);
                 }
             }
-            // 更新後、詳細画面にリダイレクト
-            System.out.println("StudentViewServletにリダイレクト: " + request.getContextPath() + "/StudentViewServlet?id=" + studentId);
-            response.sendRedirect(request.getContextPath() + "/StudentViewServlet?id=" + studentId);
+            if(role.equals("student")){
+                // 更新後、詳細画面にリダイレクト
+                System.out.println("StudentViewServletにリダイレクト: " + request.getContextPath() + "/StudentViewServlet?id=" + studentId);
+                response.sendRedirect(request.getContextPath() + "/StudentDetailServlet");
+            }else{
+                // 更新後、詳細画面にリダイレクト
+                System.out.println("StudentViewServletにリダイレクト: " + request.getContextPath() + "/StudentViewServlet?id=" + studentId);
+                response.sendRedirect(request.getContextPath() + "/StudentViewServlet?id=" + studentId);
+            }
             
 
             
