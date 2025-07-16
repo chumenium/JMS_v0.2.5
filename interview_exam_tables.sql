@@ -55,3 +55,4 @@ INSERT IGNORE INTO interview_types (interview_type_name) VALUES
 ('プレゼンテーション'),
 ('その他');
 
+ 
