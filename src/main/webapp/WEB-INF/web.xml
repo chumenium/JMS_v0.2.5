@@ -229,4 +229,10 @@
     <url-pattern>/JobHuntingSearchServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- バックアップディレクトリの設定 -->
+  <context-param>
+    <param-name>backup-directory</param-name>
+    <param-value>/backups</param-value>
+  </context-param>
+  
 </web-app>

@@ -482,8 +482,8 @@
             <!-- アクションボタン -->
             <div class="action-buttons">
                 <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=backup" 
-                   class="btn btn-primary" onclick="return confirmAction('バックアップを実行しますか？')">
-                    💾 バックアップ実行
+                   class="btn btn-primary">
+                    💾 バックアップ実行（ダウンロード）
                 </a>
                 <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=optimize" 
                    class="btn btn-warning" onclick="return confirmAction('データベースを最適化しますか？')">
@@ -522,20 +522,6 @@
                 </div>
             <% } %>
 
-            <% 
-            List<String> backupResults = (List<String>) request.getAttribute("backupResults");
-            if (backupResults != null && !backupResults.isEmpty()) { 
-            %>
-                <div class="alert alert-success">
-                    <h5>バックアップ結果:</h5>
-                    <div class="result-list">
-                        <% for (String result : backupResults) { %>
-                            <div class="result-item"><%= result %></div>
-                        <% } %>
-                    </div>
-                </div>
-            <% } %>
-
             <!-- ローディング表示 -->
             <div id="loading" class="loading">
                 <div class="spinner"></div>
@@ -568,7 +554,57 @@ function hideLoading() {
 }
 
 function showBackupTab() {
-    alert('バックアップ機能は開発中です。\n\n現在利用可能な機能:\n- 統計情報表示\n- テーブル一覧表示\n- データベース最適化\n- 整合性チェック');
+    // バックアップタブの内容を表示
+    const tabContent = document.querySelector('.tab-content');
+    const activePane = tabContent.querySelector('.tab-pane.active');
+    if (activePane) {
+        activePane.classList.remove('active');
+    }
+    
+    // バックアップタブの内容を作成
+    const backupPane = document.createElement('div');
+    backupPane.className = 'tab-pane active';
+    backupPane.innerHTML = `
+        <h3>💾 データベースバックアップ</h3>
+        <div class="alert alert-info">
+            <strong>バックアップ機能:</strong>
+            <ul>
+                <li>全テーブルの構造とデータをSQLファイルとしてエクスポート</li>
+                <li>バックアップファイルは自動的にダウンロード可能</li>
+                <li>文字エンコーディング: UTF-8</li>
+                <li>大量データ対応（1000行ごとにINSERT文を分割）</li>
+            </ul>
+        </div>
+        <div class="action-buttons">
+            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=backup" 
+               class="btn btn-success" onclick="return confirmAction('バックアップを実行しますか？\n\n注意: データ量によっては時間がかかる場合があります。')">
+                💾 バックアップ実行
+            </a>
+        </div>
+    `;
+    
+    tabContent.appendChild(backupPane);
+    
+    // タブのアクティブ状態を更新
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert('パスをクリップボードにコピーしました');
+    }).catch(function(err) {
+        console.error('クリップボードへのコピーに失敗しました:', err);
+        // フォールバック: テキストエリアを使用
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        alert('パスをクリップボードにコピーしました');
+    });
 }
 
 function showMaintenanceTab() {
