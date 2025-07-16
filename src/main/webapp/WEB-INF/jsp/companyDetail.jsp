@@ -39,6 +39,10 @@
   boolean recruit_results = (Boolean) session.getAttribute("recruit_results");
   int work_place_id = (Integer) session.getAttribute("work_place_id");
   int occupation_id = (Integer) session.getAttribute("occupation_id");
+  
+  // セッションからユーザー情報を取得
+  String username = (String) session.getAttribute("username");
+  String role = (String) session.getAttribute("role");
 %>
 <!--▲▲▲▲▲-->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
