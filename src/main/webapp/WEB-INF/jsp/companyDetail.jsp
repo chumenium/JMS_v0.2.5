@@ -295,6 +295,7 @@
 <!-- ここから機能部分を記述 -->
 <main>
 <section class="bg3 bg-pattern3" id="main">
+<<<<<<< HEAD
 <ul aria-colcount="2">
     <li>企業ID : <textarea readonly><%= company != null ? company.getCompanyId() : "" %></textarea></li>
     <li>企業名 : <textarea readonly><%= company != null ? company.getCompanyName() : "" %></textarea></li>
@@ -313,6 +314,35 @@
     <li>勤務地 : <textarea readonly><%= workPlaceName %></textarea></li>
     <li>職種 : <textarea readonly><%= occupationName %></textarea></li>
 </ul>
+=======
+    <div class="dashboard">
+        <h1>企業詳細情報</h1>
+        <ul aria-colcount="2">
+            <li>企業ID : <textarea><%= companys_id %></textarea></li>
+            <li>企業名 : <textarea><%= companys_name %></textarea></li>
+            <li>郵便番号 : <textarea><%= post_code %></textarea></li>
+            <li>住所 : <textarea><%= address %></textarea></li>
+            <li>電話番号 : <textarea><%= tel %></textarea></li>
+            <li>メールアドレス : <textarea><%= mail_address %></textarea></li>
+            <li>担当者名 : <textarea><%= manager_name %></textarea></li>
+            <li>採用実績 : <textarea><%= recruit_results %></textarea></li>
+            <li>勤務地 : <textarea><%= work_place_id %></textarea></li>
+            <li>職種 : <textarea><%= occupation_id %></textarea></li>
+        </ul>
+        
+        <!-- 操作ボタン -->
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="${pageContext.request.contextPath}/CompanyManagementServlet?action=edit&id=<%= companys_id %>" 
+               class="btn btn-primary" style="margin-right: 10px;">編集</a>
+            <a href="${pageContext.request.contextPath}/InterviewExamViewServlet?companyId=<%= companys_id %>" 
+               class="btn btn-info" style="margin-right: 10px;">情報を見る</a>
+            <a href="${pageContext.request.contextPath}/InterviewExamInputServlet" 
+               class="btn btn-success" style="margin-right: 10px;">試験・面接内容登録</a>
+            <a href="${pageContext.request.contextPath}/CompanyListServlet" 
+               class="btn btn-secondary">企業一覧へ戻る</a>
+        </div>
+    </div>
+>>>>>>> c6018fcf42cfe8ceaebfedb0cc42fc725658e5cf
 </section>
 </main>
 <!-- ここまで機能部分を記述 -->

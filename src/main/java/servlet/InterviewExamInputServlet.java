@@ -1,216 +1,275 @@
 package servlet;
 
 import java.io.IOException;
-import java.sql.Date;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-import dao.InterviewDAO;
-import dao.StudentDAO;
-import dao.CompanyDAO;
 
-/**
- * 面接・試験入力サーブレット
- * 面接や試験の記録入力機能を提供
- */
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import beans.CompanyBean;
+import beans.ExamTypeBean;
+import beans.InterviewTypeBean;
+import utils.DBConnection;
+
+@WebServlet("/InterviewExamInputServlet")
 public class InterviewExamInputServlet extends HttpServlet {
-    
-    @Override
+    private static final long serialVersionUID = 1L;
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
-        // セッションの確認
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("id") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.html");
-            return;
-        }
-        
-        // 権限チェック（学生、管理者、企業担当者）
-        String role = (String) session.getAttribute("role");
-        if (role == null || (!role.equals("admin") && !role.equals("student") && !role.equals("company"))) {
-            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-            return;
-        }
-        
         try {
-            // DAOを使用してデータを取得
-            InterviewDAO interviewDAO = new InterviewDAO();
-            StudentDAO studentDAO = new StudentDAO();
-            CompanyDAO companyDAO = new CompanyDAO();
+            // セッションから学生IDを取得
+            String studentId = (String) request.getSession().getAttribute("student_id");
+            String role = (String) request.getSession().getAttribute("role");
             
-            // 面接一覧を取得
-            List<Map<String, Object>> interviews = interviewDAO.getAllInterviews();
-            request.setAttribute("interviews", interviews);
-            
-            // 学生一覧を取得
-            List<Map<String, Object>> students = studentDAO.getAllStudents();
-            request.setAttribute("students", students);
-            
-            // 企業一覧を取得
-            List<Map<String, Object>> companies = companyDAO.getAllCompanies();
+            // 企業一覧を取得（学生の場合は登録済み企業のみ、教員・管理者の場合は全企業）
+            List<CompanyBean> companies;
+            if ("student".equals(role) && studentId != null) {
+                companies = getCompaniesByStudent(studentId);
+            } else if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role) || "admin".equals(role)) {
+                companies = getAllCompanies();
+            } else {
+                companies = new ArrayList<>();
+            }
             request.setAttribute("companies", companies);
             
+            // 試験種別一覧を取得
+            List<ExamTypeBean> examTypes = getExamTypes();
+            request.setAttribute("examTypes", examTypes);
+            
+            // 面接種別一覧を取得
+            List<InterviewTypeBean> interviewTypes = getInterviewTypes();
+            request.setAttribute("interviewTypes", interviewTypes);
+            
+            request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp").forward(request, response);
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("message", "データの取得に失敗しました: " + e.getMessage());
+            request.setAttribute("messageType", "danger");
+            request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
-            // エラーが発生しても画面は表示
+            request.setAttribute("message", "予期しないエラーが発生しました: " + e.getMessage());
+            request.setAttribute("messageType", "danger");
+            request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp").forward(request, response);
         }
-        
-        // 面接・試験入力ページにフォワード
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp");
-        dispatcher.forward(request, response);
     }
-    
-    @Override
+
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
         
-        // セッションの確認
-        HttpSession session = request.getSession(false);
-        if (session == null || session.getAttribute("id") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.html");
-            return;
+        String action = request.getParameter("action");
+        
+        if ("register".equals(action)) {
+            registerContent(request, response);
+        } else {
+            doGet(request, response);
         }
-        
-        // 権限チェック
-        String role = (String) session.getAttribute("role");
-        if (role == null || (!role.equals("admin") && !role.equals("teacher") && 
-                           !role.equals("headmaster") && !role.equals("egd") && !role.equals("student"))) {
-            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
-            return;
-        }
-        
-        // 選考ステージ登録処理
-        handleSelectionStageRegistration(request, response);
     }
     
-    private void handleAddInterviewExam(HttpServletRequest request, HttpServletResponse response) 
+    private void registerContent(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         try {
-            InterviewDAO interviewDAO = new InterviewDAO();
-            
-            // リクエストパラメータを取得
-            String studentId = request.getParameter("student_id");
-            String companyIdStr = request.getParameter("company_id");
-            String interviewDateStr = request.getParameter("interview_date");
-            String interviewType = request.getParameter("interview_type");
-            String status = request.getParameter("status");
-            String notes = request.getParameter("notes");
+            String companyIdParam = request.getParameter("companyId");
+            String contentType = request.getParameter("contentType");
             
             // バリデーション
-            if (studentId == null || studentId.trim().isEmpty() ||
-                companyIdStr == null || companyIdStr.trim().isEmpty() ||
-                interviewDateStr == null || interviewDateStr.trim().isEmpty()) {
-                request.setAttribute("errorMessage", "必須項目が入力されていません。");
+            if (companyIdParam == null || companyIdParam.trim().isEmpty()) {
+                request.setAttribute("message", "企業を選択してください。");
+                request.setAttribute("messageType", "danger");
                 doGet(request, response);
                 return;
             }
             
-            // データ型変換
-            int companyId = Integer.parseInt(companyIdStr);
-            Date interviewDate = Date.valueOf(interviewDateStr);
-            
-            // 面接情報を登録
-            boolean success = interviewDAO.addInterview(studentId, companyId, interviewDate, interviewType, status, notes);
-            
-            if (success) {
-                request.setAttribute("successMessage", "面接情報の登録が完了しました。");
-            } else {
-                request.setAttribute("errorMessage", "面接情報の登録に失敗しました。");
+            if (contentType == null || contentType.trim().isEmpty()) {
+                request.setAttribute("message", "内容種別を選択してください。");
+                request.setAttribute("messageType", "danger");
+                doGet(request, response);
+                return;
             }
             
+            int companyId = Integer.parseInt(companyIdParam);
+            
+            // 企業IDごとの連番を取得
+            int contentNumber = getNextContentNumber(companyId, contentType);
+            
+            Connection conn = DBConnection.getConnection();
+            String sql = "INSERT INTO interview_exam_content (companys_id, content_type, content_number, " +
+                        "exam_type_id, exam_subject, exam_content, interview_type_id, interview_questions, interview_notes) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setInt(1, companyId);
+            pstmt.setString(2, contentType);
+            pstmt.setInt(3, contentNumber);
+            
+            if ("試験".equals(contentType)) {
+                String examTypeId = request.getParameter("examType");
+                pstmt.setObject(4, examTypeId != null && !examTypeId.isEmpty() ? Integer.parseInt(examTypeId) : null);
+                pstmt.setString(5, request.getParameter("examSubject"));
+                pstmt.setString(6, request.getParameter("examContent"));
+                pstmt.setObject(7, null);
+                pstmt.setString(8, null);
+                pstmt.setString(9, null);
+            } else {
+                pstmt.setObject(4, null);
+                pstmt.setString(5, null);
+                pstmt.setString(6, null);
+                String interviewTypeId = request.getParameter("interviewType");
+                pstmt.setObject(7, interviewTypeId != null && !interviewTypeId.isEmpty() ? Integer.parseInt(interviewTypeId) : null);
+                pstmt.setString(8, request.getParameter("interviewQuestions"));
+                pstmt.setString(9, request.getParameter("interviewNotes"));
+            }
+            
+            pstmt.executeUpdate();
+            pstmt.close();
+            conn.close();
+            
+            request.setAttribute("message", "試験・面接内容を登録しました。");
+            request.setAttribute("messageType", "success");
+            
+        } catch (SQLException e) {
+            e.printStackTrace();
+            request.setAttribute("message", "登録に失敗しました: " + e.getMessage());
+            request.setAttribute("messageType", "danger");
+        } catch (NumberFormatException e) {
+            request.setAttribute("message", "企業IDが正しくありません。");
+            request.setAttribute("messageType", "danger");
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "システムエラーが発生しました: " + e.getMessage());
+            request.setAttribute("message", "予期しないエラーが発生しました: " + e.getMessage());
+            request.setAttribute("messageType", "danger");
         }
         
         doGet(request, response);
     }
     
-    private void handleUpdateInterviewExam(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        // TODO: 面接・試験記録更新の実装
-        // 現在は基本的なフォワードのみ
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp");
-        dispatcher.forward(request, response);
-    }
-    
-    private void handleDeleteInterviewExam(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        // TODO: 面接・試験記録削除の実装
-        // 現在は基本的なフォワードのみ
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp");
-        dispatcher.forward(request, response);
-    }
-    
-    /**
-     * 選考ステージ登録処理
-     */
-    private void handleSelectionStageRegistration(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        try {
-            // リクエストパラメータを取得
-            String companyId = request.getParameter("companyId");
-            String studentId = request.getParameter("studentId");
-            String companyName = request.getParameter("companyName");
-            String studentName = request.getParameter("studentName");
-            String jobTitle = request.getParameter("jobTitle");
-            String examType = request.getParameter("examType");
-            String examDate = request.getParameter("examDate");
-            String examVenue = request.getParameter("examVenue");
-            String examStartTime = request.getParameter("examStartTime");
-            String examEndTime = request.getParameter("examEndTime");
-            String interviewDate = request.getParameter("interviewDate");
-            String interviewVenue = request.getParameter("interviewVenue");
-            String interviewFormat = request.getParameter("interviewFormat");
-            String interviewerCount = request.getParameter("interviewerCount");
-            
-            // デバッグ用ログ
-            System.out.println("=== 選考ステージ登録開始 ===");
-            System.out.println("企業ID: " + companyId);
-            System.out.println("学生ID: " + studentId);
-            System.out.println("企業名: " + companyName);
-            System.out.println("学生名: " + studentName);
-            System.out.println("職種: " + jobTitle);
-            System.out.println("試験種別: " + examType);
-            System.out.println("試験日: " + examDate);
-            System.out.println("試験会場: " + examVenue);
-            System.out.println("試験開始時間: " + examStartTime);
-            System.out.println("試験終了時間: " + examEndTime);
-            System.out.println("面接日: " + interviewDate);
-            System.out.println("面接会場: " + interviewVenue);
-            System.out.println("面接形式: " + interviewFormat);
-            System.out.println("面接官人数: " + interviewerCount);
-            
-            // バリデーション
-            if (companyName == null || companyName.trim().isEmpty() ||
-                studentName == null || studentName.trim().isEmpty() ||
-                examType == null || examType.trim().isEmpty() ||
-                interviewFormat == null || interviewFormat.trim().isEmpty()) {
-                request.setAttribute("errorMessage", "必須項目が入力されていません。");
-                doGet(request, response);
-                return;
+    private int getNextContentNumber(int companyId, String contentType) throws SQLException {
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT MAX(content_number) FROM interview_exam_content " +
+                    "WHERE companys_id = ? AND content_type = ?";
+        
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setInt(1, companyId);
+        pstmt.setString(2, contentType);
+        
+        ResultSet rs = pstmt.executeQuery();
+        int nextNumber = 1;
+        
+        if (rs.next()) {
+            int maxNumber = rs.getInt(1);
+            if (maxNumber > 0) {
+                nextNumber = maxNumber + 1;
             }
-            
-            // TODO: データベースへの登録処理を実装
-            // 現在は成功メッセージを表示
-            request.setAttribute("successMessage", "選考ステージの登録が完了しました。");
-            
-            System.out.println("=== 選考ステージ登録完了 ===");
-            
-        } catch (Exception e) {
-            System.err.println("選考ステージ登録エラー: " + e.getMessage());
-            e.printStackTrace();
-            request.setAttribute("errorMessage", "システムエラーが発生しました: " + e.getMessage());
         }
         
-        // 選考ステージ登録ページにフォワード
-        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/InterviewExamInput.jsp");
-        dispatcher.forward(request, response);
+        rs.close();
+        pstmt.close();
+        conn.close();
+        
+        return nextNumber;
     }
-} 
+    
+    private List<CompanyBean> getAllCompanies() throws SQLException {
+        List<CompanyBean> companies = new ArrayList<>();
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT companys_id, company_name FROM companys_tbl ORDER BY company_name";
+        
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            CompanyBean company = new CompanyBean();
+            company.setCompanysId(rs.getInt("companys_id"));
+            company.setCompanyName(rs.getString("company_name"));
+            companies.add(company);
+        }
+        
+        rs.close();
+        pstmt.close();
+        conn.close();
+        
+        return companies;
+    }
+    
+    private List<CompanyBean> getCompaniesByStudent(String studentId) throws SQLException {
+        List<CompanyBean> companies = new ArrayList<>();
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT DISTINCT c.companys_id, c.company_name " +
+                    "FROM companys_tbl c " +
+                    "INNER JOIN job_activity_tbl ja ON c.companys_id = ja.companys_id " +
+                    "WHERE ja.student_id = ? " +
+                    "ORDER BY c.company_name";
+        
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        pstmt.setString(1, studentId);
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            CompanyBean company = new CompanyBean();
+            company.setCompanysId(rs.getInt("companys_id"));
+            company.setCompanyName(rs.getString("company_name"));
+            companies.add(company);
+        }
+        
+        rs.close();
+        pstmt.close();
+        conn.close();
+        
+        return companies;
+    }
+    
+    private List<ExamTypeBean> getExamTypes() throws SQLException {
+        List<ExamTypeBean> examTypes = new ArrayList<>();
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT id, exam_type_name FROM exam_types ORDER BY exam_type_name";
+        
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            ExamTypeBean examType = new ExamTypeBean();
+            examType.setId(rs.getInt("id"));
+            examType.setExamTypeName(rs.getString("exam_type_name"));
+            examTypes.add(examType);
+        }
+        
+        rs.close();
+        pstmt.close();
+        conn.close();
+        
+        return examTypes;
+    }
+    
+    private List<InterviewTypeBean> getInterviewTypes() throws SQLException {
+        List<InterviewTypeBean> interviewTypes = new ArrayList<>();
+        Connection conn = DBConnection.getConnection();
+        String sql = "SELECT id, interview_type_name FROM interview_types ORDER BY interview_type_name";
+        
+        PreparedStatement pstmt = conn.prepareStatement(sql);
+        ResultSet rs = pstmt.executeQuery();
+        
+        while (rs.next()) {
+            InterviewTypeBean interviewType = new InterviewTypeBean();
+            interviewType.setId(rs.getInt("id"));
+            interviewType.setInterviewTypeName(rs.getString("interview_type_name"));
+            interviewTypes.add(interviewType);
+        }
+        
+        rs.close();
+        pstmt.close();
+        conn.close();
+        
+        return interviewTypes;
+    }
+}

@@ -98,3 +98,186 @@ INSERT IGNORE INTO students (student_id, name, name_kana, graduation_year) VALUE
 ('2023003', '田中次郎', 'タナカジロウ', 2024),
 ('2023004', '鈴木美咲', 'スズキミサキ', 2026),
 ('2023005', '高橋健一', 'タカハシケンイチ', 2025); 
+
+mysql> show tables;
++-------------------------+
+| Tables_in_jms_essential |
++-------------------------+
+| company_occupation_tbl  |
+| company_work_place_tbl  |
+| companys_tbl            |
+| exam_types              |
+| interview_exam_content  |
+| interview_types         |
+| job_activity_detail_tbl |
+| job_activity_tbl        |
+| occupations_tbl         |
+| selection_tbl           |
+| students_tbl            |
+| students_work_place_tbl |
+| teacher_tbl             |
+| users                   |
+| work_place_tbl          |
++-------------------------+
+
+mysql> SHOW FIELDS FROM company_occupation_tbl;
++---------------+------+------+-----+---------+-------+
+| Field         | Type | Null | Key | Default | Extra |
++---------------+------+------+-----+---------+-------+
+| companys_id   | int  | NO   | PRI | NULL    |       |
+| occupation_id | int  | NO   | PRI | NULL    |       |
++---------------+------+------+-----+---------+-------+
+
+mysql> SHOW FIELDS FROM company_work_place_tbl;
++---------------+------+------+-----+---------+-------+
+| Field         | Type | Null | Key | Default | Extra |
++---------------+------+------+-----+---------+-------+
+| companys_id   | int  | NO   | PRI | NULL    |       |
+| work_place_id | int  | NO   | PRI | NULL    |       |
++---------------+------+------+-----+---------+-------+
+
+mysql> show fields from companys_tbl;
++---------------------+--------------+------+-----+---------+----------------+
+| Field               | Type         | Null | Key | Default | Extra          |
++---------------------+--------------+------+-----+---------+----------------+
+| companys_id         | int          | NO   | PRI | NULL    | auto_increment |
+| company_name        | varchar(50)  | YES  |     | NULL    |                |
+| post_code           | varchar(10)  | YES  |     |         |                |
+| address             | varchar(100) | YES  |     |         |                |
+| tel                 | varchar(15)  | YES  |     |         |                |
+| mail_address        | varchar(30)  | YES  |     |         |                |
+| manager_name        | varchar(20)  | YES  |     |         |                |
+| recruitment_results | tinyint(1)   | YES  |     | NULL    |                |
++---------------------+--------------+------+-----+---------+----------------+
+
+mysql> SHOW FIELDS FROM job_activity_detail_tbl;
++--------------+--------------+------+-----+---------+-------+
+| Field        | Type         | Null | Key | Default | Extra |
++--------------+--------------+------+-----+---------+-------+
+| student_id   | varchar(8)   | NO   | PRI | NULL    |       |
+| companys_id  | int          | NO   | PRI | NULL    |       |
+| selection_id | int          | NO   | PRI | NULL    |       |
+| date         | date         | YES  |     | NULL    |       |
+| time         | time         | YES  |     | NULL    |       |
+| venue        | varchar(30)  | YES  |     | NULL    |       |
+| remarks      | varchar(200) | YES  |     | NULL    |       |
++--------------+--------------+------+-----+---------+-------+
+
+mysql> SHOW FIELDS FROM job_activity_tbl;
++-----------------+---------------------------------------------------------------------------------------------+------+-----+---------+-------+
+| Field           | Type                                                                                        | Null | Key | Default | Extra |
++-----------------+---------------------------------------------------------------------------------------------+------+-----+---------+-------+
+| student_id      | varchar(8)                                                                                  | NO   | PRI | NULL    |       |
+| companys_id     | int                                                                                         | NO   | PRI | NULL    |       |
+| activity_status | enum('検討中','エントリー中','選考中','内定承諾','内定保留','内定辞退','不採用','選考中止') | YES  |     | NULL    |       |
+| reporte_date    | date                                                                                        | YES  |     | NULL    |       |
++-----------------+---------------------------------------------------------------------------------------------+------+-----+---------+-------+
+
+mysql> SHOW FIELDS FROM occupations_tbl;
++---------------+-------------+------+-----+---------+----------------+
+| Field         | Type        | Null | Key | Default | Extra          |
++---------------+-------------+------+-----+---------+----------------+
+| occupation_id | int         | NO   | PRI | NULL    | auto_increment |
+| occupation    | varchar(25) | YES  |     | NULL    |                |
++---------------+-------------+------+-----+---------+----------------+
+
+mysql> SHOW FIELDS FROM selection_tbl;
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| selection_id   | int         | NO   | PRI | NULL    | auto_increment |
+| selection_name | varchar(20) | YES  |     | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+
+mysql> SHOW FIELDS FROM students_tbl;
++-------------------------+-------------------------------------------------------------------+------+-----+---------+-------+
+| Field                   | Type                                                              | Null | Key | Default | Extra |
++-------------------------+-------------------------------------------------------------------+------+-----+---------+-------+
+| student_id              | varchar(8)                                                        | NO   | PRI | NULL    |       |
+| department              | varchar(3)                                                        | YES  |     | NULL    |       |
+| class                   | varchar(3)                                                        | YES  |     | NULL    |       |
+| number                  | varchar(3)                                                        | YES  |     | NULL    |       |
+| name                    | varchar(20)                                                       | YES  |     | NULL    |       |
+| name_reading            | varchar(40)                                                       | YES  |     | NULL    |       |
+| gender                  | enum('男','女')                                                   | YES  |     | NULL    |       |
+| email                   | varchar(50)                                                       | YES  |     |         |       |
+| tel                     | varchar(50)                                                       | YES  |     |         |       |
+| enrollment_status       | enum('在籍','退学','休学','卒業')                                 | YES  |     | NULL    |       |
+| mediation_status        | enum('受理','辞退')                                               | YES  |     | NULL    |       |
+| job_hunting_status      | enum('未開始','準備中','活動中','内定済み','就職決定','就職辞退') | YES  |     | NULL    |       |
+| desired_job_type_1st_id | int                                                               | YES  | MUL | NULL    |       |
+| desired_job_type_2nd_id | int                                                               | YES  | MUL | NULL    |       |
+| desired_job_type_3rd_id | int                                                               | YES  | MUL | NULL    |       |
+| graduation_year         | int                                                               | YES  |     | NULL    |       |
+| remarks                 | varchar(500)                                                      | YES  |     |         |       |
++-------------------------+-------------------------------------------------------------------+------+-----+---------+-------+
+
+mysql> SHOW FIELDS FROM students_work_place_tbl;
++---------------+---------+------+-----+---------+-------+
+| Field         | Type    | Null | Key | Default | Extra |
++---------------+---------+------+-----+---------+-------+
+| student_id    | char(8) | NO   | PRI | NULL    |       |
+| work_place_id | int     | NO   | PRI | NULL    |       |
++---------------+---------+------+-----+---------+-------+
+
+mysql> SHOW FIELDS FROM teacher_tbl;
++------------+-------------+------+-----+---------+-------+
+| Field      | Type        | Null | Key | Default | Extra |
++------------+-------------+------+-----+---------+-------+
+| teacher_id | char(8)     | NO   | PRI | NULL    |       |
+| name       | varchar(20) | YES  |     | NULL    |       |
++------------+-------------+------+-----+---------+-------+
+
+mysql> SHOW FIELDS FROM users;
++----------+------------------------------------------------------+------+-----+---------+-------+
+| Field    | Type                                                 | Null | Key | Default | Extra |
++----------+------------------------------------------------------+------+-----+---------+-------+
+| id       | varchar(8)                                           | NO   | PRI | NULL    |       |
+| password | varchar(255)                                         | YES  |     | NULL    |       |
+| role     | enum('student','teacher','headmaster','egd','admin') | YES  |     | NULL    |       |
+| salt     | varchar(255)                                         | YES  |     | NULL    |       |
++----------+------------------------------------------------------+------+-----+---------+-------+
+
+mysql> SHOW FIELDS FROM work_place_tbl;
++------------+-------------+------+-----+---------+----------------+
+| Field      | Type        | Null | Key | Default | Extra          |
++------------+-------------+------+-----+---------+----------------+
+| id         | int         | NO   | PRI | NULL    | auto_increment |
+| work_place | varchar(15) | YES  |     | NULL    |                |
++------------+-------------+------+-----+---------+----------------+
+
+mysql> show fields from exam_types;
++----------------+-------------+------+-----+---------+----------------+
+| Field          | Type        | Null | Key | Default | Extra          |
++----------------+-------------+------+-----+---------+----------------+
+| id             | int         | NO   | PRI | NULL    | auto_increment |
+| exam_type_name | varchar(50) | NO   | UNI | NULL    |                |
++----------------+-------------+------+-----+---------+----------------+
+
+mysql> show fields from interview_types;
++---------------------+-------------+------+-----+---------+----------------+
+| Field               | Type        | Null | Key | Default | Extra          |
++---------------------+-------------+------+-----+---------+----------------+
+| id                  | int         | NO   | PRI | NULL    | auto_increment |
+| interview_type_name | varchar(50) | NO   | UNI | NULL    |                |
++---------------------+-------------+------+-----+---------+----------------+
+
+mysql> show fields from interview_exam_content;
++---------------------+---------------------+------+-----+-------------------+-----------------------------------------------+
+| Field               | Type                | Null | Key | Default           | Extra                                         |
++---------------------+---------------------+------+-----+-------------------+-----------------------------------------------+
+| id                  | int                 | NO   | PRI | NULL              | auto_increment                                |
+| companys_id         | int                 | NO   | MUL | NULL              |                                               |
+| content_type        | enum('試験','面接') | NO   |     | NULL              |                                               |
+| content_number      | int                 | NO   |     | NULL              |                                               |
+| exam_type_id        | int                 | YES  | MUL | NULL              |                                               |
+| exam_subject        | varchar(100)        | YES  |     | NULL              |                                               |
+| exam_content        | varchar(1000)       | YES  |     | NULL              |                                               |
+| interview_type_id   | int                 | YES  | MUL | NULL              |                                               |
+| interview_questions | varchar(1000)       | YES  |     | NULL              |                                               |
+| interview_notes     | varchar(1000)       | YES  |     | NULL              |                                               |
+| created_at          | timestamp           | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED                             |
+| updated_at          | timestamp           | YES  |     | CURRENT_TIMESTAMP | DEFAULT_GENERATED on update CURRENT_TIMESTAMP |
++---------------------+---------------------+------+-----+-------------------+-----------------------------------------------+
+
+
