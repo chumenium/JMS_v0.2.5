@@ -21,7 +21,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
-<%
+<% 
   String username = (String) session.getAttribute("username"); 
   String role     = (String) session.getAttribute("role"); 
   
@@ -104,7 +104,7 @@
                 <div class="message error-message">
                     ❌ <%= errorMessage %>
                 </div>
-            <% } %>
+<% } %>
 
             <!-- 登録フォーム -->
             <section class="registration-form" role="region" aria-label="選考ステージ登録フォーム">
@@ -120,16 +120,28 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="companyName">企業名 <span class="required">*</span></label>
-                            <input type="text" id="companyName" name="companyName" value="<%= companyName != null ? companyName : "" %>" required>
+                            <div class="search-input-container">
+                                <input type="text" id="companyName" name="companyName" value="<%= companyName != null ? companyName : "" %>" required placeholder="企業名を入力" autocomplete="off">
+                                <button type="button" class="search-btn" onclick="openCompanySearch()" title="企業を検索">
+                                    🔍
+                                </button>
+                            </div>
+                            <input type="hidden" id="companyId" name="companyId" value="<%= companyId != null ? companyId : "" %>">
                         </div>
                         <div class="form-group">
                             <label for="studentName">学生名 <span class="required">*</span></label>
-                            <input type="text" id="studentName" name="studentName" value="<%= studentName != null ? studentName : "" %>" required>
+                            <div class="search-input-container">
+                                <input type="text" id="studentName" name="studentName" value="<%= studentName != null ? studentName : "" %>" required placeholder="学生名を入力" autocomplete="off">
+                                <button type="button" class="search-btn" onclick="openStudentSearch()" title="学生を検索">
+                                    🔍
+                                </button>
+                            </div>
+                            <input type="hidden" id="studentId" name="studentId" value="<%= studentId != null ? studentId : "" %>">
                         </div>
                         <div class="form-group">
                             <label for="jobTitle">職種</label>
                             <select id="jobTitle" name="jobTitle">
-                                <option value="">選択してください</option>
+            <option value="">選択してください</option>
                                 <option value="インフラエンジニア">インフラエンジニア</option>
                                 <option value="アプリ開発エンジニア">アプリ開発エンジニア</option>
                                 <option value="セキュリティエンジニア">セキュリティエンジニア</option>
@@ -140,10 +152,10 @@
                                 <option value="ITサポート">ITサポート</option>
                                 <option value="ヘルプデスク">ヘルプデスク</option>
                                 <option value="品質管理／テスト">品質管理／テスト</option>
-                            </select>
+        </select>
                         </div>
                     </div>
-                </div>
+    </div>
 
                 <!-- 選考ステージ管理セクション -->
                 <div class="form-section">
@@ -152,12 +164,12 @@
                         <button type="button" class="btn btn-primary btn-sm" onclick="addSelectionStage()">
                             ➕ ステージを追加
                         </button>
-                    </div>
+        </div>
                     
                     <div id="selectionStagesContainer">
                         <!-- 選考ステージが動的に追加される場所 -->
-                    </div>
-                    
+    </div>
+
                     <div class="stage-template" id="stageTemplate" style="display: none;">
                         <div class="stage-item" data-stage-index="">
                             <div class="stage-header">
@@ -165,14 +177,14 @@
                                 <button type="button" class="remove-stage-btn" onclick="removeStage(this)" title="このステージを削除">
                                     🗑️
                                 </button>
-                            </div>
-                            
+    </div>
+
                             <div class="stage-content">
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>ステージ種別 <span class="required">*</span></label>
                                         <select class="stage-type" name="stages[].type" required>
-                                            <option value="">選択してください</option>
+            <option value="">選択してください</option>
                                             <option value="説明会">説明会</option>
                                             <option value="書類選考">書類選考</option>
                                             <option value="筆記試験">筆記試験</option>
@@ -185,14 +197,14 @@
                                             <option value="プレゼンテーション">プレゼンテーション</option>
                                             <option value="実技試験">実技試験</option>
                                             <option value="その他">その他</option>
-                                        </select>
-                                    </div>
-                                    
+        </select>
+    </div>
+
                                     <div class="form-group">
                                         <label>実施日</label>
                                         <input type="date" class="stage-date" name="stages[].date">
-                                    </div>
-                                    
+    </div>
+
                                     <div class="form-group">
                                         <label>実施時間</label>
                                         <div class="time-range">
@@ -200,19 +212,19 @@
                                             <span class="time-separator">～</span>
                                             <input type="time" class="stage-end-time" name="stages[].endTime">
                                         </div>
-                                    </div>
-                                    
+    </div>
+
                                     <div class="form-group">
                                         <label>実施場所</label>
                                         <select class="stage-venue" name="stages[].venue">
-                                            <option value="">選択してください</option>
+            <option value="">選択してください</option>
                                             <option value="校内">校内</option>
                                             <option value="企業本社">企業本社</option>
                                             <option value="オンライン">オンライン</option>
                                             <option value="その他">その他</option>
-                                        </select>
-                                    </div>
-                                    
+        </select>
+    </div>
+
                                     <div class="form-group">
                                         <label>実施形式</label>
                                         <select class="stage-format" name="stages[].format">
@@ -223,20 +235,20 @@
                                             <option value="対面">対面</option>
                                             <option value="ハイブリッド">ハイブリッド</option>
                                         </select>
-                                    </div>
-                                    
+    </div>
+
                                     <div class="form-group">
                                         <label>担当者数</label>
                                         <select class="stage-interviewer-count" name="stages[].interviewerCount">
-                                            <option value="">選択してください</option>
+            <option value="">選択してください</option>
                                             <option value="1">1名</option>
                                             <option value="2">2名</option>
                                             <option value="3">3名</option>
                                             <option value="4">4名</option>
                                             <option value="5名以上">5名以上</option>
-                                        </select>
-                                    </div>
-                                    
+        </select>
+    </div>
+
                                     <div class="form-group full-width">
                                         <label>備考・特記事項</label>
                                         <textarea class="stage-notes" name="stages[].notes" rows="3" 
@@ -267,25 +279,25 @@
                     <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting" class="btn btn-secondary">
                         🔙 戻る
                     </a>
-                </div>
-            </form>
+    </div>
+</form>
         </section>
         </div>
     </main>
 
-    <!--▼▼▼▼▼ここから「フッター」-->
-    <footer>
-        <div>
-            <p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
-            <ul class="icons">
-                <li><a href="#"><i class="fa-brands fa-x-twitter"></i></a></li>
-                <li><a href="#"><i class="fab fa-line"></i></a></li>
-                <li><a href="#"><i class="fab fa-youtube"></i></a></li>
-                <li><a href="#"><i class="fab fa-instagram"></i></a></li>
-            </ul>
-            <small>Copyright&copy; @ 2025 Job Management System All Rights Reserved.</small>
-        </div>
-        <div>
+<!--▼▼▼▼▼ここから「フッター」-->
+<footer>
+<div>
+<p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
+<ul class="icons">
+<li><a href="#"><i class="fa-brands fa-x-twitter"></i></a></li>
+<li><a href="#"><i class="fab fa-line"></i></a></li>
+<li><a href="#"><i class="fab fa-youtube"></i></a></li>
+<li><a href="#"><i class="fab fa-instagram"></i></a></li>
+</ul>
+<small>Copyright&copy; @ 2025 Job Management System All Rights Reserved.</small>
+</div>
+<div>
             <ul>
                 <li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
                 <!-- 権限に応じた機能リンク -->
@@ -305,35 +317,35 @@
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
                 <% } %>
                 <li><a href="extension.html">お問い合わせ</a></li>
-            </ul>
-        </div>
-    </footer>
-    <!--▲▲▲▲▲ここまで「フッター」-->
+</ul>
+</div>
+</footer>
+<!--▲▲▲▲▲ここまで「フッター」-->
 
-    <!--▼▼最下部-->
-    <span class="pr"><a href="" target="_blank">@ 2025 Job Management System</a></span>
-    <!--▲▲ここまで最下部-->
+<!--▼▼最下部-->
+<span class="pr"><a href="" target="_blank">@ 2025 Job Management System</a></span>
+<!--▲▲ここまで最下部-->
 </div>
 <!--/#container-->
 
 <!--ローディング-->
 <div id="loading">
-    <img src="images/logo.png" alt="Loading">
-    <div class="progress-container">
-        <div class="progress-bar"></div>
-    </div>
+<img src="images/logo.png" alt="Loading">
+<div class="progress-container">
+<div class="progress-bar"></div>
+</div>
 </div>
 
 <!--開閉ボタン（ハンバーガーアイコン）-->
 <div id="menubar_hdr">
-    <span></span><span></span><span></span>
+<span></span><span></span><span></span>
 </div>
 
 <!--開閉ブロック-->
 <div id="menubar">
-    <p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
-    <nav>
-        <ul>
+<p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
+<nav>
+<ul>
             <li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
             <!-- 権限に応じた機能リンク -->
             <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
@@ -355,8 +367,8 @@
             <% if (username != null) { %>
                 <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
             <% } %>
-        </ul>
-    </nav>
+</ul>
+</nav>
 </div>
 <!--/#menubar-->
 
@@ -700,6 +712,7 @@ function enableDragAndDrop() {
 
     .form-group {
         margin-bottom: 20px;
+        position: relative;
     }
 
     .form-group label {
@@ -1125,6 +1138,33 @@ function enableDragAndDrop() {
         }
     }
 
+    /* 検索機能のスタイル */
+    .search-input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .search-input-container input {
+        flex: 1;
+    }
+
+    .search-btn {
+        background: #2C7744;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: background-color 0.3s ease;
+    }
+
+    .search-btn:hover {
+        background: #1e5a2e;
+    }
+
 
 
     /* アニメーションの最適化 */
@@ -1145,6 +1185,96 @@ function enableDragAndDrop() {
     }
 </style>
 
+<script>
+// 検索機能の実装
+
+
+
+function openCompanySearch() {
+    const searchTerm = document.getElementById('companyName').value.trim();
+    const url = '${pageContext.request.contextPath}/SearchServlet?type=company&term=' + encodeURIComponent(searchTerm) + '&view=popup';
+    
+    console.log('企業検索URL:', url);
+    
+    const popup = window.open(url, 'companySearch', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    
+    // ポップアップがブロックされた場合の処理
+    if (!popup || popup.closed || typeof popup.closed == 'undefined') {
+        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    } else {
+        console.log('企業検索ポップアップを開きました');
+    }
+}
+
+function openStudentSearch() {
+    const searchTerm = document.getElementById('studentName').value.trim();
+    const url = '${pageContext.request.contextPath}/SearchServlet?type=student&term=' + encodeURIComponent(searchTerm) + '&view=popup';
+    
+    console.log('学生検索URL:', url);
+    
+    const popup = window.open(url, 'studentSearch', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    
+    // ポップアップがブロックされた場合の処理
+    if (!popup || popup.closed || typeof popup.closed == 'undefined') {
+        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    } else {
+        console.log('学生検索ポップアップを開きました');
+    }
+}
+
+
+
+// 検索結果を受け取る関数
+function setSearchResult(id, name, type) {
+    if (type === 'company') {
+        document.getElementById('companyName').value = name;
+        document.getElementById('companyId').value = id;
+        
+        // 選択されたことを視覚的に示す
+        const companyInput = document.getElementById('companyName');
+        companyInput.style.backgroundColor = '#e8f5e8';
+        setTimeout(() => {
+            companyInput.style.backgroundColor = '';
+        }, 1000);
+        
+    } else if (type === 'student') {
+        document.getElementById('studentName').value = name;
+        document.getElementById('studentId').value = id;
+        
+        // 選択されたことを視覚的に示す
+        const studentInput = document.getElementById('studentName');
+        studentInput.style.backgroundColor = '#e8f5e8';
+        setTimeout(() => {
+            studentInput.style.backgroundColor = '';
+        }, 1000);
+    }
+}
+
+// ローカルストレージから検索結果を取得（フォールバック）
+function checkLocalStorageResult() {
+    const stored = localStorage.getItem('selectedResult');
+    if (stored) {
+        try {
+            const result = JSON.parse(stored);
+            const now = new Date().getTime();
+            
+            // 5分以内の結果のみ有効
+            if (now - result.timestamp < 300000) {
+                setSearchResult(result.id, result.name, result.type);
+                localStorage.removeItem('selectedResult');
+            }
+        } catch (e) {
+            console.error('ローカルストレージの結果を解析できませんでした:', e);
+        }
+    }
+}
+
+// ページ読み込み時の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('ページ読み込み完了');
+    checkLocalStorageResult();
+});
+</script>
 
 </body>
 </html>

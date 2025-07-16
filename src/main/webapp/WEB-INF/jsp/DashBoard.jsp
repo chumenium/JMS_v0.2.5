@@ -571,6 +571,18 @@
                     <% if ("student".equals(role)) { %>
                         <!-- 就職管理 - 選考ステージ登録 -->
                         <div class="feature-card">
+                            <span class="feature-icon">🗾</span>
+                            <h3 class="feature-title">希望勤務地・職種編集</h3>
+                            <p class="feature-description">
+                                希望勤務地及び、希望職種を編集できます。
+                            </p>
+                            <a href="${pageContext.request.contextPath}/StudentDetailServlet" class="feature-link">
+                                希望勤務地・職種編集を開く
+                            </a>
+                        </div>
+
+                        <!-- 就職管理 - 選考ステージ登録 -->
+                        <div class="feature-card">
                             <span class="feature-icon">📊</span>
                             <h3 class="feature-title">選考ステージ登録</h3>
                             <p class="feature-description">

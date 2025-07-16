@@ -374,6 +374,30 @@
                 </div>
             </div>
 
+            <!-- 希望職種・勤務地 -->
+            <div class="info-section">
+                <h3>希望職種・勤務地</h3>
+                <div class="info-item">
+                    <span class="info-label">希望職種1</span>
+                    <div class="info-value"><%= student != null ? student.getDesiredJobType1() : "" %></div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">希望職種2</span>
+                    <div class="info-value"><%= student != null ? student.getDesiredJobType2() : "" %></div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">希望職種3</span>
+                    <div class="info-value"><%= student != null ? student.getDesiredJobType3() : "" %></div>
+                </div>
+                <div class="info-item">
+                    <% if(student != null && student.getDesiredWorkPlace() != null) { %>
+                    <span class="info-label">希望勤務地</span>
+                    <% for(String wp : student.getDesiredWorkPlace()) { %>
+                        <div class="info-value"><%= wp %></div>
+                    <% }} %>
+                </div>
+            </div>
+            
             <!-- 連絡先情報 -->
             <div class="info-section">
                 <h3>連絡先情報</h3>
@@ -422,29 +446,6 @@
                 </div>
             </div>
 
-            <!-- 希望職種・勤務地 -->
-            <div class="info-section">
-                <h3>希望職種・勤務地</h3>
-                <div class="info-item">
-                    <span class="info-label">希望職種1</span>
-                    <div class="info-value"><%= student != null ? student.getDesiredJobType1() : "" %></div>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">希望職種2</span>
-                    <div class="info-value"><%= student != null ? student.getDesiredJobType2() : "" %></div>
-                </div>
-                <div class="info-item">
-                    <span class="info-label">希望職種3</span>
-                    <div class="info-value"><%= student != null ? student.getDesiredJobType3() : "" %></div>
-                </div>
-                <div class="info-item">
-                    <% if(student != null && student.getDesiredWorkPlace() != null) { %>
-                    <span class="info-label">希望勤務地</span>
-                    <% for(String wp : student.getDesiredWorkPlace()) { %>
-                        <div class="info-value"><%= wp %></div>
-                    <% }} %>
-                </div>
-            </div>
         </div>
 
         <!-- 備考 -->

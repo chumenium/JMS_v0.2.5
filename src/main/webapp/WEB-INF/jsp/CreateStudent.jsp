@@ -539,6 +539,9 @@
 
                 <!-- ボタン -->
                 <div class="btn-group">
+                    <div id="updating-indicator" style="display:none; margin-top:10px; color:#007bff; font-weight:bold;">
+                        <span class="spinner"></span> 登録中...
+                    </div>
                     <button type="submit" class="btn btn-primary">登録する</button>
                     <a href="StatusServlet?status=studentManagement" class="btn btn-secondary">キャンセル</a>
                 </div>
@@ -687,6 +690,11 @@
             document.getElementById('classType').addEventListener('change', updateClassNameRxAx);
             document.getElementById('classGrade').addEventListener('change', updateClassNameRxAx);
             document.getElementById('classGroup').addEventListener('change', updateClassNameRxAx);
+        });
+
+        // 更新ボタン押下時にアニメーション表示
+            document.getElementById('updateBtn').addEventListener('click', function() {
+            document.getElementById('updating-indicator').style.display = 'block';
         });
     </script>
 </body>
