@@ -22,9 +22,8 @@ public class SelectionStageDAO {
      * 選考ステージ情報を登録
      */
     public boolean addSelectionStages(String companyId, String studentId, String companyName, 
-                                    String studentName, String jobTitle, String[] stageTypes,
-                                    String[] stageDates, String[] stageStartTimes, String[] stageEndTimes,
-                                    String[] stageVenues, String[] stageFormats, String[] stageInterviewerCounts) {
+                                    String studentName, String selectionStatus, String[] stageTypes,
+                                    String[] stageDates, String[] stageTimes, String[] stageFormats) {
         
         String sql = "INSERT INTO job_activity_detail_tbl (student_id, companys_id, selection_id, date, time, venue, remarks) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -53,37 +52,31 @@ public class SelectionStageDAO {
                             stmt.setNull(4, java.sql.Types.DATE);
                         }
                         
-                        // 時間の処理（開始時間のみ使用）
-                        if (stageStartTimes != null && i < stageStartTimes.length && 
-                            stageStartTimes[i] != null && !stageStartTimes[i].trim().isEmpty()) {
-                            stmt.setTime(5, Time.valueOf(stageStartTimes[i] + ":00"));
+                        // 時間の処理
+                        if (stageTimes != null && i < stageTimes.length && 
+                            stageTimes[i] != null && !stageTimes[i].trim().isEmpty()) {
+                            stmt.setTime(5, Time.valueOf(stageTimes[i] + ":00"));
                         } else {
                             stmt.setNull(5, java.sql.Types.TIME);
                         }
                         
-                        // 会場の処理
+                        // 実施形式をvenueフィールドに格納
                         String venue = "";
-                        if (stageVenues != null && i < stageVenues.length && stageVenues[i] != null) {
-                            venue = stageVenues[i];
-                        }
                         if (stageFormats != null && i < stageFormats.length && stageFormats[i] != null) {
-                            venue += (venue.isEmpty() ? "" : " ") + stageFormats[i];
-                        }
-                        if (stageInterviewerCounts != null && i < stageInterviewerCounts.length && stageInterviewerCounts[i] != null) {
-                            venue += (venue.isEmpty() ? "" : " ") + stageInterviewerCounts[i];
+                            venue = stageFormats[i];
                         }
                         stmt.setString(6, venue);
                         
                         // 備考の処理
-                        String remarks = "職種: " + jobTitle;
-                        if (stageEndTimes != null && i < stageEndTimes.length && stageEndTimes[i] != null) {
-                            remarks += ", 終了時間: " + stageEndTimes[i];
-                        }
+                        String remarks = "選考ステータス: " + selectionStatus;
                         stmt.setString(7, remarks);
                         
                         stmt.executeUpdate();
                     }
                 }
+                
+                // job_activity_tblに選考ステータスを登録・更新
+                updateJobActivityStatus(studentId, Integer.parseInt(companyId), selectionStatus);
                 
                 // トランザクションコミット
                 conn.commit();
@@ -147,6 +140,29 @@ public class SelectionStageDAO {
             e.printStackTrace();
         }
         return 1; // デフォルト値
+    }
+    
+    /**
+     * job_activity_tblの選考ステータスを更新
+     */
+    private void updateJobActivityStatus(String studentId, int companyId, String selectionStatus) {
+        String sql = "INSERT INTO job_activity_tbl (student_id, companys_id, activity_status, reporte_date) " +
+                    "VALUES (?, ?, ?, CURDATE()) " +
+                    "ON DUPLICATE KEY UPDATE activity_status = ?, reporte_date = CURDATE()";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, studentId);
+            stmt.setInt(2, companyId);
+            stmt.setString(3, selectionStatus);
+            stmt.setString(4, selectionStatus);
+            
+            stmt.executeUpdate();
+            
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
     
     /**

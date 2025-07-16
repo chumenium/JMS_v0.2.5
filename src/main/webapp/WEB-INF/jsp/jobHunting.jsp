@@ -627,7 +627,7 @@
                     <a href="JobHuntingSearchServlet" class="action-btn" aria-label="就活情報検索画面へ">
                         <i class="fas fa-search" aria-hidden="true"></i>就活情報検索
                     </a>
-                    <a href="StatusServlet?view=InterviewExamInput.jsp" class="action-btn secondary" aria-label="選考ステージ登録画面へ">
+                    <a href="StatusServlet?view=SelectionStage" class="action-btn secondary" aria-label="選考ステージ登録画面へ">
                         <i class="fas fa-edit" aria-hidden="true"></i>選考ステージ登録
                     </a>
                     <a href="StatusServlet?view=         " class="action-btn secondary" aria-label="試験面接情報入力画面へ">
@@ -687,7 +687,7 @@
                             <span class="stat-label">未完了</span>
                         </div>
                     </div>
-                    <a href="StatusServlet?view=InterviewExamInput.jsp" class="card-link" aria-label="選考ステージを登録">
+                    <a href="StatusServlet?view=SelectionStage" class="card-link" aria-label="選考ステージを登録">
                         選考ステージを登録
                     </a>
                 </article>
