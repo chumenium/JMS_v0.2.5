@@ -61,13 +61,16 @@ public class DatabaseManagementServlet extends HttpServlet {
             } else if ("optimize".equals(action)) {
                 // データベース最適化
                 optimizeDatabase(request, response);
-            } else if ("check".equals(action)) {
-                // データ整合性チェック
-                checkDataIntegrity(request, response);
-            } else {
-                // デフォルト：統計情報表示
-                getDatabaseStatistics(request, response);
-            }
+                    } else if ("check".equals(action)) {
+            // データ整合性チェック
+            checkDataIntegrity(request, response);
+        } else if ("download".equals(action)) {
+            // バックアップファイルダウンロード
+            downloadBackupFile(request, response);
+        } else {
+            // デフォルト：統計情報表示
+            getDatabaseStatistics(request, response);
+        }
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "データベース操作中にエラーが発生しました: " + e.getMessage());
@@ -169,79 +172,132 @@ public class DatabaseManagementServlet extends HttpServlet {
      * バックアップ実行
      */
     private void performBackup(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        List<String> backupResults = new ArrayList<>();
-        String backupFileName = "jms_backup_" + 
-            new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".sql";
-        
-        try (Connection conn = DBConnection.getConnection()) {
-            // テーブル一覧を取得
-            String tableQuery = "SHOW TABLES";
-            List<String> tableNames = new ArrayList<>();
-            
-            try (PreparedStatement stmt = conn.prepareStatement(tableQuery);
-                 ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    tableNames.add(rs.getString(1));
-                }
+        throws ServletException, IOException {
+
+    List<String> backupResults = new ArrayList<>();
+    String backupFileName = "jms_backup_" + 
+        new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()) + ".sql";
+
+    try (Connection conn = DBConnection.getConnection()) {
+        // テーブル一覧を取得
+        String tableQuery = "SHOW TABLES";
+        List<String> tableNames = new ArrayList<>();
+
+        try (PreparedStatement stmt = conn.prepareStatement(tableQuery);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                tableNames.add(rs.getString(1));
             }
-            
-            backupResults.add("=== JMSデータベースバックアップ ===");
-            backupResults.add("バックアップ日時: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
-            backupResults.add("対象テーブル数: " + tableNames.size());
-            backupResults.add("");
-            
-            // 各テーブルの構造とデータをバックアップ
-            for (String tableName : tableNames) {
-                try {
-                    // テーブル構造を取得
-                    String createTableQuery = "SHOW CREATE TABLE " + tableName;
-                    try (PreparedStatement stmt = conn.prepareStatement(createTableQuery);
-                         ResultSet rs = stmt.executeQuery()) {
-                        if (rs.next()) {
-                            backupResults.add("-- テーブル構造: " + tableName);
-                            backupResults.add("DROP TABLE IF EXISTS `" + tableName + "`;");
-                            backupResults.add(rs.getString(2) + ";");
-                            backupResults.add("");
-                        }
-                    }
-                    
-                    // データ件数を取得
-                    String countQuery = "SELECT COUNT(*) FROM " + tableName;
-                    int recordCount = 0;
-                    try (PreparedStatement stmt = conn.prepareStatement(countQuery);
-                         ResultSet rs = stmt.executeQuery()) {
-                        if (rs.next()) {
-                            recordCount = rs.getInt(1);
-                        }
-                    }
-                    
-                    if (recordCount > 0) {
-                        backupResults.add("-- データ: " + tableName + " (" + recordCount + " 件)");
-                        // 実際の本格的なバックアップでは、ここでINSERT文を生成
-                        backupResults.add("-- INSERT文は実装中...");
+        }
+
+        backupResults.add("=== JMSデータベースバックアップ ===");
+        backupResults.add("バックアップ日時: " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+        backupResults.add("対象テーブル数: " + tableNames.size());
+        backupResults.add("");
+
+        // 各テーブルの構造とデータをバックアップ
+        for (String tableName : tableNames) {
+            try {
+                // テーブル構造を取得
+                String createTableQuery = "SHOW CREATE TABLE " + tableName;
+                try (PreparedStatement stmt = conn.prepareStatement(createTableQuery);
+                     ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        backupResults.add("-- テーブル構造: " + tableName);
+                        backupResults.add("DROP TABLE IF EXISTS `" + tableName + "`;");
+                        backupResults.add(rs.getString(2) + ";");
                         backupResults.add("");
                     }
-                    
-                } catch (SQLException e) {
-                    backupResults.add("-- エラー: " + tableName + " - " + e.getMessage());
                 }
+
+                // データをエクスポート
+                String dataQuery = "SELECT * FROM " + tableName;
+                try (PreparedStatement stmt = conn.prepareStatement(dataQuery);
+                     ResultSet rs = stmt.executeQuery()) {
+
+                    java.sql.ResultSetMetaData metaData = rs.getMetaData();
+                    int columnCount = metaData.getColumnCount();
+
+                    // カラム名を取得
+                    StringBuilder columnNames = new StringBuilder();
+                    for (int i = 1; i <= columnCount; i++) {
+                        if (i > 1) columnNames.append(", ");
+                        columnNames.append("`").append(metaData.getColumnName(i)).append("`");
+                    }
+
+                    backupResults.add("-- データ: " + tableName);
+                    backupResults.add("INSERT INTO `" + tableName + "` (" + columnNames.toString() + ") VALUES");
+
+                    boolean firstRow = true;
+                    int rowCount = 0;
+
+                    while (rs.next()) {
+                        if (!firstRow) {
+                            backupResults.add(",");
+                        }
+
+                        StringBuilder values = new StringBuilder("(");
+                        for (int i = 1; i <= columnCount; i++) {
+                            if (i > 1) values.append(", ");
+
+                            Object value = rs.getObject(i);
+                            if (value == null) {
+                                values.append("NULL");
+                            } else if (value instanceof String) {
+                                String strValue = (String) value;
+                                strValue = strValue.replace("'", "''");
+                                strValue = strValue.replace("\\", "\\\\");
+                                values.append("'").append(strValue).append("'");
+                            } else if (value instanceof java.sql.Date) {
+                                values.append("'").append(value.toString()).append("'");
+                            } else if (value instanceof java.sql.Timestamp) {
+                                values.append("'").append(value.toString()).append("'");
+                            } else {
+                                values.append(value.toString());
+                            }
+                        }
+                        values.append(")");
+                        backupResults.add(values.toString());
+                        firstRow = false;
+                        rowCount++;
+
+                        // 大量データ対策：1000行ごとにINSERT文を分割
+                        if (rowCount % 1000 == 0) {
+                            backupResults.add(";");
+                            backupResults.add("");
+                            backupResults.add("INSERT INTO `" + tableName + "` (" + columnNames.toString() + ") VALUES");
+                            firstRow = true;
+                        }
+                    }
+
+                    if (rowCount > 0) {
+                        backupResults.add(";");
+                        backupResults.add("-- " + tableName + " テーブル: " + rowCount + " 行をエクスポート");
+                    }
+                    backupResults.add("");
+                }
+
+            } catch (SQLException e) {
+                backupResults.add("-- エラー: " + tableName + " - " + e.getMessage());
             }
-            
-            // バックアップ結果をシミュレート（実際の実装では、ファイルに書き出し）
-            Thread.sleep(1000); // 処理時間をシミュレート
-            
-            request.setAttribute("success", "バックアップが正常に完了しました。ファイル名: " + backupFileName);
-            request.setAttribute("backupResults", backupResults);
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            request.setAttribute("error", "バックアップ処理中にエラーが発生しました: " + e.getMessage());
         }
-        
-        getDatabaseStatistics(request, response);
+
+        // 直接ダウンロードレスポンス
+        response.setContentType("application/octet-stream; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + backupFileName + "\"");
+        try (java.io.PrintWriter writer = response.getWriter()) {
+            for (String line : backupResults) {
+                writer.println(line);
+            }
+        }
+        // ここでreturnして終了。JSPへのフォワードやsetAttributeは絶対にしない
+        return;
+
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "バックアップ処理中にエラーが発生しました: " + e.getMessage());
     }
+}
     
     /**
      * データベース最適化
@@ -346,6 +402,56 @@ public class DatabaseManagementServlet extends HttpServlet {
         }
         
         getDatabaseStatistics(request, response);
+    }
+    
+    /**
+     * バックアップファイルダウンロード
+     */
+    private void downloadBackupFile(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        String fileName = request.getParameter("file");
+        if (fileName == null || fileName.trim().isEmpty()) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "ファイル名が指定されていません");
+            return;
+        }
+        
+        // セキュリティ対策：ファイル名の検証
+        if (fileName.contains("..") || !fileName.startsWith("jms_backup_")) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "無効なファイル名です");
+            return;
+        }
+        
+        try {
+            String backupDir = getServletContext().getRealPath("/backups");
+            java.io.File backupFile = new java.io.File(backupDir, fileName);
+            
+            if (!backupFile.exists()) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND, "ファイルが見つかりません");
+                return;
+            }
+            
+            // レスポンスヘッダーを設定
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            response.setContentLength((int) backupFile.length());
+            
+            // ファイルをストリームで送信
+            try (java.io.FileInputStream fis = new java.io.FileInputStream(backupFile);
+                 java.io.OutputStream os = response.getOutputStream()) {
+                
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = fis.read(buffer)) != -1) {
+                    os.write(buffer, 0, bytesRead);
+                }
+                os.flush();
+            }
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "ファイルダウンロード中にエラーが発生しました");
+        }
     }
     
     /**
