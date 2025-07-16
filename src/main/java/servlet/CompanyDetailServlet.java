@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -137,13 +138,13 @@ public class CompanyDetailServlet extends HttpServlet {
             } catch (Exception e) {
                 System.out.println("CompanyDetailServlet: Error getting place/occupation names: " + e.getMessage());
             }
-            
+            ServletContext sc = getServletContext();
             // プルダウン用データを取得
             List<String> workPlaces = null;
             List<String> occupations = null;
             try {
-                workPlaces = CompanyDAO.getWorkPlaces();
-                occupations = CompanyDAO.getOccupations();
+                workPlaces = (List<String>)sc.getAttribute("workplaces");
+                occupations = (List<String>)sc.getAttribute("jobtypes");
             } catch (Exception e) {
                 System.out.println("CompanyDetailServlet: Error getting dropdown data: " + e.getMessage());
                 workPlaces = new java.util.ArrayList<>();

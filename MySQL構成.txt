@@ -126,6 +126,12 @@ ALTER TABLE companys_tbl ALTER COLUMN address SET DEFAULT '';
 ALTER TABLE companys_tbl ALTER COLUMN tel SET DEFAULT '';
 ALTER TABLE companys_tbl ALTER COLUMN mail_address SET DEFAULT '';
 ALTER TABLE companys_tbl ALTER COLUMN manager_name SET DEFAULT '';
+
+ALTER TABLE job_activity_detail_tbl
+  ADD status enum("予定","実施済み","合格","不合格","辞退");
+
+ALTER TABLE job_activity_detail_tbl
+  ADD process_type ENUM('選択してください', '説明会', '書類選考', '筆記試験', '適性検査', '1次面接', '2次面接', '3次面接', '最終面接', 'グループディスカッション', 'プレゼンテーション', '実技試験', 'その他')
 -------------------------------------------
 
 テストデータ

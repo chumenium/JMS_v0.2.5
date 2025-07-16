@@ -28,7 +28,7 @@
 
 
 <!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
-<% 
+<!-- <% 
   int companys_id = (Integer) session.getAttribute("companys_id");
   String companys_name = (String) session.getAttribute("companys_name");
   String post_code = (String) session.getAttribute("post_code");
@@ -39,7 +39,16 @@
   boolean recruit_results = (Boolean) session.getAttribute("recruit_results");
   int work_place_id = (Integer) session.getAttribute("work_place_id");
   int occupation_id = (Integer) session.getAttribute("occupation_id");
+%> -->
+<%@ page import="beans.CompanyBean" %>
+<%
+  CompanyBean company = (CompanyBean) request.getAttribute("company");
+  String workPlaceName = (String) request.getAttribute("workPlaceName");
+  String occupationName = (String) request.getAttribute("occupationName");
+  String role = (String) session.getAttribute("role"); 
+  String username = (String) session.getAttribute("username"); 
 %>
+
 <!--▲▲▲▲▲-->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
@@ -286,18 +295,24 @@
 <!-- ここから機能部分を記述 -->
 <main>
 <section class="bg3 bg-pattern3" id="main">
-    <ul aria-colcount="2">
-        <li>企業ID : <textarea><%= companys_id %></textarea></li>
-        <li>企業名 : <textarea><%= companys_name %></textarea></li>
-        <li>郵便番号 : <textarea><%= post_code %></textarea></li>
-        <li>住所 : <textarea><%= address %></textarea></li>
-        <li>電話番号 : <textarea><%= tel %></textarea></li>
-        <li>メールアドレス : <textarea><%= mail_address %></textarea></li>
-        <li>担当者名 : <textarea><%= manager_name %></textarea></li>
-        <li>採用実績 : <textarea><%= recruit_results %></textarea></li>
-        <li>勤務地 : <textarea><%= work_place_id %></textarea></li>
-        <li>職種 : <textarea><%= occupation_id %></textarea></li>
-    </ul>
+<ul aria-colcount="2">
+    <li>企業ID : <textarea readonly><%= company != null ? company.getCompanyId() : "" %></textarea></li>
+    <li>企業名 : <textarea readonly><%= company != null ? company.getCompanyName() : "" %></textarea></li>
+    <li>郵便番号 : <textarea readonly><%= company != null ? company.getPostCode() : "" %></textarea></li>
+    <li>住所 : <textarea readonly><%= company != null ? company.getAddress() : "" %></textarea></li>
+    <li>電話番号 : <textarea readonly><%= company != null ? company.getTel() : "" %></textarea></li>
+    <li>メールアドレス : <textarea readonly><%= company != null ? company.getMailAddress() : "" %></textarea></li>
+    <li>担当者名 : <textarea readonly><%= company != null ? company.getManagerName() : "" %></textarea></li>
+    
+      <% if (company.getRecruitmentResults()) { %>
+        <li>あり</li>
+      <% } else { %>
+        <li>なし</li>
+      <% } %>
+      </li>
+    <li>勤務地 : <textarea readonly><%= workPlaceName %></textarea></li>
+    <li>職種 : <textarea readonly><%= occupationName %></textarea></li>
+</ul>
 </section>
 </main>
 <!-- ここまで機能部分を記述 -->
