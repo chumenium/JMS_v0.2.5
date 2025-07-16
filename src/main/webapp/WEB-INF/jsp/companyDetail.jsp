@@ -28,7 +28,7 @@
 
 
 <!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
-<% 
+<!-- <% 
   int companys_id = (Integer) session.getAttribute("companys_id");
   String companys_name = (String) session.getAttribute("companys_name");
   String post_code = (String) session.getAttribute("post_code");
@@ -39,7 +39,16 @@
   boolean recruit_results = (Boolean) session.getAttribute("recruit_results");
   int work_place_id = (Integer) session.getAttribute("work_place_id");
   int occupation_id = (Integer) session.getAttribute("occupation_id");
+%> -->
+<%@ page import="beans.CompanyBean" %>
+<%
+  CompanyBean company = (CompanyBean) request.getAttribute("company");
+  String workPlaceName = (String) request.getAttribute("workPlaceName");
+  String occupationName = (String) request.getAttribute("occupationName");
+  String role = (String) session.getAttribute("role"); 
+  String username = (String) session.getAttribute("username"); 
 %>
+
 <!--▲▲▲▲▲-->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>

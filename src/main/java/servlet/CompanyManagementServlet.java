@@ -160,6 +160,10 @@ public class CompanyManagementServlet extends HttpServlet {
             		boolean success = CompanyDAO.updateCompany(companyId, companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
             
             if (success) {
+                CompanyDAO CompanyDAO = new CompanyDAO();
+                List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+                ServletContext sc = getServletContext();
+                sc.setAttribute("companies", companies);
                 request.setAttribute("successMessage", "企業情報の更新が完了しました。");
             } else {
                 request.setAttribute("errorMessage", "企業情報の更新に失敗しました。");
@@ -189,6 +193,10 @@ public class CompanyManagementServlet extends HttpServlet {
             		boolean success = CompanyDAO.deleteCompany(companyId);
             
             if (success) {
+                CompanyDAO CompanyDAO = new CompanyDAO();
+                List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+                ServletContext sc = getServletContext();
+                sc.setAttribute("companies", companies);
                 request.setAttribute("successMessage", "企業の削除が完了しました。");
             } else {
                 request.setAttribute("errorMessage", "企業の削除に失敗しました。");
