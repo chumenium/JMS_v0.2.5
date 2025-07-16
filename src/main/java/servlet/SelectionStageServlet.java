@@ -11,14 +11,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import dao.SelectionStageDAO;
+import dao.StudentDAO;
+import dao.CompanyDAO;
 
 /**
- * 選考段階管理サーブレット
- * 選考プロセスの管理機能を提供
+ * 選考ステージ登録サーブレット
+ * 選考ステージの登録・管理機能を提供
  */
 public class SelectionStageServlet extends HttpServlet {
-    
-    	private SelectionStageDAO SelectionStageDAO = new SelectionStageDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -31,33 +31,38 @@ public class SelectionStageServlet extends HttpServlet {
             return;
         }
         
-        // 権限チェック（学生、管理者、企業担当者）
+        // 権限チェック（教員、校長・教務部長、就職指導部、システム管理者、学生）
         String role = (String) session.getAttribute("role");
-        if (role == null || (!role.equals("admin") && !role.equals("student") && !role.equals("company"))) {
+        if (role == null || (!role.equals("admin") && !role.equals("teacher") && 
+                           !role.equals("headmaster") && !role.equals("egd") && !role.equals("student"))) {
             response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
             return;
         }
         
-        // 学生IDを取得
-        String studentId = (String) session.getAttribute("id");
-        
-        // 選考段階一覧を取得
-        List<Map<String, Object>> selectionStages;
-        if ("admin".equals(role)) {
-            // 管理者の場合は全ての選考段階を取得
-            			selectionStages = SelectionStageDAO.getAllSelectionStages();
-        } else {
-            // 学生の場合は自分の選考段階のみ取得
-            			selectionStages = SelectionStageDAO.getSelectionStagesByStudentId(studentId);
+        try {
+            // DAOを使用してデータを取得
+            SelectionStageDAO selectionStageDAO = new SelectionStageDAO();
+            StudentDAO studentDAO = new StudentDAO();
+            CompanyDAO companyDAO = new CompanyDAO();
+            
+            // 選考ステージ一覧を取得
+            List<Map<String, Object>> selectionStages = selectionStageDAO.getAllSelectionStages();
+            request.setAttribute("selectionStages", selectionStages);
+            
+            // 学生一覧を取得
+            List<Map<String, Object>> students = studentDAO.getAllStudents();
+            request.setAttribute("students", students);
+            
+            // 企業一覧を取得
+            List<Map<String, Object>> companies = companyDAO.getAllCompanies();
+            request.setAttribute("companies", companies);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            // エラーが発生しても画面は表示
         }
         
-        // 統計情報を取得
-        		Map<String, Integer> statistics = SelectionStageDAO.getSelectionStageStatistics();
-        
-        request.setAttribute("selectionStages", selectionStages);
-        request.setAttribute("statistics", statistics);
-        
-        // 選考段階管理ページにフォワード
+        // 選考ステージ登録ページにフォワード
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/SelectionStage.jsp");
         dispatcher.forward(request, response);
     }
@@ -73,80 +78,93 @@ public class SelectionStageServlet extends HttpServlet {
             return;
         }
         
-        String action = request.getParameter("action");
-        
-        if ("update".equals(action)) {
-            // 選考段階更新処理
-            handleUpdateSelectionStage(request, response);
-        } else if ("advance".equals(action)) {
-            // 選考段階進行処理
-            handleAdvanceSelectionStage(request, response);
-        } else if ("reject".equals(action)) {
-            // 選考段階却下処理
-            handleRejectSelectionStage(request, response);
-        } else {
-            // デフォルトは選考段階管理ページにフォワード
-            doGet(request, response);
+        // 権限チェック
+        String role = (String) session.getAttribute("role");
+        if (role == null || (!role.equals("admin") && !role.equals("teacher") && 
+                           !role.equals("headmaster") && !role.equals("egd") && !role.equals("student"))) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
         }
+        
+        // 選考ステージ登録処理
+        handleSelectionStageRegistration(request, response);
     }
     
-    private void handleUpdateSelectionStage(HttpServletRequest request, HttpServletResponse response) 
+    /**
+     * 選考ステージ登録処理
+     */
+    private void handleSelectionStageRegistration(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String currentStage = request.getParameter("currentStage");
-            String notes = request.getParameter("notes");
+            // リクエストパラメータを取得
+            String companyId = request.getParameter("companyId");
+            String studentId = request.getParameter("studentId");
+            String companyName = request.getParameter("companyName");
+            String studentName = request.getParameter("studentName");
+            String jobTitle = request.getParameter("jobTitle");
             
-            		boolean success = SelectionStageDAO.updateSelectionStage(id, currentStage, notes);
+            // 選考ステージの配列パラメータを取得
+            String[] stageTypes = request.getParameterValues("stages[].type");
+            String[] stageDates = request.getParameterValues("stages[].date");
+            String[] stageStartTimes = request.getParameterValues("stages[].startTime");
+            String[] stageEndTimes = request.getParameterValues("stages[].endTime");
+            String[] stageVenues = request.getParameterValues("stages[].venue");
+            String[] stageFormats = request.getParameterValues("stages[].format");
+            String[] stageInterviewerCounts = request.getParameterValues("stages[].interviewerCount");
+            
+            // デバッグ用ログ
+            System.out.println("=== 選考ステージ登録開始 ===");
+            System.out.println("企業ID: " + companyId);
+            System.out.println("学生ID: " + studentId);
+            System.out.println("企業名: " + companyName);
+            System.out.println("学生名: " + studentName);
+            System.out.println("職種: " + jobTitle);
+            
+            if (stageTypes != null) {
+                System.out.println("選考ステージ数: " + stageTypes.length);
+                for (int i = 0; i < stageTypes.length; i++) {
+                    System.out.println("ステージ " + (i + 1) + ": " + stageTypes[i]);
+                }
+            }
+            
+            // バリデーション
+            if (companyName == null || companyName.trim().isEmpty() ||
+                studentName == null || studentName.trim().isEmpty()) {
+                request.setAttribute("errorMessage", "企業名と学生名は必須項目です。");
+                doGet(request, response);
+                return;
+            }
+            
+            if (stageTypes == null || stageTypes.length == 0) {
+                request.setAttribute("errorMessage", "少なくとも1つの選考ステージを追加してください。");
+                doGet(request, response);
+                return;
+            }
+            
+            // 選考ステージDAOを使用してデータベースに登録
+            SelectionStageDAO selectionStageDAO = new SelectionStageDAO();
+            boolean success = selectionStageDAO.addSelectionStages(
+                companyId, studentId, companyName, studentName, jobTitle,
+                stageTypes, stageDates, stageStartTimes, stageEndTimes,
+                stageVenues, stageFormats, stageInterviewerCounts
+            );
             
             if (success) {
-                request.setAttribute("message", "選考段階を更新しました。");
+                request.setAttribute("successMessage", "選考ステージの登録が完了しました。");
             } else {
-                request.setAttribute("error", "選考段階の更新に失敗しました。");
+                request.setAttribute("errorMessage", "選考ステージの登録に失敗しました。");
             }
+            
+            System.out.println("=== 選考ステージ登録完了 ===");
+            
         } catch (Exception e) {
-            request.setAttribute("error", "選考段階の更新中にエラーが発生しました。");
+            System.err.println("選考ステージ登録エラー: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "システムエラーが発生しました: " + e.getMessage());
         }
         
-        doGet(request, response);
-    }
-    
-    private void handleAdvanceSelectionStage(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            String newStage = request.getParameter("newStage");
-            
-            		boolean success = SelectionStageDAO.advanceSelectionStage(id, newStage);
-            
-            if (success) {
-                request.setAttribute("message", "選考段階を進行させました。");
-            } else {
-                request.setAttribute("error", "選考段階の進行に失敗しました。");
-            }
-        } catch (Exception e) {
-            request.setAttribute("error", "選考段階の進行中にエラーが発生しました。");
-        }
-        
-        doGet(request, response);
-    }
-    
-    private void handleRejectSelectionStage(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        try {
-            int id = Integer.parseInt(request.getParameter("id"));
-            
-            		boolean success = SelectionStageDAO.rejectSelectionStage(id);
-            
-            if (success) {
-                request.setAttribute("message", "選考を不合格にしました。");
-            } else {
-                request.setAttribute("error", "選考の不合格処理に失敗しました。");
-            }
-        } catch (Exception e) {
-            request.setAttribute("error", "選考の不合格処理中にエラーが発生しました。");
-        }
-        
-        doGet(request, response);
+        // 選考ステージ登録ページにフォワード
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/SelectionStage.jsp");
+        dispatcher.forward(request, response);
     }
 } 

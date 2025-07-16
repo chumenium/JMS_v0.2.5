@@ -4,48 +4,97 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import utils.DBConnection;
 
 /**
- * 面接・試験データアクセスオブジェクト
- * 面接・試験情報のCRUD操作を提供
+ * 選考ステージデータアクセスオブジェクト
+ * 選考ステージ情報のCRUD操作を提供
  */
-public class InterviewDAO {
+public class SelectionStageDAO {
     
     /**
-     * 面接・試験情報を登録
+     * 選考ステージ情報を登録
      */
-    public boolean addInterviewExam(String studentId, String companyName, String jobTitle, 
-                                  String examType, Date examDate, String examVenue, 
-                                  String examStartTime, String examEndTime, String interviewType,
-                                  Date interviewDate, String interviewVenue, String interviewStartTime,
-                                  String interviewEndTime, String notes) {
-        String sql = "INSERT INTO interview_exam_tbl (student_id, company_name, job_title, exam_type, exam_date, exam_venue, exam_start_time, exam_end_time, interview_type, interview_date, interview_venue, interview_start_time, interview_end_time, notes) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public boolean addSelectionStages(String companyId, String studentId, String companyName, 
+                                    String studentName, String jobTitle, String[] stageTypes,
+                                    String[] stageDates, String[] stageStartTimes, String[] stageEndTimes,
+                                    String[] stageVenues, String[] stageFormats, String[] stageInterviewerCounts) {
+        
+        String sql = "INSERT INTO job_activity_detail_tbl (student_id, companys_id, selection_id, date, time, venue, remarks) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, studentId);
-            stmt.setString(2, companyName);
-            stmt.setString(3, jobTitle);
-            stmt.setString(4, examType);
-            stmt.setDate(5, new java.sql.Date(examDate.getTime()));
-            stmt.setString(6, examVenue);
-            stmt.setString(7, examStartTime);
-            stmt.setString(8, examEndTime);
-            stmt.setString(9, interviewType);
-            stmt.setDate(10, new java.sql.Date(interviewDate.getTime()));
-            stmt.setString(11, interviewVenue);
-            stmt.setString(12, interviewStartTime);
-            stmt.setString(13, interviewEndTime);
-            stmt.setString(14, notes);
+            // トランザクション開始
+            conn.setAutoCommit(false);
             
-            return stmt.executeUpdate() > 0;
+            try {
+                for (int i = 0; i < stageTypes.length; i++) {
+                    if (stageTypes[i] != null && !stageTypes[i].trim().isEmpty()) {
+                        // selection_idを取得（selection_tblから）
+                        int selectionId = getSelectionIdByName(stageTypes[i]);
+                        
+                        stmt.setString(1, studentId);
+                        stmt.setInt(2, Integer.parseInt(companyId));
+                        stmt.setInt(3, selectionId);
+                        
+                        // 日付の処理
+                        if (stageDates != null && i < stageDates.length && 
+                            stageDates[i] != null && !stageDates[i].trim().isEmpty()) {
+                            stmt.setDate(4, Date.valueOf(stageDates[i]));
+                        } else {
+                            stmt.setNull(4, java.sql.Types.DATE);
+                        }
+                        
+                        // 時間の処理（開始時間のみ使用）
+                        if (stageStartTimes != null && i < stageStartTimes.length && 
+                            stageStartTimes[i] != null && !stageStartTimes[i].trim().isEmpty()) {
+                            stmt.setTime(5, Time.valueOf(stageStartTimes[i] + ":00"));
+                        } else {
+                            stmt.setNull(5, java.sql.Types.TIME);
+                        }
+                        
+                        // 会場の処理
+                        String venue = "";
+                        if (stageVenues != null && i < stageVenues.length && stageVenues[i] != null) {
+                            venue = stageVenues[i];
+                        }
+                        if (stageFormats != null && i < stageFormats.length && stageFormats[i] != null) {
+                            venue += (venue.isEmpty() ? "" : " ") + stageFormats[i];
+                        }
+                        if (stageInterviewerCounts != null && i < stageInterviewerCounts.length && stageInterviewerCounts[i] != null) {
+                            venue += (venue.isEmpty() ? "" : " ") + stageInterviewerCounts[i];
+                        }
+                        stmt.setString(6, venue);
+                        
+                        // 備考の処理
+                        String remarks = "職種: " + jobTitle;
+                        if (stageEndTimes != null && i < stageEndTimes.length && stageEndTimes[i] != null) {
+                            remarks += ", 終了時間: " + stageEndTimes[i];
+                        }
+                        stmt.setString(7, remarks);
+                        
+                        stmt.executeUpdate();
+                    }
+                }
+                
+                // トランザクションコミット
+                conn.commit();
+                return true;
+                
+            } catch (SQLException e) {
+                // エラーが発生した場合はロールバック
+                conn.rollback();
+                throw e;
+            }
+            
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
@@ -53,11 +102,64 @@ public class InterviewDAO {
     }
     
     /**
-     * 学生IDで面接・試験情報一覧を取得
+     * 選考種別名からselection_idを取得
      */
-    public List<Map<String, Object>> getInterviewExamsByStudentId(String studentId) {
-        List<Map<String, Object>> interviews = new ArrayList<>();
-        String sql = "SELECT * FROM interview_exam_tbl WHERE student_id = ? ORDER BY exam_date DESC, interview_date DESC";
+    private int getSelectionIdByName(String selectionName) {
+        String sql = "SELECT selection_id FROM selection_tbl WHERE selection_name = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, selectionName);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("selection_id");
+            } else {
+                // 存在しない場合は新規作成
+                return createSelectionType(selectionName);
+            }
+            
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return 1; // デフォルト値
+        }
+    }
+    
+    /**
+     * 新しい選考種別を作成
+     */
+    private int createSelectionType(String selectionName) {
+        String sql = "INSERT INTO selection_tbl (selection_name) VALUES (?)";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            
+            stmt.setString(1, selectionName);
+            stmt.executeUpdate();
+            
+            ResultSet rs = stmt.getGeneratedKeys();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+            
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 1; // デフォルト値
+    }
+    
+    /**
+     * 学生IDで選考ステージ情報一覧を取得
+     */
+    public List<Map<String, Object>> getSelectionStagesByStudentId(String studentId) {
+        List<Map<String, Object>> stages = new ArrayList<>();
+        String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
+                    "FROM job_activity_detail_tbl jad " +
+                    "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
+                    "LEFT JOIN companys_tbl c ON jad.companys_id = c.companys_id " +
+                    "LEFT JOIN students_tbl st ON jad.student_id = st.student_id " +
+                    "WHERE jad.student_id = ? ORDER BY jad.date DESC, jad.time DESC";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -66,147 +168,165 @@ public class InterviewDAO {
             ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
-                Map<String, Object> interview = new HashMap<>();
-                interview.put("id", rs.getInt("id"));
-                interview.put("student_id", rs.getString("student_id"));
-                interview.put("company_name", rs.getString("company_name"));
-                interview.put("job_title", rs.getString("job_title"));
-                interview.put("exam_type", rs.getString("exam_type"));
-                interview.put("exam_date", rs.getDate("exam_date"));
-                interview.put("exam_venue", rs.getString("exam_venue"));
-                interview.put("exam_start_time", rs.getString("exam_start_time"));
-                interview.put("exam_end_time", rs.getString("exam_end_time"));
-                interview.put("interview_type", rs.getString("interview_type"));
-                interview.put("interview_date", rs.getDate("interview_date"));
-                interview.put("interview_venue", rs.getString("interview_venue"));
-                interview.put("interview_start_time", rs.getString("interview_start_time"));
-                interview.put("interview_end_time", rs.getString("interview_end_time"));
-                interview.put("notes", rs.getString("notes"));
-                interviews.add(interview);
+                Map<String, Object> stage = new HashMap<>();
+                stage.put("student_id", rs.getString("student_id"));
+                stage.put("companys_id", rs.getInt("companys_id"));
+                stage.put("selection_id", rs.getInt("selection_id"));
+                stage.put("selection_name", rs.getString("selection_name"));
+                stage.put("company_name", rs.getString("company_name"));
+                stage.put("student_name", rs.getString("student_name"));
+                stage.put("date", rs.getDate("date"));
+                stage.put("time", rs.getTime("time"));
+                stage.put("venue", rs.getString("venue"));
+                stage.put("remarks", rs.getString("remarks"));
+                stages.add(stage);
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return interviews;
+        return stages;
     }
     
     /**
-     * 面接・試験情報を更新
+     * 企業IDで選考ステージ情報一覧を取得
      */
-    public boolean updateInterviewExam(int id, String companyName, String jobTitle, 
-                                     String examType, Date examDate, String examVenue, 
-                                     String examStartTime, String examEndTime, String interviewType,
-                                     Date interviewDate, String interviewVenue, String interviewStartTime,
-                                     String interviewEndTime, String notes) {
-        String sql = "UPDATE interview_exam_tbl SET company_name=?, job_title=?, exam_type=?, exam_date=?, exam_venue=?, exam_start_time=?, exam_end_time=?, interview_type=?, interview_date=?, interview_venue=?, interview_start_time=?, interview_end_time=?, notes=? WHERE id=?";
+    public List<Map<String, Object>> getSelectionStagesByCompanyId(String companyId) {
+        List<Map<String, Object>> stages = new ArrayList<>();
+        String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
+                    "FROM job_activity_detail_tbl jad " +
+                    "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
+                    "LEFT JOIN companys_tbl c ON jad.companys_id = c.companys_id " +
+                    "LEFT JOIN students_tbl st ON jad.student_id = st.student_id " +
+                    "WHERE jad.companys_id = ? ORDER BY jad.date DESC, jad.time DESC";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, companyName);
-            stmt.setString(2, jobTitle);
-            stmt.setString(3, examType);
-            stmt.setDate(4, new java.sql.Date(examDate.getTime()));
-            stmt.setString(5, examVenue);
-            stmt.setString(6, examStartTime);
-            stmt.setString(7, examEndTime);
-            stmt.setString(8, interviewType);
-            stmt.setDate(9, new java.sql.Date(interviewDate.getTime()));
-            stmt.setString(10, interviewVenue);
-            stmt.setString(11, interviewStartTime);
-            stmt.setString(12, interviewEndTime);
-            stmt.setString(13, notes);
-            stmt.setInt(14, id);
-            
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    /**
-     * 面接・試験情報を削除
-     */
-    public boolean deleteInterviewExam(int id) {
-        String sql = "DELETE FROM interview_exam_tbl WHERE id=?";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    /**
-     * 全ての面接・試験情報を取得
-     */
-    public List<Map<String, Object>> getAllInterviewExams() {
-        List<Map<String, Object>> interviews = new ArrayList<>();
-        String sql = "SELECT ie.*, s.name as student_name FROM interview_exam_tbl ie LEFT JOIN students_tbl s ON ie.student_id = s.student_id ORDER BY ie.exam_date DESC, ie.interview_date DESC";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+            stmt.setInt(1, Integer.parseInt(companyId));
+            ResultSet rs = stmt.executeQuery();
             
             while (rs.next()) {
-                Map<String, Object> interview = new HashMap<>();
-                interview.put("id", rs.getInt("id"));
-                interview.put("student_id", rs.getString("student_id"));
-                interview.put("student_name", rs.getString("student_name"));
-                interview.put("company_name", rs.getString("company_name"));
-                interview.put("job_title", rs.getString("job_title"));
-                interview.put("exam_type", rs.getString("exam_type"));
-                interview.put("exam_date", rs.getDate("exam_date"));
-                interview.put("exam_venue", rs.getString("exam_venue"));
-                interview.put("exam_start_time", rs.getString("exam_start_time"));
-                interview.put("exam_end_time", rs.getString("exam_end_time"));
-                interview.put("interview_type", rs.getString("interview_type"));
-                interview.put("interview_date", rs.getDate("interview_date"));
-                interview.put("interview_venue", rs.getString("interview_venue"));
-                interview.put("interview_start_time", rs.getString("interview_start_time"));
-                interview.put("interview_end_time", rs.getString("interview_end_time"));
-                interview.put("notes", rs.getString("notes"));
-                interviews.add(interview);
+                Map<String, Object> stage = new HashMap<>();
+                stage.put("student_id", rs.getString("student_id"));
+                stage.put("companys_id", rs.getInt("companys_id"));
+                stage.put("selection_id", rs.getInt("selection_id"));
+                stage.put("selection_name", rs.getString("selection_name"));
+                stage.put("company_name", rs.getString("company_name"));
+                stage.put("student_name", rs.getString("student_name"));
+                stage.put("date", rs.getDate("date"));
+                stage.put("time", rs.getTime("time"));
+                stage.put("venue", rs.getString("venue"));
+                stage.put("remarks", rs.getString("remarks"));
+                stages.add(stage);
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return interviews;
+        return stages;
     }
     
     /**
-     * 全ての面接情報を取得（InterviewExamInputServlet用）
+     * 選考ステージ情報を更新
      */
-    public List<Map<String, Object>> getAllInterviews() {
-        return getAllInterviewExams();
+    public boolean updateSelectionStage(String studentId, int companyId, int selectionId, 
+                                     Date stageDate, Time stageTime, String stageVenue, String stageRemarks) {
+        String sql = "UPDATE job_activity_detail_tbl SET date=?, time=?, venue=?, remarks=? " +
+                    "WHERE student_id=? AND companys_id=? AND selection_id=?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setDate(1, stageDate);
+            stmt.setTime(2, stageTime);
+            stmt.setString(3, stageVenue);
+            stmt.setString(4, stageRemarks);
+            stmt.setString(5, studentId);
+            stmt.setInt(6, companyId);
+            stmt.setInt(7, selectionId);
+            
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
     
     /**
-     * 面接情報を登録（InterviewExamInputServlet用）
+     * 選考ステージ情報を削除
      */
-    public boolean addInterview(String studentId, int companyId, Date interviewDate, 
-                              String interviewType, String status, String notes) {
-        String sql = "INSERT INTO interview_exam_tbl (student_id, company_id, interview_date, interview_type, status, notes) VALUES (?, ?, ?, ?, ?, ?)";
+    public boolean deleteSelectionStage(String studentId, int companyId, int selectionId) {
+        String sql = "DELETE FROM job_activity_detail_tbl WHERE student_id=? AND companys_id=? AND selection_id=?";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setString(1, studentId);
             stmt.setInt(2, companyId);
-            stmt.setDate(3, new java.sql.Date(interviewDate.getTime()));
-            stmt.setString(4, interviewType);
-            stmt.setString(5, status);
-            stmt.setString(6, notes);
+            stmt.setInt(3, selectionId);
             
             return stmt.executeUpdate() > 0;
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
         }
+    }
+    
+    /**
+     * 全ての選考ステージ情報を取得
+     */
+    public List<Map<String, Object>> getAllSelectionStages() {
+        List<Map<String, Object>> stages = new ArrayList<>();
+        String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
+                    "FROM job_activity_detail_tbl jad " +
+                    "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
+                    "LEFT JOIN companys_tbl c ON jad.companys_id = c.companys_id " +
+                    "LEFT JOIN students_tbl st ON jad.student_id = st.student_id " +
+                    "ORDER BY jad.date DESC, jad.time DESC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Map<String, Object> stage = new HashMap<>();
+                stage.put("student_id", rs.getString("student_id"));
+                stage.put("companys_id", rs.getInt("companys_id"));
+                stage.put("selection_id", rs.getInt("selection_id"));
+                stage.put("selection_name", rs.getString("selection_name"));
+                stage.put("company_name", rs.getString("company_name"));
+                stage.put("student_name", rs.getString("student_name"));
+                stage.put("date", rs.getDate("date"));
+                stage.put("time", rs.getTime("time"));
+                stage.put("venue", rs.getString("venue"));
+                stage.put("remarks", rs.getString("remarks"));
+                stages.add(stage);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return stages;
+    }
+    
+    /**
+     * 選考種別一覧を取得
+     */
+    public List<Map<String, Object>> getAllSelectionTypes() {
+        List<Map<String, Object>> selectionTypes = new ArrayList<>();
+        String sql = "SELECT * FROM selection_tbl ORDER BY selection_id";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                Map<String, Object> selectionType = new HashMap<>();
+                selectionType.put("selection_id", rs.getInt("selection_id"));
+                selectionType.put("selection_name", rs.getString("selection_name"));
+                selectionTypes.add(selectionType);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return selectionTypes;
     }
 } 

@@ -109,7 +109,7 @@
             <!-- 登録フォーム -->
             <section class="registration-form" role="region" aria-label="選考ステージ登録フォーム">
                 <h3 class="form-title">📝 選考情報入力</h3>
-                <form action="InterviewExamInputServlet" method="post" id="selectionForm">
+                <form action="SelectionStageServlet" method="post" id="selectionForm">
                 <!-- 隠しフィールドで企業IDと学生IDを送信 -->
                 <input type="hidden" name="companyId" value="<%= companyId != null ? companyId : "" %>">
                 <input type="hidden" name="studentId" value="<%= studentId != null ? studentId : "" %>">
