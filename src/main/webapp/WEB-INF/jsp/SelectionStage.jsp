@@ -26,8 +26,8 @@
   String role     = (String) session.getAttribute("role"); 
   
   // デバッグ用：セッション情報をコンソールに出力
-  System.out.println("InterviewExamInput.jsp - username: " + username);
-  System.out.println("InterviewExamInput.jsp - role: " + role);
+  System.out.println("SelectionStage.jsp - username: " + username);
+  System.out.println("SelectionStage.jsp - role: " + role);
   
   // nullチェック
   if (username == null) {
@@ -57,10 +57,10 @@
   String studentName = request.getParameter("studentName");
   
   // デバッグ用ログ
-  System.out.println("InterviewExamInput.jsp - companyId: " + companyId);
-  System.out.println("InterviewExamInput.jsp - studentId: " + studentId);
-  System.out.println("InterviewExamInput.jsp - companyName: " + companyName);
-  System.out.println("InterviewExamInput.jsp - studentName: " + studentName);
+  System.out.println("SelectionStage.jsp - companyId: " + companyId);
+  System.out.println("SelectionStage.jsp - studentId: " + studentId);
+  System.out.println("SelectionStage.jsp - companyName: " + companyName);
+  System.out.println("SelectionStage.jsp - studentName: " + studentName);
   
   // メッセージを取得
   String successMessage = (String) request.getAttribute("successMessage");
@@ -139,20 +139,18 @@
                             <input type="hidden" id="studentId" name="studentId" value="<%= studentId != null ? studentId : "" %>">
                         </div>
                         <div class="form-group">
-                            <label for="jobTitle">職種</label>
-                            <select id="jobTitle" name="jobTitle">
-            <option value="">選択してください</option>
-                                <option value="インフラエンジニア">インフラエンジニア</option>
-                                <option value="アプリ開発エンジニア">アプリ開発エンジニア</option>
-                                <option value="セキュリティエンジニア">セキュリティエンジニア</option>
-                                <option value="ネットワークエンジニア">ネットワークエンジニア</option>
-                                <option value="PM補佐">PM補佐</option>
-                                <option value="サーバーエンジニア">サーバーエンジニア</option>
-                                <option value="データベース管理者">データベース管理者</option>
-                                <option value="ITサポート">ITサポート</option>
-                                <option value="ヘルプデスク">ヘルプデスク</option>
-                                <option value="品質管理／テスト">品質管理／テスト</option>
-        </select>
+                            <label for="selectionStatus">選考ステータス</label>
+                            <select id="selectionStatus" name="selectionStatus">
+                                <option value="">選択してください</option>
+                                <option value="検討中">検討中</option>
+                                <option value="エントリー中">エントリー中</option>
+                                <option value="選考中">選考中</option>
+                                <option value="内定承諾">内定承諾</option>
+                                <option value="内定保留">内定保留</option>
+                                <option value="内定辞退">内定辞退</option>
+                                <option value="不採用">不採用</option>
+                                <option value="選考中止">選考中止</option>
+                            </select>
                         </div>
                     </div>
     </div>
@@ -207,23 +205,8 @@
 
                                     <div class="form-group">
                                         <label>実施時間</label>
-                                        <div class="time-range">
-                                            <input type="time" class="stage-start-time" name="stages[].startTime">
-                                            <span class="time-separator">～</span>
-                                            <input type="time" class="stage-end-time" name="stages[].endTime">
-                                        </div>
-    </div>
-
-                                    <div class="form-group">
-                                        <label>実施場所</label>
-                                        <select class="stage-venue" name="stages[].venue">
-            <option value="">選択してください</option>
-                                            <option value="校内">校内</option>
-                                            <option value="企業本社">企業本社</option>
-                                            <option value="オンライン">オンライン</option>
-                                            <option value="その他">その他</option>
-        </select>
-    </div>
+                                        <input type="time" class="stage-time" name="stages[].time">
+                                    </div>
 
                                     <div class="form-group">
                                         <label>実施形式</label>
@@ -235,19 +218,7 @@
                                             <option value="対面">対面</option>
                                             <option value="ハイブリッド">ハイブリッド</option>
                                         </select>
-    </div>
-
-                                    <div class="form-group">
-                                        <label>担当者数</label>
-                                        <select class="stage-interviewer-count" name="stages[].interviewerCount">
-            <option value="">選択してください</option>
-                                            <option value="1">1名</option>
-                                            <option value="2">2名</option>
-                                            <option value="3">3名</option>
-                                            <option value="4">4名</option>
-                                            <option value="5名以上">5名以上</option>
-        </select>
-    </div>
+                                    </div>
 
                                     <div class="form-group full-width">
                                         <label>備考・特記事項</label>

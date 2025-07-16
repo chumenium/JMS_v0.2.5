@@ -101,16 +101,13 @@ public class SelectionStageServlet extends HttpServlet {
             String studentId = request.getParameter("studentId");
             String companyName = request.getParameter("companyName");
             String studentName = request.getParameter("studentName");
-            String jobTitle = request.getParameter("jobTitle");
+            String selectionStatus = request.getParameter("selectionStatus");
             
             // 選考ステージの配列パラメータを取得
             String[] stageTypes = request.getParameterValues("stages[].type");
             String[] stageDates = request.getParameterValues("stages[].date");
-            String[] stageStartTimes = request.getParameterValues("stages[].startTime");
-            String[] stageEndTimes = request.getParameterValues("stages[].endTime");
-            String[] stageVenues = request.getParameterValues("stages[].venue");
+            String[] stageTimes = request.getParameterValues("stages[].time");
             String[] stageFormats = request.getParameterValues("stages[].format");
-            String[] stageInterviewerCounts = request.getParameterValues("stages[].interviewerCount");
             
             // デバッグ用ログ
             System.out.println("=== 選考ステージ登録開始 ===");
@@ -118,7 +115,7 @@ public class SelectionStageServlet extends HttpServlet {
             System.out.println("学生ID: " + studentId);
             System.out.println("企業名: " + companyName);
             System.out.println("学生名: " + studentName);
-            System.out.println("職種: " + jobTitle);
+            System.out.println("選考ステータス: " + selectionStatus);
             
             if (stageTypes != null) {
                 System.out.println("選考ステージ数: " + stageTypes.length);
@@ -144,9 +141,8 @@ public class SelectionStageServlet extends HttpServlet {
             // 選考ステージDAOを使用してデータベースに登録
             SelectionStageDAO selectionStageDAO = new SelectionStageDAO();
             boolean success = selectionStageDAO.addSelectionStages(
-                companyId, studentId, companyName, studentName, jobTitle,
-                stageTypes, stageDates, stageStartTimes, stageEndTimes,
-                stageVenues, stageFormats, stageInterviewerCounts
+                companyId, studentId, companyName, studentName, selectionStatus,
+                stageTypes, stageDates, stageTimes, stageFormats
             );
             
             if (success) {

@@ -726,7 +726,7 @@
                                     <td><%= result.get("activity_status") != null ? result.get("activity_status") : "-" %></td>
                                     <td><%= result.get("report_date") != null ? result.get("report_date") : "-" %></td>
                                     <td>
-                                        <a href="StatusServlet?view=InterviewExamInput.jsp&companyId=<%= result.get("company_id") %>&studentId=<%= result.get("student_id") %>&companyName=<%= result.get("company_name") != null ? result.get("company_name") : "" %>&studentName=<%= result.get("student_name") != null ? result.get("student_name") : "" %>" 
+                                        <a href="StatusServlet?view=SelectionStage&companyId=<%= result.get("company_id") %>&studentId=<%= result.get("student_id") %>&companyName=<%= result.get("company_name") != null ? result.get("company_name") : "" %>&studentName=<%= result.get("student_name") != null ? result.get("student_name") : "" %>" 
                                            class="action-btn" aria-label="選考ステージ登録">
                                             選考登録
                                         </a>
