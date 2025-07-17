@@ -29,7 +29,9 @@
 <!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
 <% 
   String username = (String) session.getAttribute("username"); 
-  String role     = (String) session.getAttribute("role"); 
+  String role     = (String) session.getAttribute("role");
+  int allcnt = (Integer)request.getAttribute("allcnt"); 
+  int cnt = (Integer)request.getAttribute("cnt");
   
   // デバッグ用：セッション情報をコンソールに出力
   System.out.println("StudentManagement.jsp - username: " + username);
@@ -616,11 +618,11 @@
                     </p>
                     <div class="card-stats" role="group" aria-label="学生統計">
                         <div class="stat-item">
-                            <span class="stat-number">150</span>
+                            <span class="stat-number"><%= allcnt %></span>
                             <span class="stat-label">総学生数</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">45</span>
+                            <span class="stat-number"><%= cnt %></span>
                             <span class="stat-label">就職活動中</span>
                         </div>
                     </div>
@@ -638,12 +640,12 @@
                     </p>
                     <div class="card-stats" role="group" aria-label="登録統計">
                         <div class="stat-item">
-                            <span class="stat-number">12</span>
-                            <span class="stat-label">今月登録</span>
+                            <span class="stat-number">-</span>
+                            <span class="stat-label">-</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">3</span>
-                            <span class="stat-label">未完了</span>
+                            <span class="stat-number">-</span>
+                            <span class="stat-label">-</span>
                         </div>
                     </div>
                     <a href="StatusServlet?status=createStudent" class="card-link" aria-label="新規学生を登録">

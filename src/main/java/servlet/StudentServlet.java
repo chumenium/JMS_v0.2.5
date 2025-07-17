@@ -149,7 +149,7 @@ public class StudentServlet extends HttpServlet {
                         }
 
                         // 学生一覧取得SQL（シンプル版）
-                        String sql = "SELECT student_id, name, department, class, job_hunting_status FROM students_tbl";
+                        String sql = "SELECT student_id, name, department, class, enrollment_status FROM students_tbl";
                         PreparedStatement stmt = conn.prepareStatement(sql);
                         ResultSet rs = stmt.executeQuery();
 
@@ -161,7 +161,7 @@ public class StudentServlet extends HttpServlet {
                             studentids.add(rs.getString("student_id"));
                             names.add(rs.getString("name"));
                             classs.add(rs.getString("department") + rs.getString("class"));
-                            enrollmentStatuss.add(rs.getString("job_hunting_status"));
+                            enrollmentStatuss.add(rs.getString("enrollment_status"));
                         }
                         students.add(studentids);
                         students.add(names);
@@ -349,7 +349,7 @@ public class StudentServlet extends HttpServlet {
                         }
 
                         // 学生一覧取得SQL（シンプル版）
-                        String getstudentsql = "SELECT student_id, name, department, class, job_hunting_status FROM students_tbl ORDER BY student_id";
+                        String getstudentsql = "SELECT student_id, name, department, class, enrollment_status FROM students_tbl ORDER BY student_id";
                         PreparedStatement getstudentstmt = conn.prepareStatement(getstudentsql);
                         ResultSet rs = getstudentstmt.executeQuery();
 
@@ -361,7 +361,7 @@ public class StudentServlet extends HttpServlet {
                             studentids.add(rs.getString("student_id"));
                             names.add(rs.getString("name"));
                             classs.add(rs.getString("department") + rs.getString("class"));
-                            enrollmentStatuss.add(rs.getString("job_hunting_status"));
+                            enrollmentStatuss.add(rs.getString("enrollment_status"));
                         }
                         students.add(studentids);
                         students.add(names);
@@ -549,7 +549,7 @@ public class StudentServlet extends HttpServlet {
                         }
 
                         // 学生一覧取得SQL（シンプル版）
-                        String getstudentsql = "SELECT student_id, name, department, class, job_hunting_status FROM students_tbl ORDER BY student_id";
+                        String getstudentsql = "SELECT student_id, name, department, class, enrollment_status FROM students_tbl ORDER BY student_id";
                         PreparedStatement getstudentstmt = conn.prepareStatement(getstudentsql);
 
                         ResultSet rs = getstudentstmt.executeQuery();
@@ -562,7 +562,7 @@ public class StudentServlet extends HttpServlet {
                             studentids.add(rs.getString("student_id"));
                             names.add(rs.getString("name"));
                             classs.add(rs.getString("department") + rs.getString("class"));
-                            enrollmentStatuss.add(rs.getString("job_hunting_status"));
+                            enrollmentStatuss.add(rs.getString("enrollment_status"));
                         }
                         students.add(studentids);
                         students.add(names);

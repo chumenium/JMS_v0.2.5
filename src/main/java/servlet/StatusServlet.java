@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -64,7 +65,7 @@ public class StatusServlet extends HttpServlet {
 	        for (String key : paramMap.keySet()) {
 	            System.out.println("StatusServlet: param " + key + " = " + java.util.Arrays.toString(paramMap.get(key)));
 	        }
-
+			ServletContext sc = getServletContext();
 	        if (view != null) {
 	            switch (view) {
 	                case "index":
@@ -80,6 +81,18 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/3.jsp";
 	                    break;
 	                case "studentManagement":
+						ArrayList<ArrayList<String>> students = (ArrayList<ArrayList<String>>)sc.getAttribute("students");
+						ArrayList<String> enrollmentStatuss = students.get(3);
+						int cnt = 0;
+						int allcnt = 0;
+						for(String enrollmentStatus : enrollmentStatuss){
+							allcnt++;
+							if(enrollmentStatus.equals("活動中")){
+								cnt++;
+							}
+						}
+						request.setAttribute("allcnt",allcnt);
+						request.setAttribute("cnt",cnt);
 	                    nextPage = "/WEB-INF/jsp/StudentManagement.jsp";
 	                    break;
 	                case "DashBoard":
@@ -102,7 +115,6 @@ public class StatusServlet extends HttpServlet {
 	                    break;
 	                case "createStudent":
 						//DropdownDataDAO dropdownDAO = new DropdownDataDAO();
-						ServletContext sc = getServletContext();
 						request.setAttribute("jobtypes", sc.getAttribute("jobtypes"));
 						System.out.print("アプリケーションスコープのデータを使用");
 	                    nextPage = "/WEB-INF/jsp/CreateStudent.jsp";
