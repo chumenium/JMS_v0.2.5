@@ -75,6 +75,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 
 <body class="interview-exam-page">
@@ -223,7 +224,9 @@
                                     <div class="form-group full-width">
                                         <label>備考・特記事項</label>
                                         <textarea class="stage-notes" name="stages[].notes" rows="3" 
-                                                  placeholder="特記事項があれば入力してください"></textarea>
+                                                  placeholder="特記事項があれば入力してください"
+                                                  style="resize: none; overflow: hidden;"
+                                                  oninput="autoResize(this)"></textarea>
                                     </div>
                                     
                                     <div class="form-group">
@@ -350,6 +353,8 @@
 <script src="js/jquery.inview_set.js"></script>
 <!--このテンプレート専用のスクリプト-->
 <script src="js/main.js"></script>
+<!--Flatpickrの読み込み-->
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
 // 選考ステージ登録画面のJavaScript
@@ -382,6 +387,27 @@ function addSelectionStage() {
             element.name = element.name.replace('[]', '[' + (stageCounter - 1) + ']');
         }
     });
+    
+    // 新しく追加されたテキストエリアに自動リサイズを適用
+    const newTextarea = newStage.querySelector('.stage-notes');
+    if (newTextarea) {
+        newTextarea.style.resize = 'none';
+        newTextarea.style.overflow = 'hidden';
+        newTextarea.addEventListener('input', function() {
+            autoResize(this);
+        });
+    }
+    
+    // 新しく追加された日付入力にFlatpickrを適用
+    const newDateInput = newStage.querySelector('.stage-date');
+    if (newDateInput && typeof flatpickr !== 'undefined') {
+        flatpickr(newDateInput, {
+            dateFormat: 'Y-m-d',
+            locale: 'ja',
+            allowInput: true,
+            disableMobile: true
+        });
+    }
     
     // コンテナに追加
     container.appendChild(newStage);
@@ -818,7 +844,7 @@ function enableDragAndDrop() {
         font-size: 16px;
         transition: all 0.2s ease;
         box-sizing: border-box;
-        resize: vertical;
+        resize: none;
         min-height: 80px;
     }
 
@@ -1240,12 +1266,104 @@ function checkLocalStorageResult() {
     }
 }
 
+// テキストエリアの自動リサイズ機能
+function autoResize(textarea) {
+    // 一度高さをリセット
+    textarea.style.height = 'auto';
+    // スクロールハイトを取得して高さを設定
+    const scrollHeight = textarea.scrollHeight;
+    const minHeight = 60; // 最小高さ（3行分）
+    let newHeight = Math.max(scrollHeight, minHeight);
+    textarea.style.height = newHeight + 'px';
+    // スクロールバー制御は不要
+}
+
 // ページ読み込み時の初期化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('ページ読み込み完了');
     checkLocalStorageResult();
+    
+    // 既存のテキストエリアに自動リサイズを適用
+    const textareas = document.querySelectorAll('.stage-notes');
+    textareas.forEach(textarea => {
+        autoResize(textarea);
+    });
+    
+    // Flatpickrを全ての.stage-dateに適用
+    flatpickr('.stage-date', {
+        dateFormat: 'Y-m-d',
+        locale: 'ja',
+        allowInput: true,
+        disableMobile: true,
+        // カスタムアイコンや色はCSSで調整
+    });
 });
 </script>
+
+<style>
+    /* Flatpickrカスタム: システムの緑・角丸・フォント */
+.flatpickr-calendar {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: 12px;
+    border: 2px solid #2C7744;
+    box-shadow: 0 4px 24px rgba(44,119,68,0.08);
+}
+.flatpickr-months .flatpickr-month {
+    background: #2C7744;
+    color: #fff;
+    border-radius: 12px 12px 0 0;
+}
+.flatpickr-weekdays {
+    background: #e8f5e8;
+    color: #2C7744;
+}
+.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day:hover {
+    background: #2C7744;
+    color: #fff;
+    border-radius: 8px;
+}
+.flatpickr-day.today {
+    border-color: #2C7744;
+}
+.flatpickr-input[readonly] {
+    background: #fff;
+    color: #2C7744;
+    border: 1.5px solid #2C7744;
+    border-radius: 6px;
+}
+
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+    .flatpickr-calendar {
+        background: #2c2f34;
+        border-color: #7fffd4;
+        color: #f4f6f8;
+    }
+    .flatpickr-months .flatpickr-month {
+        background: #7fffd4;
+        color: #2c2f34;
+    }
+    .flatpickr-weekdays {
+        background: #3d3d3d;
+        color: #7fffd4;
+    }
+    .flatpickr-day {
+        color: #f4f6f8;
+    }
+    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day:hover {
+        background: #7fffd4;
+        color: #2c2f34;
+    }
+    .flatpickr-day.today {
+        border-color: #7fffd4;
+    }
+    .flatpickr-input[readonly] {
+        background: #23272b;
+        color: #7fffd4;
+        border-color: #7fffd4;
+    }
+}
+</style>
 
 </body>
 </html>
