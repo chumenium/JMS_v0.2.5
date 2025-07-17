@@ -4,37 +4,37 @@
 
 | 画面名 | ステータス |
 |:-------|:----------|
-| トップページ（index.html） | 未完了 |
-| ログイン画面（login.html） | 未完了 |
-| 新規登録画面（register.html） | 未完了 |
-| お問い合わせ画面（extension.html） | 作成中 |
+| トップページ（index.html） | 完成 |
+| ログイン画面（login.html） | 完成 |
+| 新規登録画面（register.html） | 完成 |
+| お問い合わせ画面（extension.html） | 未完了 |
 
 ## ⚠️ エラー画面
 
 | 画面名 | ステータス |
 |:-------|:----------|
-| 403エラー画面（403.html） | 未完了 |
-| 404エラー画面（404.html） | 未完了 |
-| 500エラー画面（500.html） | 未完了 |
-| アクセス拒否画面（access-denied.html） | 未完了 |
-| ログイン失敗画面（login-failed.html） | 未完了 |
-| セッション期限切れ画面（session-expired.html） | 未完了 |
+| 403エラー画面（403.html） | 完了 |
+| 404エラー画面（404.html） | 完了  |
+| 500エラー画面（500.html） | 完了 |
+| アクセス拒否画面（access-denied.html） | 完了 |
+| ログイン失敗画面（login-failed.html） | 完了 |
+| セッション期限切れ画面（session-expired.html） | 完了 |
 
 ## 🔐 認証後メイン画面
 
 | 画面名 | ステータス |
 |:-------|:----------|
-| ダッシュボード画面（DashBoard.jsp） | 未完了 |
+| ダッシュボード画面（DashBoard.jsp） | 完了 |
 
 ## 👥 学生管理画面
 
 | 画面名 | ステータス |
 |:-------|:----------|
-| 学生一覧画面（StudentList.jsp） | 未完了 |
-| 学生詳細画面（studentDetail.jsp） | 未完了 |
-| 学生登録画面（CreateStudent.jsp） | 未完了 |
-| 学生管理画面（StudentManagement.jsp） | 未完了 |
-| 学生表示画面（studentView.jsp） | 未完了 |
+| 学生一覧画面（StudentList.jsp） | 完了 |
+| 学生編集画面（studentDetail.jsp） | 完了 |
+| 学生登録画面（CreateStudent.jsp） | 完了 |
+| 学生管理画面（StudentManagement.jsp） | 未完成 |
+| 学生管理画面（studentView.jsp） | 完了 |
 
 ## 🏢 企業管理画面
 
@@ -52,15 +52,15 @@
 | 就職活動画面（jobHunting.jsp） | 未完了 |
 | 就職活動検索画面（jobHuntingSearch.jsp） | 未完了 |
 | 選考ステージ画面（SelectionStage.jsp） | 未完了 |
-| 面接試験入力画面（InterviewExamInput.jsp） | 作成済み |
-| 面接試験表示画面（InterviewExamView.jsp） | 作成済み |
+| 面接試験入力画面（InterviewExamInput.jsp） | 未完成 |
+| 面接試験表示画面（InterviewExamView.jsp） | 未完成 |
 | 受験者一覧画面（applicantList.jsp） | 未完了 |
 
 ## 🔍 検索・結果画面
 
 | 画面名 | ステータス |
 |:-------|:----------|
-| 検索結果画面（SearchResults.jsp） | 未完了 |
+| 検索結果画面（SearchResults.jsp） | 完了 |
 
 ## ⚙️ システム管理画面
 
@@ -81,11 +81,11 @@
 
 | 権限 | 画面数 | ステータス |
 |:-----|:-------|:----------|
-| 学生（student） | 8画面 | 未完了 |
-| 教員（teacher） | 15画面 | 未完了 |
-| 校長・教務部長（headmaster） | 15画面 | 未完了 |
-| 就職指導部（egd） | 12画面 | 未完了 |
-| システム管理者（admin） | 30画面 | 未完了 |
+| 学生（student） | 8画面 | 完了 |
+| 教員（teacher） | 15画面 | 完了 |
+| 校長・教務部長（headmaster） | 15画面 | 完了 |
+| 就職指導部（egd） | 12画面 | 完了 |
+| システム管理者（admin） | 30画面 | 完了 |
 
 ### 画面タイプ別
 

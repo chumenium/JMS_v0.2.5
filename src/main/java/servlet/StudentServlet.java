@@ -702,11 +702,12 @@ public class StudentServlet extends HttpServlet {
                     ArrayList<String> DJTs2 = new ArrayList<>();
                     ArrayList<String> DJTs3 = new ArrayList<>();
                     ArrayList<String> graduationYears = new ArrayList<>();
+                    ArrayList<String> jobHuntingStatus = new ArrayList<>();
                     while(rs.next()) {
                         studentids.add(rs.getString("student_id"));
                         names.add(rs.getString("name"));
                         classs.add(rs.getString("department") + rs.getString("class"));
-                        enrollmentStatuss.add(rs.getString("job_hunting_status"));
+                        jobHuntingStatus.add(rs.getString("job_hunting_status"));
                         numbers.add(rs.getString("number"));
                         nameReadings.add(rs.getString("name_reading"));
                         genders.add(rs.getString("gender"));
@@ -724,7 +725,7 @@ public class StudentServlet extends HttpServlet {
                     String[] keywords = keyword.split(" ");
                     for(int i = 0; i < studentids.size(); i++) {
                         for(int j = 0; j < keywords.length; j++) {
-                            String date = studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i)+numbers.get(i)+nameReadings.get(i)+genders.get(i)+mediationStatuss.get(i)+DJTs1.get(i)+DJTs2.get(i)+DJTs3.get(i)+graduationYears.get(i);
+                            String date = studentids.get(i)+names.get(i)+classs.get(i)+enrollmentStatuss.get(i)+numbers.get(i)+nameReadings.get(i)+genders.get(i)+mediationStatuss.get(i)+DJTs1.get(i)+DJTs2.get(i)+DJTs3.get(i)+graduationYears.get(i)+jobHuntingStatus.get(i);
                             if(date.matches(".*"+keywords[j]+".*")) {
                                 studentids2.add(studentids.get(i));
                                 names2.add(names.get(i));
