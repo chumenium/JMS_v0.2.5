@@ -8,11 +8,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import beans.CompanyBean;
 import beans.InterviewExamContentBean;
@@ -94,112 +94,104 @@ public class InterviewExamViewServlet extends HttpServlet {
     }
     
     private CompanyBean getCompany(int companyId) throws SQLException {
-        Connection conn = DBConnection.getConnection();
-        String sql = "SELECT companys_id, company_name FROM companys_tbl WHERE companys_id = ?";
-        
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setInt(1, companyId);
-        
-        ResultSet rs = pstmt.executeQuery();
-        CompanyBean company = null;
-        
-        if (rs.next()) {
-            company = new CompanyBean();
-            company.setCompanysId(rs.getInt("companys_id"));
-            company.setCompanyName(rs.getString("company_name"));
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                 "SELECT companys_id, company_name FROM companys_tbl WHERE companys_id = ?")) {
+            
+            pstmt.setInt(1, companyId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                CompanyBean company = null;
+                
+                if (rs.next()) {
+                    company = new CompanyBean();
+                    company.setCompanysId(rs.getInt("companys_id"));
+                    company.setCompanyName(rs.getString("company_name"));
+                }
+                
+                return company;
+            }
         }
-        
-        rs.close();
-        pstmt.close();
-        conn.close();
-        
-        return company;
     }
     
     private boolean isStudentRegisteredToCompany(String studentId, int companyId) throws SQLException {
-        Connection conn = DBConnection.getConnection();
-        String sql = "SELECT COUNT(*) FROM job_activity_tbl WHERE student_id = ? AND companys_id = ?";
-        
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setString(1, studentId);
-        pstmt.setInt(2, companyId);
-        
-        ResultSet rs = pstmt.executeQuery();
-        boolean isRegistered = false;
-        
-        if (rs.next()) {
-            isRegistered = rs.getInt(1) > 0;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                 "SELECT COUNT(*) FROM job_activity_tbl WHERE student_id = ? AND companys_id = ?")) {
+            
+            pstmt.setString(1, studentId);
+            pstmt.setInt(2, companyId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                boolean isRegistered = false;
+                
+                if (rs.next()) {
+                    isRegistered = rs.getInt(1) > 0;
+                }
+                
+                return isRegistered;
+            }
         }
-        
-        rs.close();
-        pstmt.close();
-        conn.close();
-        
-        return isRegistered;
     }
     
     private List<InterviewExamContentBean> getExamContents(int companyId) throws SQLException {
         List<InterviewExamContentBean> contents = new ArrayList<>();
-        Connection conn = DBConnection.getConnection();
-        String sql = "SELECT c.id, c.content_number, c.exam_subject, c.exam_content, c.created_at, " +
-                    "et.exam_type_name " +
-                    "FROM interview_exam_content c " +
-                    "LEFT JOIN exam_types et ON c.exam_type_id = et.id " +
-                    "WHERE c.companys_id = ? AND c.content_type = '試験' " +
-                    "ORDER BY c.content_number";
         
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setInt(1, companyId);
-        
-        ResultSet rs = pstmt.executeQuery();
-        
-        while (rs.next()) {
-            InterviewExamContentBean content = new InterviewExamContentBean();
-            content.setId(rs.getInt("id"));
-            content.setContentNumber(rs.getInt("content_number"));
-            content.setExamType(rs.getString("exam_type_name"));
-            content.setExamSubject(rs.getString("exam_subject"));
-            content.setExamContent(rs.getString("exam_content"));
-            content.setCreatedAt(rs.getTimestamp("created_at"));
-            contents.add(content);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                 "SELECT c.id, c.content_number, c.exam_subject, c.exam_content, c.created_at, " +
+                 "et.exam_type_name " +
+                 "FROM interview_exam_content c " +
+                 "LEFT JOIN exam_types et ON c.exam_type_id = et.id " +
+                 "WHERE c.companys_id = ? AND c.content_type = '試験' " +
+                 "ORDER BY c.content_number")) {
+            
+            pstmt.setInt(1, companyId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    InterviewExamContentBean content = new InterviewExamContentBean();
+                    content.setId(rs.getInt("id"));
+                    content.setContentNumber(rs.getInt("content_number"));
+                    content.setExamType(rs.getString("exam_type_name"));
+                    content.setExamSubject(rs.getString("exam_subject"));
+                    content.setExamContent(rs.getString("exam_content"));
+                    content.setCreatedAt(rs.getTimestamp("created_at"));
+                    contents.add(content);
+                }
+            }
         }
-        
-        rs.close();
-        pstmt.close();
-        conn.close();
         
         return contents;
     }
     
     private List<InterviewExamContentBean> getInterviewContents(int companyId) throws SQLException {
         List<InterviewExamContentBean> contents = new ArrayList<>();
-        Connection conn = DBConnection.getConnection();
-        String sql = "SELECT c.id, c.content_number, c.interview_questions, c.interview_notes, c.created_at, " +
-                    "it.interview_type_name " +
-                    "FROM interview_exam_content c " +
-                    "LEFT JOIN interview_types it ON c.interview_type_id = it.id " +
-                    "WHERE c.companys_id = ? AND c.content_type = '面接' " +
-                    "ORDER BY c.content_number";
         
-        PreparedStatement pstmt = conn.prepareStatement(sql);
-        pstmt.setInt(1, companyId);
-        
-        ResultSet rs = pstmt.executeQuery();
-        
-        while (rs.next()) {
-            InterviewExamContentBean content = new InterviewExamContentBean();
-            content.setId(rs.getInt("id"));
-            content.setContentNumber(rs.getInt("content_number"));
-            content.setInterviewType(rs.getString("interview_type_name"));
-            content.setInterviewQuestions(rs.getString("interview_questions"));
-            content.setInterviewNotes(rs.getString("interview_notes"));
-            content.setCreatedAt(rs.getTimestamp("created_at"));
-            contents.add(content);
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(
+                 "SELECT c.id, c.content_number, c.interview_questions, c.interview_notes, c.created_at, " +
+                 "it.interview_type_name " +
+                 "FROM interview_exam_content c " +
+                 "LEFT JOIN interview_types it ON c.interview_type_id = it.id " +
+                 "WHERE c.companys_id = ? AND c.content_type = '面接' " +
+                 "ORDER BY c.content_number")) {
+            
+            pstmt.setInt(1, companyId);
+            
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    InterviewExamContentBean content = new InterviewExamContentBean();
+                    content.setId(rs.getInt("id"));
+                    content.setContentNumber(rs.getInt("content_number"));
+                    content.setInterviewType(rs.getString("interview_type_name"));
+                    content.setInterviewQuestions(rs.getString("interview_questions"));
+                    content.setInterviewNotes(rs.getString("interview_notes"));
+                    content.setCreatedAt(rs.getTimestamp("created_at"));
+                    contents.add(content);
+                }
+            }
         }
-        
-        rs.close();
-        pstmt.close();
-        conn.close();
         
         return contents;
     }
