@@ -20,6 +20,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import beans.CompanyBean;
 import dao.CompanyDAO;
 import dao.StudentDAO;
 import utils.DBConnection;
@@ -182,7 +183,7 @@ public class StudentServlet extends HttpServlet {
                     sc.setAttribute("currentPage", page);
                     sc.setAttribute("totalPages", totalPages);
                     CompanyDAO CompanyDAO = new CompanyDAO();
-                    List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+                    List<CompanyBean> companies = CompanyDAO.getAllCompanies();
                     sc.setAttribute("companies", companies);
 
                 } catch (Exception e) {

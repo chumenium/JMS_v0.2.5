@@ -1,7 +1,15 @@
 package dao;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import beans.CompanyBean;
 import utils.DBConnection;
 
 /**
@@ -13,24 +21,47 @@ public class CompanyDAO {
     /**
      * 全企業一覧を取得
      */
-    public List<Map<String, Object>> getAllCompanies() {
-        List<Map<String, Object>> companies = new ArrayList<>();
+    public List<CompanyBean> getAllCompanies() {
+        List<CompanyBean> companies = new ArrayList<>();
         String sql = "SELECT * FROM companys_tbl ORDER BY companys_id";
         
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            
+            int companyId = 0;
             while (rs.next()) {
-                Map<String, Object> company = new HashMap<>();
-                company.put("companys_id", rs.getInt("companys_id"));
-                company.put("company_name", rs.getString("company_name"));
-                company.put("post_code", rs.getString("post_code"));
-                company.put("address", rs.getString("address"));
-                company.put("tel", rs.getString("tel"));
-                company.put("mail_address", rs.getString("mail_address"));
-                company.put("manager_name", rs.getString("manager_name"));
-                company.put("recruitment_results", rs.getBoolean("recruitment_results"));
+                CompanyBean company = new CompanyBean();
+                companyId = rs.getInt("companys_id");
+                company.setCompanyId(rs.getInt("companys_id"));
+                company.setCompanyName(rs.getString("company_name"));
+                company.setPostCode(rs.getString("post_code"));
+                company.setAddress(rs.getString("address"));
+                company.setTel(rs.getString("tel"));
+                company.setMailAddress(rs.getString("mail_address"));
+                company.setManagerName(rs.getString("manager_name"));
+                company.setRecruitmentResults(rs.getBoolean("recruitment_results"));
+
+                List<String> occupations = new ArrayList<>();
+                String sqloc = "SELECT o.occupation FROM company_occupation_tbl co JOIN occupations_tbl o ON co.occupation_id = o.occupation_id WHERE co.companys_id = ?";
+                PreparedStatement stmtoc = conn.prepareStatement(sqloc);
+                stmtoc.setInt(1, companyId);
+                ResultSet rsoc = stmtoc.executeQuery();
+                while (rsoc.next()) {
+                    occupations.add(rsoc.getString("occupation"));
+                }
+
+                List<String> workPlaces = new ArrayList<>();
+                String sqlwp = "SELECT wp.work_place FROM company_work_place_tbl cwp JOIN work_place_tbl wp ON cwp.work_place_id = wp.id WHERE cwp.companys_id = ?";
+                PreparedStatement stmtwp = conn.prepareStatement(sqlwp);
+                
+                stmtwp.setInt(1, companyId);
+                ResultSet rswp = stmtwp.executeQuery();
+                
+                while (rswp.next()) {
+                    workPlaces.add(rswp.getString("work_place"));
+                }
+                company.setOccupations(occupations);
+                company.setWorkPlaces(workPlaces);
                 companies.add(company);
             }
         } catch (SQLException | ClassNotFoundException e) {
@@ -87,7 +118,50 @@ public class CompanyDAO {
     }
     
     /**
-     * 企業IDで企業情報を取得
+     * 企業IDで企業情報を取得（新しいCompanyBean構造対応）
+     */
+    public beans.CompanyBean getCompanyBeanById(int companyId) {
+        String sql = "SELECT * FROM companys_tbl WHERE companys_id=?";
+        System.out.println("CompanyDAO: getCompanyBeanById called with ID = " + companyId);
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            System.out.println("CompanyDAO: Database connection established");
+            stmt.setInt(1, companyId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                beans.CompanyBean company = new beans.CompanyBean();
+                company.setCompanyId(rs.getInt("companys_id"));
+                company.setCompanyName(rs.getString("company_name"));
+                company.setPostCode(rs.getString("post_code"));
+                company.setAddress(rs.getString("address"));
+                company.setTel(rs.getString("tel"));
+                company.setMailAddress(rs.getString("mail_address"));
+                company.setManagerName(rs.getString("manager_name"));
+                company.setRecruitmentResults(rs.getBoolean("recruitment_results"));
+                
+                // 職種と勤務地のリストを取得
+                List<String> occupations = getCompanyOccupations(companyId);
+                List<String> workPlaces = getCompanyWorkPlaces(companyId);
+                company.setOccupations(occupations);
+                company.setWorkPlaces(workPlaces);
+                
+                System.out.println("CompanyDAO: Found company data = " + company);
+                return company;
+            } else {
+                System.out.println("CompanyDAO: No company found with ID = " + companyId);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            System.out.println("CompanyDAO: Error in getCompanyBeanById: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
+     * 企業IDで企業情報を取得（従来のMap形式）
      */
     public Map<String, Object> getCompanyById(int companyId) {
         String sql = "SELECT * FROM companys_tbl WHERE companys_id=?";
@@ -122,7 +196,197 @@ public class CompanyDAO {
         return null;
     }
     
-        /**
+    /**
+     * 企業の職種リストを取得
+     */
+    public List<String> getCompanyOccupations(int companyId) {
+        List<String> occupations = new ArrayList<>();
+        String sql = "SELECT o.occupation FROM company_occupation_tbl co " +
+                    "JOIN occupations_tbl o ON co.occupation_id = o.occupation_id " +
+                    "WHERE co.companys_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, companyId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                occupations.add(rs.getString("occupation"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return occupations;
+    }
+    
+    /**
+     * 企業の勤務地リストを取得
+     */
+    public List<String> getCompanyWorkPlaces(int companyId) {
+        List<String> workPlaces = new ArrayList<>();
+        String sql = "SELECT wp.work_place FROM company_work_place_tbl cwp " +
+                    "JOIN work_place_tbl wp ON cwp.work_place_id = wp.id " +
+                    "WHERE cwp.companys_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, companyId);
+            ResultSet rs = stmt.executeQuery();
+            
+            while (rs.next()) {
+                workPlaces.add(rs.getString("work_place"));
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return workPlaces;
+    }
+    
+    /**
+     * 企業情報を更新（新しいCompanyBean構造対応）
+     */
+    public boolean updateCompanyBean(beans.CompanyBean company) {
+        Connection conn = null;
+        try {
+            conn = DBConnection.getConnection();
+            conn.setAutoCommit(false);
+            
+            // 企業基本情報を更新（remarksカラムは存在しないため除外）
+            String updateSql = "UPDATE companys_tbl SET company_name=?, post_code=?, address=?, tel=?, mail_address=?, manager_name=?, recruitment_results=? WHERE companys_id=?";
+            try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
+                stmt.setString(1, company.getCompanyName());
+                stmt.setString(2, company.getPostCode());
+                stmt.setString(3, company.getAddress());
+                stmt.setString(4, company.getTel());
+                stmt.setString(5, company.getMailAddress());
+                stmt.setString(6, company.getManagerName());
+                stmt.setBoolean(7, company.getRecruitmentResults());
+                stmt.setInt(8, company.getCompanyId());
+                
+                int result = stmt.executeUpdate();
+                if (result == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+            
+            // 既存の職種・勤務地を削除
+            String deleteOccupationsSql = "DELETE FROM company_occupation_tbl WHERE companys_id=?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteOccupationsSql)) {
+                stmt.setInt(1, company.getCompanyId());
+                stmt.executeUpdate();
+            }
+            
+            String deleteWorkPlacesSql = "DELETE FROM company_work_place_tbl WHERE companys_id=?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteWorkPlacesSql)) {
+                stmt.setInt(1, company.getCompanyId());
+                stmt.executeUpdate();
+            }
+            
+            // 新しい職種を登録
+            if (company.getOccupations() != null) {
+                String insertOccupationSql = "INSERT INTO company_occupation_tbl (companys_id, occupation_id) VALUES (?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(insertOccupationSql)) {
+                    for (String occupation : company.getOccupations()) {
+                        if (occupation != null && !occupation.trim().isEmpty()) {
+                            int occupationId = getOccupationIdByName(occupation);
+                            if (occupationId > 0) {
+                                stmt.setInt(1, company.getCompanyId());
+                                stmt.setInt(2, occupationId);
+                                stmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // 新しい勤務地を登録
+            if (company.getWorkPlaces() != null) {
+                String insertWorkPlaceSql = "INSERT INTO company_work_place_tbl (companys_id, work_place_id) VALUES (?, ?)";
+                try (PreparedStatement stmt = conn.prepareStatement(insertWorkPlaceSql)) {
+                    for (String workPlace : company.getWorkPlaces()) {
+                        if (workPlace != null && !workPlace.trim().isEmpty()) {
+                            int workPlaceId = getWorkPlaceIdByName(workPlace);
+                            if (workPlaceId > 0) {
+                                stmt.setInt(1, company.getCompanyId());
+                                stmt.setInt(2, workPlaceId);
+                                stmt.executeUpdate();
+                            }
+                        }
+                    }
+                }
+            }
+            
+            conn.commit();
+            return true;
+            
+        } catch (SQLException | ClassNotFoundException e) {
+            try {
+                if (conn != null) {
+                    conn.rollback();
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
+    /**
+     * 職種名からIDを取得
+     */
+    private int getOccupationIdByName(String occupationName) {
+        String sql = "SELECT occupation_id FROM occupations_tbl WHERE occupation = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, occupationName);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("occupation_id");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * 勤務地名からIDを取得
+     */
+    private int getWorkPlaceIdByName(String workPlaceName) {
+        String sql = "SELECT id FROM work_place_tbl WHERE work_place = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, workPlaceName);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt("id");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
      * 企業数を取得
      */
     public List<Integer> getCompanyCountRecruitment() {
@@ -148,7 +412,6 @@ public class CompanyDAO {
         }
         return null;
     }
-
 
     /**
      * 企業数を取得
@@ -271,7 +534,7 @@ public class CompanyDAO {
     }
     
     /**
-     * 企業情報を更新
+     * 企業情報を更新（従来の方法）
      */
     public boolean updateCompany(int companyId, String companyName, String postCode, String address, 
                                String tel, String mailAddress, String managerName, boolean recruitmentResults) {
@@ -297,7 +560,7 @@ public class CompanyDAO {
     }
     
     /**
-     * CompanyBeanを使用して企業情報を更新
+     * CompanyBeanを使用して企業情報を更新（従来の方法）
      */
     public boolean updateCompany(beans.CompanyBean company) {
         String sql = "UPDATE companys_tbl SET company_name=?, post_code=?, address=?, tel=?, mail_address=?, manager_name=?, recruitment_results=? WHERE companys_id=?";
@@ -318,6 +581,38 @@ public class CompanyDAO {
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * 企業を登録し、登録したIDを返す
+     */
+    public int addCompanyAndGetId(String companyName, String postCode, String address, 
+                            String tel, String mailAddress, String managerName, boolean recruitmentResults) {
+        String sql = "INSERT INTO companys_tbl (company_name, post_code, address, tel, mail_address, manager_name, recruitment_results) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try (Connection conn = utils.DBConnection.getConnection();
+             java.sql.PreparedStatement stmt = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, companyName);
+            stmt.setString(2, postCode);
+            stmt.setString(3, address);
+            stmt.setString(4, tel);
+            stmt.setString(5, mailAddress);
+            stmt.setString(6, managerName);
+            stmt.setBoolean(7, recruitmentResults);
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                return -1;
+            }
+            try (java.sql.ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    return generatedKeys.getInt(1);
+                } else {
+                    return -1;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
         }
     }
 } 

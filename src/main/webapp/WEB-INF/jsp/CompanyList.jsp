@@ -19,18 +19,19 @@
 
 <!-- 企業管理画面用 -->
 
-<% 
-    String username = (String) session.getAttribute("username"); 
-    String role = (String) session.getAttribute("role"); 
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="beans.CompanyBean,java.util.List" %>
+<%
+    String username = (String) session.getAttribute("username");
+    String role = (String) session.getAttribute("role");
     if (username == null) username = "ゲスト";
     if (role == null) role = "guest";
-    java.util.List<java.util.Map<String, Object>> companies = (java.util.List<java.util.Map<String, Object>>) request.getAttribute("companies");
+    List<CompanyBean> companies = (List<CompanyBean>) request.getAttribute("companies");
     Integer totalCompanies = (Integer) request.getAttribute("totalCompanies");
     Integer recruitmentCompanies = (Integer) request.getAttribute("recruitmentCompanies");
+    java.util.List<java.util.List<String>> workPlacesList = (java.util.List<java.util.List<String>>) request.getAttribute("workPlacesList");
+    java.util.List<java.util.List<String>> occupationsList = (java.util.List<java.util.List<String>>) request.getAttribute("occupationsList");
 %>
 <!--▲▲▲▲▲-->
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -458,44 +459,56 @@
                     <table class="company-table">
                         <thead>
                             <tr>
-                                <th>企業ID</th>
                                 <th>企業名</th>
-                                <th>郵便番号</th>
-                                <th>住所</th>
-                                <th>電話番号</th>
-                                <th>メールアドレス</th>
-                                <th>担当者名</th>
+                                <th>職種</th>
+                                <th>勤務地</th>
                                 <th>採用実績</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <% if (companies != null) { for (java.util.Map<String, Object> company : companies) { %>
+                            <% for (int i = 0; i < companies.size(); i++) {
+                                beans.CompanyBean company = companies.get(i);
+                                List<String> occupations = company.getOccupations();
+                                List<String> workPlaces = company.getWorkPlaces();
+                            %>
                             <tr>
-                              <td><%= company.get("companys_id") %></td>
-                              <td><%= company.get("company_name") %></td>
-                              <td><%= company.get("post_code") %></td>
-                              <td><%= company.get("address") %></td>
-                              <td><%= company.get("tel") %></td>
-                              <td><%= company.get("mail_address") %></td>
-                              <td><%= company.get("manager_name") %></td>
+                              <td><%= company.getCompanyName() %></td>
                               <td>
-                                <% if (company.get("recruitment_results") != null && (Boolean) company.get("recruitment_results")) { %>
+                                <% if (occupations != null && !occupations.isEmpty()) { %>
+                                    <% for (int j = 0; j < occupations.size(); j++) { %>
+                                        <span><%= occupations.get(j) %></span><% if (j != occupations.size()-1) { %>, <% } %>
+                                    <% } %>
+                                <% } else { %>
+                                    <span style="color:#aaa;">未設定</span>
+                                <% } %>
+                              </td>
+                              <td>
+                                <% if (workPlaces != null && !workPlaces.isEmpty()) { %>
+                                    <% for (int j = 0; j < workPlaces.size(); j++) { %>
+                                        <span><%= workPlaces.get(j) %></span><% if (j != workPlaces.size()-1) { %>, <% } %>
+                                    <% } %>
+                                <% } else { %>
+                                    <span style="color:#aaa;">未設定</span>
+                                <% } %>
+                              </td>
+                              <td>
+                                <% if (company.getRecruitmentResults()) { %>
                                   <span class="status-badge success">あり</span>
                                 <% } else { %>
                                   <span class="status-badge warning">なし</span>
                                 <% } %>
                               </td>
                               <td>
-                                <a href="CompanyDetailServlet?companyId=<%= company.get("companys_id") %>" class="table-action-btn" style="background-color: #28a745; color: white;">
+                                <a href="CompanyDetailServlet?companyId=<%= company.getCompanyId() %>" class="table-action-btn" style="background-color: #28a745; color: white;">
                                   <i class="fas fa-eye"></i>詳細
                                 </a>
-                                <a href="CompanyDetailServlet?companyId=<%= company.get("companys_id") %>&mode=edit" class="table-action-btn edit">
+                                <a href="CompanyDetailServlet?companyId=<%= company.getCompanyId() %>&mode=edit" class="table-action-btn edit">
                                   <i class="fas fa-edit"></i>編集
                                 </a>
                               </td>
                             </tr>
-                            <% }} %>
+                            <% } %>
                         </tbody>
                     </table>
                 <% } else { %>

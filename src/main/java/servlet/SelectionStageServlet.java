@@ -1,18 +1,20 @@
 package servlet;
 
 import java.io.IOException;
-import java.sql.Date;
 import java.util.List;
 import java.util.Map;
+
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+
+import beans.CompanyBean;
+import dao.CompanyDAO;
 import dao.SelectionStageDAO;
 import dao.StudentDAO;
-import dao.CompanyDAO;
 
 /**
  * 選考ステージ登録サーブレット
@@ -54,7 +56,7 @@ public class SelectionStageServlet extends HttpServlet {
             request.setAttribute("students", students);
             
             // 企業一覧を取得
-            List<Map<String, Object>> companies = companyDAO.getAllCompanies();
+            List<CompanyBean> companies = companyDAO.getAllCompanies();
             request.setAttribute("companies", companies);
             
         } catch (Exception e) {

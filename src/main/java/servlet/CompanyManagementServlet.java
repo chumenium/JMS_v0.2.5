@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import beans.CompanyBean;
 import dao.CompanyDAO;
 
 /**
@@ -96,7 +97,6 @@ public class CompanyManagementServlet extends HttpServlet {
     
     private void handleAddCompany(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        
         // リクエストパラメータを取得
         String companyName = request.getParameter("company_name");
         String postCode = request.getParameter("post_code");
@@ -104,28 +104,66 @@ public class CompanyManagementServlet extends HttpServlet {
         String tel = request.getParameter("tel");
         String mailAddress = request.getParameter("mail_address");
         String managerName = request.getParameter("manager_name");
-
         boolean recruitmentResults = "true".equals(request.getParameter("recruitment_results"));
-        
+
+        // 職種リスト
+        java.util.List<String> occupations = new java.util.ArrayList<>();
+        int maxOccupationIndex = 0;
+        try {
+            maxOccupationIndex = Integer.parseInt(request.getParameter("maxOccupationIndex"));
+        } catch (Exception e) {}
+        for (int i = 0; i <= maxOccupationIndex; i++) {
+            String occupation = request.getParameter("occupation" + i);
+            if (occupation != null && !occupation.trim().isEmpty()) {
+                occupations.add(occupation);
+            }
+        }
+        // 勤務地リスト
+        java.util.List<String> workPlaces = new java.util.ArrayList<>();
+        int maxWorkPlaceIndex = 0;
+        try {
+            maxWorkPlaceIndex = Integer.parseInt(request.getParameter("maxWorkPlaceIndex"));
+        } catch (Exception e) {}
+        for (int i = 0; i <= maxWorkPlaceIndex; i++) {
+            String workPlace = request.getParameter("workPlace" + i);
+            if (workPlace != null && !workPlace.trim().isEmpty()) {
+                workPlaces.add(workPlace);
+            }
+        }
+
         // バリデーション
         if (companyName == null || companyName.trim().isEmpty()) {
             request.setAttribute("errorMessage", "企業名は必須です。");
             doGet(request, response);
             return;
         }
-        
-        // 企業を登録
-        boolean success = CompanyDAO.addCompany(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
+
+        // 企業を登録（まず基本情報をinsertし、IDを取得→Beanにセット→updateCompanyBeanで職種・勤務地も登録）
+        int newCompanyId = CompanyDAO.addCompanyAndGetId(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
+        boolean success = false;
+        if (newCompanyId > 0) {
+            beans.CompanyBean company = new beans.CompanyBean();
+            company.setCompanyId(newCompanyId);
+            company.setCompanyName(companyName);
+            company.setPostCode(postCode);
+            company.setAddress(address);
+            company.setTel(tel);
+            company.setMailAddress(mailAddress);
+            company.setManagerName(managerName);
+            company.setRecruitmentResults(recruitmentResults);
+            company.setOccupations(occupations);
+            company.setWorkPlaces(workPlaces);
+            // 職種・勤務地を登録
+            success = CompanyDAO.updateCompanyBean(company);
+        }
         if (success) {
-            CompanyDAO CompanyDAO = new CompanyDAO();
-            List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+            List<CompanyBean> companies = CompanyDAO.getAllCompanies();
             ServletContext sc = getServletContext();
             sc.setAttribute("companies", companies);
             request.setAttribute("successMessage", "企業の登録が完了しました。");
         } else {
             request.setAttribute("errorMessage", "企業の登録に失敗しました。");
         }
-        
         doGet(request, response);
     }
     
@@ -161,7 +199,7 @@ public class CompanyManagementServlet extends HttpServlet {
             
             if (success) {
                 CompanyDAO CompanyDAO = new CompanyDAO();
-                List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+                List<CompanyBean> companies = CompanyDAO.getAllCompanies();
                 ServletContext sc = getServletContext();
                 sc.setAttribute("companies", companies);
                 request.setAttribute("successMessage", "企業情報の更新が完了しました。");
@@ -194,7 +232,7 @@ public class CompanyManagementServlet extends HttpServlet {
             
             if (success) {
                 CompanyDAO CompanyDAO = new CompanyDAO();
-                List<Map<String, Object>> companies = CompanyDAO.getAllCompanies();
+                List<CompanyBean> companies = CompanyDAO.getAllCompanies();
                 ServletContext sc = getServletContext();
                 sc.setAttribute("companies", companies);
                 request.setAttribute("successMessage", "企業の削除が完了しました。");

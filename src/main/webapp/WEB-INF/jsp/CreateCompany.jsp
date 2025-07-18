@@ -321,6 +321,42 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- 職種・勤務地 複数登録エリア -->
+                <div class="form-row">
+                    <div class="form-group" style="width:100%;">
+                        <label>職種</label>
+                        <div id="occupation-container">
+                            <select name="occupation0" class="occupation-select">
+                                <option value="">選択してください</option>
+                                <% java.util.List<String> occupationList = (java.util.List<String>) application.getAttribute("jobtypes");
+                                   if (occupationList != null) {
+                                       for (String occ : occupationList) { %>
+                                           <option value="<%= occ %>"><%= occ %></option>
+                                <%     } } %>
+                            </select>
+                        </div>
+                        <button type="button" id="add-occupation-btn" class="btn btn-secondary" style="margin-top:8px;">職種を増やす＋</button>
+                        <input type="hidden" id="maxOccupationIndex" name="maxOccupationIndex" value="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group" style="width:100%;">
+                        <label>勤務地</label>
+                        <div id="workplace-container">
+                            <select name="workPlace0" class="workplace-select">
+                                <option value="">選択してください</option>
+                                <% java.util.List<String> workPlaceList = (java.util.List<String>) application.getAttribute("workplaces");
+                                   if (workPlaceList != null) {
+                                       for (String wp : workPlaceList) { %>
+                                           <option value="<%= wp %>"><%= wp %></option>
+                                <%     } } %>
+                            </select>
+                        </div>
+                        <button type="button" id="add-workplace-btn" class="btn btn-secondary" style="margin-top:8px;">勤務地を増やす＋</button>
+                        <input type="hidden" id="maxWorkPlaceIndex" name="maxWorkPlaceIndex" value="0">
+                    </div>
+                </div>
                 <!-- ボタン -->
                 <div class="form-buttons">
                     <button type="submit" class="btn btn-primary">登録する</button>
@@ -334,13 +370,38 @@
         // フォームバリデーション
         document.querySelector('form').addEventListener('submit', function(e) {
             const companyName = document.getElementById('company_name').value;
-
-            // 必須項目チェック
             if (!companyName) {
                 e.preventDefault();
                 alert('企業名を入力してください。');
                 return;
             }
+        });
+
+        // 職種追加
+        document.getElementById('add-occupation-btn').addEventListener('click', function() {
+            var container = document.getElementById('occupation-container');
+            var maxIndexInput = document.getElementById('maxOccupationIndex');
+            var currentIndex = parseInt(maxIndexInput.value, 10);
+            var newIndex = currentIndex + 1;
+            var selects = container.getElementsByTagName('select');
+            var newSelect = selects[selects.length - 1].cloneNode(true);
+            newSelect.name = 'occupation' + newIndex;
+            newSelect.selectedIndex = 0;
+            container.appendChild(newSelect);
+            maxIndexInput.value = newIndex;
+        });
+        // 勤務地追加
+        document.getElementById('add-workplace-btn').addEventListener('click', function() {
+            var container = document.getElementById('workplace-container');
+            var maxIndexInput = document.getElementById('maxWorkPlaceIndex');
+            var currentIndex = parseInt(maxIndexInput.value, 10);
+            var newIndex = currentIndex + 1;
+            var selects = container.getElementsByTagName('select');
+            var newSelect = selects[selects.length - 1].cloneNode(true);
+            newSelect.name = 'workPlace' + newIndex;
+            newSelect.selectedIndex = 0;
+            container.appendChild(newSelect);
+            maxIndexInput.value = newIndex;
         });
     </script>
 

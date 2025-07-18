@@ -1,6 +1,9 @@
 package beans;
 
-public class CompanyBean {
+import java.io.Serializable;
+import java.util.List;
+
+public class CompanyBean implements Serializable {
     private int companyId;
     private String companyName;
     private String postCode;
@@ -9,16 +12,16 @@ public class CompanyBean {
     private String mailAddress;
     private String managerName;
     private boolean recruitmentResults;
-    private int workPlaceId;
-    private int occupationId;
-    
+    private List<String> occupations; // 職種リスト
+    private List<String> workPlaces; // 勤務地リスト
+
     // デフォルトコンストラクタ
     public CompanyBean() {}
     
     // 全フィールドのコンストラクタ
     public CompanyBean(int companyId, String companyName, String postCode, String address, 
                       String tel, String mailAddress, String managerName, boolean recruitmentResults,
-                      int workPlaceId, int occupationId) {
+                      List<String> occupations, List<String> workPlaces) {
         this.companyId = companyId;
         this.companyName = companyName;
         this.postCode = postCode;
@@ -27,8 +30,8 @@ public class CompanyBean {
         this.mailAddress = mailAddress;
         this.managerName = managerName;
         this.recruitmentResults = recruitmentResults;
-        this.workPlaceId = workPlaceId;
-        this.occupationId = occupationId;
+        this.occupations = occupations;
+        this.workPlaces = workPlaces;
     }
     
     // Getter・Setterメソッド
@@ -96,21 +99,23 @@ public class CompanyBean {
         this.recruitmentResults = recruitmentResults;
     }
     
-    public int getWorkPlaceId() {
-        return workPlaceId;
+    public List<String> getOccupations() {
+        return occupations;
     }
     
-    public void setWorkPlaceId(int workPlaceId) {
-        this.workPlaceId = workPlaceId;
+    public void setOccupations(List<String> occupations) {
+        this.occupations = occupations;
     }
     
-    public int getOccupationId() {
-        return occupationId;
+    public List<String> getWorkPlaces() {
+        return workPlaces;
     }
     
-    public void setOccupationId(int occupationId) {
-        this.occupationId = occupationId;
+    public void setWorkPlaces(List<String> workPlaces) {
+        this.workPlaces = workPlaces;
     }
+    
+
     
     @Override
     public String toString() {
@@ -123,8 +128,8 @@ public class CompanyBean {
                 ", mailAddress='" + mailAddress + '\'' +
                 ", managerName='" + managerName + '\'' +
                 ", recruitmentResults=" + recruitmentResults +
-                ", workPlaceId=" + workPlaceId +
-                ", occupationId=" + occupationId +
+                ", occupations=" + occupations +
+                ", workPlaces=" + workPlaces +
                 '}';
     }
 } 

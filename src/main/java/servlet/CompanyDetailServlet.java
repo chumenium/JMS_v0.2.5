@@ -3,6 +3,7 @@ package servlet;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -20,7 +21,7 @@ import dao.CompanyDAO;
  */
 public class CompanyDetailServlet extends HttpServlet {
     
-    	private CompanyDAO CompanyDAO = new CompanyDAO();
+    private CompanyDAO CompanyDAO = new CompanyDAO();
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
@@ -73,11 +74,11 @@ public class CompanyDetailServlet extends HttpServlet {
             int companyId = Integer.parseInt(companyIdStr);
             System.out.println("CompanyDetailServlet: Parsed companyId = " + companyId);
             
-            // 企業情報を取得
-            Map<String, Object> companyData = CompanyDAO.getCompanyById(companyId);
-            System.out.println("CompanyDetailServlet: Retrieved company data = " + companyData);
+            // 企業情報を取得（新しいCompanyBean構造）
+            CompanyBean company = CompanyDAO.getCompanyBeanById(companyId);
+            System.out.println("CompanyDetailServlet: Retrieved company data = " + company);
             
-            if (companyData == null) {
+            if (company == null) {
                 System.out.println("CompanyDetailServlet: Company not found");
                 request.setAttribute("errorMessage", "指定された企業が見つかりません。");
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/error/404.html");
@@ -85,78 +86,23 @@ public class CompanyDetailServlet extends HttpServlet {
                 return;
             }
             
-            // MapからCompanyBeanに変換（null安全）
-            CompanyBean company = new CompanyBean();
-            
-            // null安全な値設定
-            Integer companyIdFromDb = (Integer) companyData.get("companys_id");
-            if (companyIdFromDb != null) {
-                company.setCompanyId(companyIdFromDb);
-            }
-            
-            String companyName = (String) companyData.get("company_name");
-            company.setCompanyName(companyName != null ? companyName : "");
-            
-            String postCode = (String) companyData.get("post_code");
-            company.setPostCode(postCode != null ? postCode : "");
-            
-            String address = (String) companyData.get("address");
-            company.setAddress(address != null ? address : "");
-            
-            String tel = (String) companyData.get("tel");
-            company.setTel(tel != null ? tel : "");
-            
-            String mailAddress = (String) companyData.get("mail_address");
-            company.setMailAddress(mailAddress != null ? mailAddress : "");
-            
-            String managerName = (String) companyData.get("manager_name");
-            company.setManagerName(managerName != null ? managerName : "");
-            
-            Boolean recruitmentResults = (Boolean) companyData.get("recruitment_results");
-            company.setRecruitmentResults(recruitmentResults != null ? recruitmentResults : false);
-            
-            // 勤務地・職種IDを設定（データベースから取得した場合）
-            if (companyData.get("work_place_id") != null) {
-                company.setWorkPlaceId((Integer) companyData.get("work_place_id"));
-            }
-            if (companyData.get("occupation_id") != null) {
-                company.setOccupationId((Integer) companyData.get("occupation_id"));
-            }
-            
-            System.out.println("CompanyDetailServlet: Created CompanyBean = " + company);
-            
-            // 勤務地・職種名を取得
-            String workPlaceName = "";
-            String occupationName = "";
-            try {
-                if (company.getWorkPlaceId() > 0) {
-                    workPlaceName = CompanyDAO.getWorkPlaceName(company.getWorkPlaceId());
-                }
-                if (company.getOccupationId() > 0) {
-                    occupationName = CompanyDAO.getOccupationName(company.getOccupationId());
-                }
-            } catch (Exception e) {
-                System.out.println("CompanyDetailServlet: Error getting place/occupation names: " + e.getMessage());
-            }
             ServletContext sc = getServletContext();
             // プルダウン用データを取得
-            List<String> workPlaces = null;
-            List<String> occupations = null;
+            List<String> workPlaceList = null;
+            List<String> occupationList = null;
             try {
-                workPlaces = (List<String>)sc.getAttribute("workplaces");
-                occupations = (List<String>)sc.getAttribute("jobtypes");
+                workPlaceList = (List<String>)sc.getAttribute("workplaces");
+                occupationList = (List<String>)sc.getAttribute("jobtypes");
             } catch (Exception e) {
                 System.out.println("CompanyDetailServlet: Error getting dropdown data: " + e.getMessage());
-                workPlaces = new java.util.ArrayList<>();
-                occupations = new java.util.ArrayList<>();
+                workPlaceList = new ArrayList<>();
+                occupationList = new ArrayList<>();
             }
             
             // リクエストスコープに設定
             request.setAttribute("company", company);
-            request.setAttribute("workPlaceName", workPlaceName);
-            request.setAttribute("occupationName", occupationName);
-            request.setAttribute("workPlaces", workPlaces);
-            request.setAttribute("occupations", occupations);
+            request.setAttribute("workPlaceList", workPlaceList);
+            request.setAttribute("occupationList", occupationList);
             
             // 編集モードかどうかを判定
             String mode = request.getParameter("mode");
@@ -165,8 +111,18 @@ public class CompanyDetailServlet extends HttpServlet {
             
             System.out.println("CompanyDetailServlet: Forwarding to JSP, editMode = " + isEditMode);
             
+            // モードに応じてJSPを選択
+            String jspPath;
+            if (isEditMode) {
+                // 編集モードの場合はCompanyDetail.jsp
+                jspPath = "/WEB-INF/jsp/companyDetail.jsp";
+            } else {
+                // 表示モードの場合はCompanyView.jsp
+                jspPath = "/WEB-INF/jsp/CompanyView.jsp";
+            }
+            
             // JSPにフォワード
-            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/companyDetail.jsp");
+            RequestDispatcher dispatcher = request.getRequestDispatcher(jspPath);
             dispatcher.forward(request, response);
             
         } catch (NumberFormatException e) {
@@ -242,7 +198,7 @@ public class CompanyDetailServlet extends HttpServlet {
     }
     
     /**
-     * 企業更新処理
+     * 企業更新処理（新しいCompanyBean構造対応）
      */
     private void handleUpdate(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -257,9 +213,25 @@ public class CompanyDetailServlet extends HttpServlet {
             String managerName = request.getParameter("managerName");
             boolean recruitmentResults = "true".equals(request.getParameter("recruitmentResults"));
             
-            // 勤務地・職種をIDに変換
-            int workPlaceId = getWorkPlaceId(request.getParameter("workPlace"));
-            int occupationId = getOccupationId(request.getParameter("occupation"));
+            // 職種リストを取得
+            List<String> occupations = new ArrayList<>();
+            int maxOccupationIndex = Integer.parseInt(request.getParameter("maxOccupationIndex"));
+            for (int i = 0; i <= maxOccupationIndex; i++) {
+                String occupation = request.getParameter("occupation" + i);
+                if (occupation != null && !occupation.trim().isEmpty()) {
+                    occupations.add(occupation);
+                }
+            }
+            
+            // 勤務地リストを取得
+            List<String> workPlaces = new ArrayList<>();
+            int maxWorkPlaceIndex = Integer.parseInt(request.getParameter("maxWorkPlaceIndex"));
+            for (int i = 0; i <= maxWorkPlaceIndex; i++) {
+                String workPlace = request.getParameter("workPlace" + i);
+                if (workPlace != null && !workPlace.trim().isEmpty()) {
+                    workPlaces.add(workPlace);
+                }
+            }
             
             // CompanyBeanに設定
             CompanyBean company = new CompanyBean();
@@ -271,11 +243,11 @@ public class CompanyDetailServlet extends HttpServlet {
             company.setMailAddress(mailAddress);
             company.setManagerName(managerName);
             company.setRecruitmentResults(recruitmentResults);
-            company.setWorkPlaceId(workPlaceId);
-            company.setOccupationId(occupationId);
+            company.setOccupations(occupations);
+            company.setWorkPlaces(workPlaces);
             
-            // 更新処理
-            boolean success = CompanyDAO.updateCompany(company);
+            // 更新処理（新しいメソッドを使用）
+            boolean success = CompanyDAO.updateCompanyBean(company);
             
             if (success) {
                 request.setAttribute("successMessage", "企業情報を更新しました。");
@@ -295,41 +267,5 @@ public class CompanyDetailServlet extends HttpServlet {
             request.setAttribute("errorMessage", "更新処理中にエラーが発生しました: " + e.getMessage());
             doGet(request, response);
         }
-    }
-    
-    /**
-     * 勤務地名からIDを取得
-     */
-    private int getWorkPlaceId(String workPlaceName) {
-        if (workPlaceName == null || workPlaceName.trim().isEmpty()) {
-            return 0;
-        }
-        
-        		// 簡易的な実装（実際はDAOで検索）
-		List<String> workPlaces = CompanyDAO.getWorkPlaces();
-        for (int i = 0; i < workPlaces.size(); i++) {
-            if (workPlaces.get(i).equals(workPlaceName)) {
-                return i + 1; // IDは1から始まると仮定
-            }
-        }
-        return 0;
-    }
-    
-    /**
-     * 職種名からIDを取得
-     */
-    private int getOccupationId(String occupationName) {
-        if (occupationName == null || occupationName.trim().isEmpty()) {
-            return 0;
-        }
-        
-        		// 簡易的な実装（実際はDAOで検索）
-		List<String> occupations = CompanyDAO.getOccupations();
-        for (int i = 0; i < occupations.size(); i++) {
-            if (occupations.get(i).equals(occupationName)) {
-                return i + 1; // IDは1から始まると仮定
-            }
-        }
-        return 0;
     }
 } 
