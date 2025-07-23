@@ -323,7 +323,18 @@ public class CompanyDAO {
                 try (PreparedStatement stmt = conn.prepareStatement(insertOccupationSql)) {
                     for (String occupation : company.getOccupations()) {
                         if (occupation != null && !occupation.trim().isEmpty()) {
-                            int occupationId = getOccupationIdByName(occupation);
+                            int occupationId = 0;//getOccupationIdByName(occupation);
+                            //職種IDをget
+                            String sql1 = "SELECT occupation_id FROM occupations_tbl WHERE occupation = ?";
+                            PreparedStatement stmt1 = conn.prepareStatement(sql1);
+                            
+                            stmt1.setString(1, occupation);
+                            ResultSet rs1 = stmt1.executeQuery();
+                            
+                            if (rs1.next()) {
+                                occupationId = rs1.getInt("occupation_id");
+                            }
+                            //ここまで
                             if (occupationId > 0) {
                                 stmt.setInt(1, company.getCompanyId());
                                 stmt.setInt(2, occupationId);
@@ -340,7 +351,16 @@ public class CompanyDAO {
                 try (PreparedStatement stmt = conn.prepareStatement(insertWorkPlaceSql)) {
                     for (String workPlace : company.getWorkPlaces()) {
                         if (workPlace != null && !workPlace.trim().isEmpty()) {
-                            int workPlaceId = getWorkPlaceIdByName(workPlace);
+                            int workPlaceId = 0;//getWorkPlaceIdByName(workPlace);
+                            //勤務地IDをget
+                            String sql2 = "SELECT id FROM work_place_tbl WHERE work_place = ?";
+                            PreparedStatement stmt2 = conn.prepareStatement(sql2);
+                            stmt2.setString(1, workPlace);
+                            ResultSet rs2 = stmt2.executeQuery();
+                            if (rs2.next()) {
+                                workPlaceId = rs2.getInt("id");
+                            }
+                            //ここまで
                             if (workPlaceId > 0) {
                                 stmt.setInt(1, company.getCompanyId());
                                 stmt.setInt(2, workPlaceId);
