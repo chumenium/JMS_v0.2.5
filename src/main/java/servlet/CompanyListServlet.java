@@ -2,7 +2,6 @@ package servlet;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -12,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import beans.CompanyBean;
 import dao.CompanyDAO;
 
 /**
@@ -52,9 +52,9 @@ public class CompanyListServlet extends HttpServlet {
         try {
             // 企業一覧を取得
             ServletContext sc = getServletContext();
-            List<Map<String, Object>> companies = (List<Map<String, Object>>)sc.getAttribute("companies");
+            List<CompanyBean> companies = (List<CompanyBean>)sc.getAttribute("companies");
             request.setAttribute("companies", companies);
-            List<Integer> numdata = CompanyDAO.getCompanyCountRecruitment();
+            List<Integer> numdata = (List<Integer>)sc.getAttribute("comNumData");
             // 統計情報を取得
             int totalCompanies = numdata.get(0);
 		    int recruitmentCompanies = numdata.get(1);

@@ -48,7 +48,7 @@ public class CompanyManagementServlet extends HttpServlet {
         
         // 企業一覧を取得
         ServletContext sc = getServletContext();
-        List<Map<String, Object>> companies = (List<Map<String, Object>>)sc.getAttribute("companies");
+        List<CompanyBean> companies = (List<CompanyBean>)sc.getAttribute("companies");
         request.setAttribute("companies", companies);
         List<Integer> numdata = CompanyDAO.getCompanyCountRecruitment();
         // 統計情報を取得
@@ -139,11 +139,11 @@ public class CompanyManagementServlet extends HttpServlet {
         }
 
         // 企業を登録（まず基本情報をinsertし、IDを取得→Beanにセット→updateCompanyBeanで職種・勤務地も登録）
-        int newCompanyId = CompanyDAO.addCompanyAndGetId(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
+        //int newCompanyId = CompanyDAO.addCompanyAndGetId(companyName, postCode, address, tel, mailAddress, managerName, recruitmentResults);
         boolean success = false;
-        if (newCompanyId > 0) {
+        //if (newCompanyId > 0) {
             beans.CompanyBean company = new beans.CompanyBean();
-            company.setCompanyId(newCompanyId);
+            //company.setCompanyId(newCompanyId);
             company.setCompanyName(companyName);
             company.setPostCode(postCode);
             company.setAddress(address);
@@ -154,12 +154,16 @@ public class CompanyManagementServlet extends HttpServlet {
             company.setOccupations(occupations);
             company.setWorkPlaces(workPlaces);
             // 職種・勤務地を登録
+            CompanyDAO.addCompanyAndGetId(companyName, company);
             success = CompanyDAO.updateCompanyBean(company);
-        }
+        //}
         if (success) {
             List<CompanyBean> companies = CompanyDAO.getAllCompanies();
             ServletContext sc = getServletContext();
             sc.setAttribute("companies", companies);
+            List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+            sc.setAttribute("companies", companies);
+            sc.setAttribute("comNumData", comNumData);
             request.setAttribute("successMessage", "企業の登録が完了しました。");
         } else {
             request.setAttribute("errorMessage", "企業の登録に失敗しました。");
@@ -202,6 +206,8 @@ public class CompanyManagementServlet extends HttpServlet {
                 List<CompanyBean> companies = CompanyDAO.getAllCompanies();
                 ServletContext sc = getServletContext();
                 sc.setAttribute("companies", companies);
+                List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+                sc.setAttribute("comNumData", comNumData);
                 request.setAttribute("successMessage", "企業情報の更新が完了しました。");
             } else {
                 request.setAttribute("errorMessage", "企業情報の更新に失敗しました。");

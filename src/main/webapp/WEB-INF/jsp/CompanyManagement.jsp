@@ -25,6 +25,8 @@
 <% 
   String username = (String) session.getAttribute("username"); 
   String role     = (String) session.getAttribute("role"); 
+  Integer totalCompanies = (Integer) request.getAttribute("totalCompanies");
+  Integer recruitmentCompanies = (Integer) request.getAttribute("recruitmentCompanies");
   
   // デバッグ用：セッション情報をコンソールに出力
   System.out.println("CompanyManagement.jsp - username: " + username);
@@ -601,11 +603,11 @@
                     </p>
                     <div class="card-stats" role="group" aria-label="企業統計">
                         <div class="stat-item">
-                            <span class="stat-number">-</span>
+                            <span class="stat-number"><%= totalCompanies != null ? totalCompanies : 0 %></span>
                             <span class="stat-label">総企業数</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">-</span>
+                            <span class="stat-number"><%= recruitmentCompanies != null ? recruitmentCompanies : 0 %></span>
                             <span class="stat-label">採用実績あり</span>
                         </div>
                     </div>

@@ -2,6 +2,7 @@ package servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -102,6 +103,12 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/jobHunting.jsp";
 	                    break;
 	                case "CompanyManagement":
+						List<Integer> numdata = (List<Integer>)sc.getAttribute("comNumData");
+						// 統計情報を取得
+						int totalCompanies = numdata.get(0);
+						int recruitmentCompanies = numdata.get(1);
+						request.setAttribute("totalCompanies", totalCompanies);
+						request.setAttribute("recruitmentCompanies", recruitmentCompanies);
 	                    nextPage = "/WEB-INF/jsp/CompanyManagement.jsp";
 	                    break;
 	                case "CompanyList":

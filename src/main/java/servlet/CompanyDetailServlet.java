@@ -182,6 +182,12 @@ public class CompanyDetailServlet extends HttpServlet {
             
             if (success) {
                 // 削除成功 - 企業一覧にリダイレクト
+                CompanyDAO CompanyDAO = new CompanyDAO();
+                List<CompanyBean> companies = CompanyDAO.getAllCompanies();
+                ServletContext sc = getServletContext();
+                sc.setAttribute("companies", companies);
+                List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+                sc.setAttribute("comNumData", comNumData);
                 System.out.println("CompanyDetailServlet: Delete successful, redirecting to CompanyListServlet");
                 response.sendRedirect(request.getContextPath() + "/CompanyListServlet?message=deleted");
             } else {
@@ -258,6 +264,14 @@ public class CompanyDetailServlet extends HttpServlet {
             // 詳細画面に戻る
             response.sendRedirect(request.getContextPath() + "/CompanyDetailServlet?companyId=" + companyId);
             
+
+            CompanyDAO CompanyDAO = new CompanyDAO();
+            List<CompanyBean> companies = CompanyDAO.getAllCompanies();
+            ServletContext sc = getServletContext();
+            sc.setAttribute("companies", companies);
+            List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+            sc.setAttribute("comNumData", comNumData);
+
         } catch (NumberFormatException e) {
             request.setAttribute("errorMessage", "入力データに不正な値が含まれています。");
             doGet(request, response);
