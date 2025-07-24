@@ -132,8 +132,12 @@
                         <div class="form-group">
                             <label for="studentName">学生名 <span class="required">*</span></label>
                             <div class="search-input-container">
-                                <input type="text" id="studentName" name="studentName" value="<%= studentName != null ? studentName : "" %>" required placeholder="学生名を入力" autocomplete="off">
-                                <button type="button" class="search-btn" onclick="openStudentSearch()" title="学生を検索">
+                                <input type="text" id="studentName" name="studentName" 
+                                       value="<%= "student".equals(role) ? username : (studentName != null ? studentName : "") %>" 
+                                       required placeholder="学生名を入力" autocomplete="off"
+                                       <%= "student".equals(role) ? "readonly" : "" %>>
+                                <button type="button" class="search-btn" onclick="openStudentSearch()" title="学生を検索"
+                                        <%= "student".equals(role) ? "style='display:none;'" : "" %>>
                                     🔍
                                 </button>
                             </div>
@@ -160,30 +164,24 @@
                 <div class="form-section">
                     <div class="section-header">
                         <h4 class="section-title">📋 選考ステージ管理</h4>
-                        <button type="button" class="btn btn-primary btn-sm" onclick="addSelectionStage()">
+                        <button type="button" class="btn btn-primary btn-sm" onclick="addStage()">
                             ➕ ステージを追加
                         </button>
         </div>
                     
-                    <div id="selectionStagesContainer">
-                        <!-- 選考ステージが動的に追加される場所 -->
-    </div>
-
-                    <div class="stage-template" id="stageTemplate" style="display: none;">
-                        <div class="stage-item" data-stage-index="">
+                    <div id="stagesContainer">
+                        <!-- 最初のステージ -->
+                        <div class="stage-card" data-stage-id="1">
                             <div class="stage-header">
-                                <h5 class="stage-title">選考ステージ <span class="stage-number"></span></h5>
-                                <button type="button" class="remove-stage-btn" onclick="removeStage(this)" title="このステージを削除">
-                                    🗑️
-                                </button>
-    </div>
-
+                                <h5 class="stage-title">選考ステージ <span class="stage-number">1</span></h5>
+                                <button type="button" class="remove-btn" onclick="removeStage(this)" title="このステージを削除">🗑️</button>
+                            </div>
                             <div class="stage-content">
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>ステージ種別 <span class="required">*</span></label>
-                                        <select class="stage-type" name="stages[].type" required>
-            <option value="">選択してください</option>
+                                        <select name="stages[0].type" required>
+                                            <option value="">選択してください</option>
                                             <option value="説明会">説明会</option>
                                             <option value="書類選考">書類選考</option>
                                             <option value="筆記試験">筆記試験</option>
@@ -196,22 +194,19 @@
                                             <option value="プレゼンテーション">プレゼンテーション</option>
                                             <option value="実技試験">実技試験</option>
                                             <option value="その他">その他</option>
-        </select>
-    </div>
-
+                                        </select>
+                                    </div>
                                     <div class="form-group">
                                         <label>実施日</label>
-                                        <input type="date" class="stage-date" name="stages[].date">
-    </div>
-
+                                        <input type="date" name="stages[0].date" class="date-input">
+                                    </div>
                                     <div class="form-group">
                                         <label>実施時間</label>
-                                        <input type="time" class="stage-time" name="stages[].time">
+                                        <input type="time" name="stages[0].time">
                                     </div>
-
                                     <div class="form-group">
                                         <label>実施形式</label>
-                                        <select class="stage-format" name="stages[].format">
+                                        <select name="stages[0].format">
                                             <option value="">選択してください</option>
                                             <option value="個人">個人</option>
                                             <option value="集団">集団</option>
@@ -220,18 +215,15 @@
                                             <option value="ハイブリッド">ハイブリッド</option>
                                         </select>
                                     </div>
-
                                     <div class="form-group full-width">
                                         <label>備考・特記事項</label>
-                                        <textarea class="stage-notes" name="stages[].notes" rows="3" 
+                                        <textarea name="stages[0].notes" rows="3" 
                                                   placeholder="特記事項があれば入力してください"
-                                                  style="resize: none; overflow: hidden;"
-                                                  oninput="autoResize(this)"></textarea>
+                                                  class="notes-textarea"></textarea>
                                     </div>
-                                    
                                     <div class="form-group">
                                         <label>ステータス</label>
-                                        <select class="stage-status" name="stages[].status">
+                                        <select name="stages[0].status">
                                             <option value="予定">予定</option>
                                             <option value="実施済み">実施済み</option>
                                             <option value="合格">合格</option>
@@ -353,55 +345,105 @@
 <script src="js/jquery.inview_set.js"></script>
 <!--このテンプレート専用のスクリプト-->
 <script src="js/main.js"></script>
+
 <!--Flatpickrの読み込み-->
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
 <script>
-// 選考ステージ登録画面のJavaScript
+// 選考ステージ登録画面のJavaScript - 完全に再構築
 
-let stageCounter = 0;
 
-// 選考ステージを追加
-function addSelectionStage() {
-    stageCounter++;
-    const container = document.getElementById('selectionStagesContainer');
-    const template = document.getElementById('stageTemplate');
-    const newStage = template.cloneNode(true);
+
+// ステージを追加
+function addStage() {
+    const container = document.getElementById('stagesContainer');
+    const existingStages = container.querySelectorAll('.stage-card');
+    const newStageNumber = existingStages.length + 1;
     
-    // テンプレートから実際の要素に変換
-    newStage.style.display = 'block';
-    newStage.classList.remove('stage-template');
-    newStage.classList.add('stage-item');
-    newStage.setAttribute('data-stage-index', stageCounter);
+    const newStage = document.createElement('div');
+    newStage.className = 'stage-card';
+    newStage.setAttribute('data-stage-id', newStageNumber);
     
-    // ステージ番号を設定
-    const stageNumber = newStage.querySelector('.stage-number');
-    if (stageNumber) {
-        stageNumber.textContent = stageCounter;
+    newStage.innerHTML = `
+        <div class="stage-header">
+            <h5 class="stage-title">選考ステージ <span class="stage-number">${newStageNumber}</span></h5>
+            <button type="button" class="remove-btn" onclick="removeStage(this)" title="このステージを削除">🗑️</button>
+        </div>
+        <div class="stage-content">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>ステージ種別 <span class="required">*</span></label>
+                    <select name="stages[${newStageNumber-1}].type" required>
+                        <option value="">選択してください</option>
+                        <option value="説明会">説明会</option>
+                        <option value="書類選考">書類選考</option>
+                        <option value="筆記試験">筆記試験</option>
+                        <option value="適性検査">適性検査</option>
+                        <option value="1次面接">1次面接</option>
+                        <option value="2次面接">2次面接</option>
+                        <option value="3次面接">3次面接</option>
+                        <option value="最終面接">最終面接</option>
+                        <option value="グループディスカッション">グループディスカッション</option>
+                        <option value="プレゼンテーション">プレゼンテーション</option>
+                        <option value="実技試験">実技試験</option>
+                        <option value="その他">その他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>実施日</label>
+                    <input type="date" name="stages[${newStageNumber-1}].date" class="date-input">
+                </div>
+                <div class="form-group">
+                    <label>実施時間</label>
+                    <input type="time" name="stages[${newStageNumber-1}].time">
+                </div>
+                <div class="form-group">
+                    <label>実施形式</label>
+                    <select name="stages[${newStageNumber-1}].format">
+                        <option value="">選択してください</option>
+                        <option value="個人">個人</option>
+                        <option value="集団">集団</option>
+                        <option value="オンライン">オンライン</option>
+                        <option value="対面">対面</option>
+                        <option value="ハイブリッド">ハイブリッド</option>
+                    </select>
+                </div>
+                <div class="form-group full-width">
+                    <label>備考・特記事項</label>
+                    <textarea name="stages[${newStageNumber-1}].notes" rows="3" 
+                              placeholder="特記事項があれば入力してください"
+                              class="notes-textarea"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>ステータス</label>
+                    <select name="stages[${newStageNumber-1}].status">
+                        <option value="予定">予定</option>
+                        <option value="実施済み">実施済み</option>
+                        <option value="合格">合格</option>
+                        <option value="不合格">不合格</option>
+                        <option value="辞退">辞退</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(newStage);
+    
+    // 番号を確実に設定
+    const stageNumberElement = newStage.querySelector('.stage-number');
+    if (stageNumberElement) {
+        stageNumberElement.textContent = newStageNumber;
     }
     
-    // フォーム要素のname属性を更新
-    const formElements = newStage.querySelectorAll('input, select, textarea');
-    formElements.forEach(element => {
-        if (element.name) {
-            element.name = element.name.replace('[]', '[' + (stageCounter - 1) + ']');
-        }
-    });
-    
-    // 新しく追加されたテキストエリアに自動リサイズを適用
-    const newTextarea = newStage.querySelector('.stage-notes');
-    if (newTextarea) {
-        newTextarea.style.resize = 'none';
-        newTextarea.style.overflow = 'hidden';
-        newTextarea.addEventListener('input', function() {
-            autoResize(this);
-        });
-    }
+    // デバッグ用：番号が正しく設定されているか確認
+    console.log('新しいステージを追加:', newStageNumber);
+    console.log('設定された番号:', stageNumberElement ? stageNumberElement.textContent : '見つかりません');
     
     // 新しく追加された日付入力にFlatpickrを適用
-    const newDateInput = newStage.querySelector('.stage-date');
-    if (newDateInput && typeof flatpickr !== 'undefined') {
-        flatpickr(newDateInput, {
+    const dateInput = newStage.querySelector('.date-input');
+    if (dateInput && typeof flatpickr !== 'undefined') {
+        flatpickr(dateInput, {
             dateFormat: 'Y-m-d',
             locale: 'ja',
             allowInput: true,
@@ -409,63 +451,191 @@ function addSelectionStage() {
         });
     }
     
-    // コンテナに追加
-    container.appendChild(newStage);
-    
-    // アニメーション効果
-    newStage.style.opacity = '0';
-    newStage.style.transform = 'translateY(20px)';
-    
-    setTimeout(() => {
-        newStage.style.transition = 'all 0.4s ease';
-        newStage.style.opacity = '1';
-        newStage.style.transform = 'translateY(0)';
-    }, 10);
-}
-
-// 選考ステージを削除
-function removeStage(button) {
-    const stageItem = button.closest('.stage-item');
-    if (stageItem) {
-        // 削除アニメーション
-        stageItem.classList.add('removing');
-        
-        setTimeout(() => {
-            stageItem.remove();
-            updateStageNumbers();
-        }, 300);
+    // テキストエリアの自動リサイズ
+    const textarea = newStage.querySelector('.notes-textarea');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
     }
 }
 
-// ステージ番号を更新
-function updateStageNumbers() {
-    const stages = document.querySelectorAll('.stage-item');
+// ステージを削除
+function removeStage(button) {
+    const stageCard = button.closest('.stage-card');
+    const stageId = stageCard.getAttribute('data-stage-id');
+    
+    // 削除確認
+    if (!confirm(`選考ステージ${stageId}を削除しますか？`)) {
+        return;
+    }
+    
+    // 削除アニメーション
+    stageCard.style.transition = 'all 0.3s ease';
+    stageCard.style.opacity = '0';
+    stageCard.style.transform = 'translateY(-10px)';
+    stageCard.style.height = '0';
+    stageCard.style.margin = '0';
+    stageCard.style.padding = '0';
+    
+    setTimeout(() => {
+        stageCard.remove();
+        reorderStages();
+    }, 300);
+}
+
+// ステージ番号を再整理（データを保持）
+function reorderStages() {
+    const stages = document.querySelectorAll('.stage-card');
+    
+    // 各ステージの入力データを保存
+    const stageData = [];
     stages.forEach((stage, index) => {
+        const data = {
+            type: stage.querySelector('select[name*=".type"]')?.value || '',
+            date: stage.querySelector('input[name*=".date"]')?.value || '',
+            time: stage.querySelector('input[name*=".time"]')?.value || '',
+            format: stage.querySelector('select[name*=".format"]')?.value || '',
+            notes: stage.querySelector('textarea[name*=".notes"]')?.value || '',
+            status: stage.querySelector('select[name*=".status"]')?.value || '予定'
+        };
+        stageData.push(data);
+    });
+    
+    // 番号とフォーム要素を更新
+    stages.forEach((stage, index) => {
+        const newNumber = index + 1;
+        
+        // ステージ番号を更新
         const stageNumber = stage.querySelector('.stage-number');
         if (stageNumber) {
-            stageNumber.textContent = index + 1;
+            stageNumber.textContent = newNumber;
         }
         
         // フォーム要素のname属性を更新
         const formElements = stage.querySelectorAll('input, select, textarea');
         formElements.forEach(element => {
             if (element.name) {
-                element.name = element.name.replace(/\[\d+\]/, '[' + index + ']');
+                element.name = element.name.replace(/\[\d+\]/, `[${index}]`);
             }
         });
+        
+        // data-stage-id属性を更新
+        stage.setAttribute('data-stage-id', newNumber);
+        
+        // 保存したデータを復元
+        const data = stageData[index];
+        if (data) {
+            const typeSelect = stage.querySelector('select[name*=".type"]');
+            if (typeSelect) typeSelect.value = data.type;
+            
+            const dateInput = stage.querySelector('input[name*=".date"]');
+            if (dateInput) dateInput.value = data.date;
+            
+            const timeInput = stage.querySelector('input[name*=".time"]');
+            if (timeInput) timeInput.value = data.time;
+            
+            const formatSelect = stage.querySelector('select[name*=".format"]');
+            if (formatSelect) formatSelect.value = data.format;
+            
+            const notesTextarea = stage.querySelector('textarea[name*=".notes"]');
+            if (notesTextarea) {
+                notesTextarea.value = data.notes;
+                // テキストエリアの高さを調整
+                notesTextarea.style.height = 'auto';
+                notesTextarea.style.height = notesTextarea.scrollHeight + 'px';
+            }
+            
+            const statusSelect = stage.querySelector('select[name*=".status"]');
+            if (statusSelect) statusSelect.value = data.status;
+        }
+    });
+    
+
+    
+    // 削除ボタンの表示制御（全てのステージで削除可能）
+    const removeBtns = document.querySelectorAll('.remove-btn');
+    removeBtns.forEach(btn => {
+        btn.style.display = 'block';
     });
 }
 
+// 検索機能
+function openCompanySearch() {
+    const searchTerm = document.getElementById('companyName').value.trim();
+    const url = '${pageContext.request.contextPath}/SearchServlet?type=company&term=' + encodeURIComponent(searchTerm) + '&view=popup';
+    
+    const popup = window.open(url, 'companySearch', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    
+    if (!popup || popup.closed || typeof popup.closed == 'undefined') {
+        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+    }
+}
+
+function openStudentSearch() {
+    const searchTerm = document.getElementById('studentName').value.trim();
+    const url = '${pageContext.request.contextPath}/SearchServlet?type=student&term=' + encodeURIComponent(searchTerm) + '&view=popup';
+    
+    const popup = window.open(url, 'studentSearch', 'width=800,height=600,scrollbars=yes,resizable=yes');
+    
+    if (!popup || popup.closed || typeof popup.closed == 'undefined') {
+        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
+            }
+}
+
+// 検索結果を受け取る関数
+function setSearchResult(id, name, type) {
+    if (type === 'company') {
+        document.getElementById('companyName').value = name;
+        document.getElementById('companyId').value = id;
+    } else if (type === 'student') {
+        document.getElementById('studentName').value = name;
+        document.getElementById('studentId').value = id;
+    }
+}
+
 // ページ読み込み時の初期化
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // 学生権限の場合の処理
+    const isStudent = '<%= "student".equals(role) %>' === 'true';
+    if (isStudent) {
+        const studentNameInput = document.getElementById('studentName');
+        if (studentNameInput) {
+            studentNameInput.classList.add('student-readonly');
+        }
+    }
+    
+    // 既存の日付入力にFlatpickrを適用
+    const dateInputs = document.querySelectorAll('.date-input');
+    dateInputs.forEach(input => {
+        if (typeof flatpickr !== 'undefined') {
+            flatpickr(input, {
+                dateFormat: 'Y-m-d',
+                locale: 'ja',
+                allowInput: true,
+                disableMobile: true
+            });
+        }
+    });
+    
+    // 既存のテキストエリアに自動リサイズを適用
+    const textareas = document.querySelectorAll('.notes-textarea');
+    textareas.forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+    
     // フォームのバリデーション
     const form = document.getElementById('selectionForm');
     if (form) {
-        form.addEventListener('submit', (e) => {
-            const stages = document.querySelectorAll('.stage-item');
+        form.addEventListener('submit', function(e) {
+            const stages = document.querySelectorAll('.stage-card');
             
             if (stages.length === 0) {
-                alert('少なくとも1つの選考ステージを追加してください。');
+                alert('少なくとも1つの選考ステージが必要です。');
                 e.preventDefault();
                 return false;
             }
@@ -473,7 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 各ステージの必須項目チェック
             let isValid = true;
             stages.forEach((stage, index) => {
-                const typeSelect = stage.querySelector('.stage-type');
+                const typeSelect = stage.querySelector('select[name*=".type"]');
                 if (typeSelect && !typeSelect.value) {
                     alert(`ステージ${index + 1}のステージ種別を選択してください。`);
                     isValid = false;
@@ -484,66 +654,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 return false;
             }
+            
+            // 送信前に最終確認
+            if (!confirm('選考ステージを登録しますか？')) {
+                e.preventDefault();
+                return false;
+            }
         });
     }
-    
-    // キーボードナビゲーションの改善
-    const buttons = document.querySelectorAll('button[type="button"]');
-    buttons.forEach(button => {
-        button.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                button.click();
-            }
-        });
-    });
-    
-    // 初期ステージを自動追加
-    addSelectionStage();
 });
-
-// ドラッグ&ドロップでステージの順序を変更（オプション機能）
-function enableDragAndDrop() {
-    const container = document.getElementById('selectionStagesContainer');
-    if (!container) return;
-    
-    let draggedElement = null;
-    
-    container.addEventListener('dragstart', (e) => {
-        if (e.target.classList.contains('stage-item')) {
-            draggedElement = e.target;
-            e.target.style.opacity = '0.5';
-        }
-    });
-    
-    container.addEventListener('dragend', (e) => {
-        if (e.target.classList.contains('stage-item')) {
-            e.target.style.opacity = '1';
-        }
-    });
-    
-    container.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        const stageItem = e.target.closest('.stage-item');
-        if (stageItem && draggedElement && stageItem !== draggedElement) {
-            const rect = stageItem.getBoundingClientRect();
-            const midY = rect.top + rect.height / 2;
-            
-            if (e.clientY < midY) {
-                stageItem.parentNode.insertBefore(draggedElement, stageItem);
-            } else {
-                stageItem.parentNode.insertBefore(draggedElement, stageItem.nextSibling);
-            }
-        }
-    });
-}
-
-// ドラッグ&ドロップを有効化（必要に応じて）
-// enableDragAndDrop();
 </script>
 
 <style>
-    /* システム上見やすさを追求した選考ステージ登録画面デザイン */
+/* 選考ステージ登録画面のスタイル - 完全に再構築 */
     
     /* 全体の設定 */
     .interview-exam-page {
@@ -563,23 +686,8 @@ function enableDragAndDrop() {
         box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
         box-sizing: border-box;
     }
-    @media (max-width: 1400px) {
-        .interview-exam-container {
-            padding: 32px 1vw;
-        }
-    }
-    @media (max-width: 768px) {
-        .interview-exam-container {
-            padding: 16px 2vw;
-        }
-    }
-    @media (max-width: 480px) {
-        .interview-exam-container {
-            padding: 8px 1vw;
-        }
-    }
 
-    /* ページヘッダー - 視認性向上 */
+/* ページヘッダー */
     .page-header {
         background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
         border-radius: 12px;
@@ -661,7 +769,7 @@ function enableDragAndDrop() {
         border: 1px solid #f5c6cb;
     }
 
-    /* 登録フォーム - 視認性と操作性の向上 */
+/* 登録フォーム */
     .registration-form {
         background: white;
         border-radius: 12px;
@@ -701,6 +809,13 @@ function enableDragAndDrop() {
         gap: 8px;
     }
 
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
     .form-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -712,16 +827,25 @@ function enableDragAndDrop() {
         position: relative;
     }
 
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
     .form-group label {
         display: block;
         margin-bottom: 8px;
         font-weight: 600;
         color: #2c3e50;
-        font-size: 16px;
+}
+
+.required {
+    color: #dc3545;
+    font-weight: 700;
     }
 
     .form-group input,
-    .form-group select {
+.form-group select,
+.form-group textarea {
         width: 100%;
         padding: 12px 16px;
         border: 1px solid #e9ecef;
@@ -729,48 +853,68 @@ function enableDragAndDrop() {
         font-size: 16px;
         transition: all 0.2s ease;
         box-sizing: border-box;
-        min-height: 48px;
+    background: #ffffff;
     }
 
     .form-group input:focus,
-    .form-group select:focus {
+.form-group select:focus,
+.form-group textarea:focus {
         outline: none;
         border-color: #2C7744;
         box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
     }
 
-    .required {
-        color: #e74c3c;
-        font-weight: 600;
-    }
-
-    /* 選考ステージ管理のスタイル */
-    .section-header {
+/* 検索機能のスタイル */
+.search-input-container {
+    position: relative;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 24px;
+    gap: 8px;
     }
 
-    .btn-sm {
-        padding: 8px 16px;
+.search-input-container input {
+    flex: 1;
+}
+
+.search-btn {
+    background: #2C7744;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
         font-size: 14px;
-        min-width: auto;
+    transition: background-color 0.3s ease;
     }
 
-    .stage-item {
+.search-btn:hover {
+    background: #1e5a2e;
+}
+
+/* 学生権限時のスタイル */
+.student-readonly {
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    cursor: not-allowed;
+}
+
+/* ステージカード */
+.stage-card {
         background: white;
-        border: 2px solid #e9ecef;
+    border: 1px solid #e9ecef;
         border-radius: 12px;
         margin-bottom: 20px;
         overflow: hidden;
         transition: all 0.3s ease;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
     }
 
-    .stage-item:hover {
+.stage-card:hover {
         border-color: #2C7744;
         box-shadow: 0 4px 12px rgba(44, 119, 68, 0.15);
+    z-index: 2;
     }
 
     .stage-header {
@@ -793,134 +937,43 @@ function enableDragAndDrop() {
     }
 
     .stage-number {
-        background: #2C7744;
-        color: white;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 700;
-    }
+    background: #2C7744;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-block;
+    min-width: 20px;
+    text-align: center;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
 
-    .remove-stage-btn {
-        background: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 16px;
-        transition: all 0.2s ease;
-    }
 
-    .remove-stage-btn:hover {
+
+.remove-btn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    display: block;
+}
+
+.remove-btn:hover {
         background: #c82333;
         transform: scale(1.05);
     }
 
     .stage-content {
-        padding: 24px;
-    }
-
-    .time-range {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .time-separator {
-        color: #6c757d;
-        font-weight: 600;
-    }
-
-    .full-width {
-        grid-column: 1 / -1;
-    }
-
-    .stage-notes {
-        width: 100%;
-        padding: 12px 16px;
-        border: 1px solid #e9ecef;
-        border-radius: 8px;
-        font-size: 16px;
-        transition: all 0.2s ease;
-        box-sizing: border-box;
-        resize: none;
-        min-height: 80px;
-    }
-
-    .stage-notes:focus {
-        outline: none;
-        border-color: #2C7744;
-        box-shadow: 0 0 0 3px rgba(44, 119, 68, 0.1);
-    }
-
-    /* ステージ追加アニメーション */
-    .stage-item {
-        animation: slideInUp 0.4s ease forwards;
-    }
-
-    @keyframes slideInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    /* ステージ削除アニメーション */
-    .stage-item.removing {
-        animation: slideOutDown 0.3s ease forwards;
-    }
-
-    @keyframes slideOutDown {
-        from {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        to {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-    }
-
-    .btn-group {
-        display: flex;
-        gap: 10px;
-        margin: 10px 0;
-        flex-wrap: wrap;
-    }
-
-    .btn-group button {
-        padding: 12px 20px;
-        border: 2px solid #2C7744;
-        background: white;
-        color: #2C7744;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-weight: 600;
-        font-size: 14px;
-        min-width: 80px;
-    }
-
-    .btn-group button:hover {
-        background: #2C7744;
-        color: white;
-        transform: translateY(-1px);
+    padding: 24px 24px 16px 24px;
     }
 
     /* ボタン */
-    .form-buttons {
-        display: flex;
-        gap: 16px;
-        justify-content: center;
-        margin-top: 32px;
-        flex-wrap: wrap;
-    }
-
     .btn {
         padding: 14px 28px;
         border-radius: 8px;
@@ -936,108 +989,40 @@ function enableDragAndDrop() {
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+    background: #2C7744;
         color: white;
-        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
     }
 
     .btn-primary:hover {
+    background: #1e5a2e;
         transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
-        color: white;
-        text-decoration: none;
     }
 
     .btn-secondary {
-        background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    background: #6c757d;
         color: white;
-        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
     }
 
     .btn-secondary:hover {
+    background: #5a6268;
         transform: translateY(-1px);
-        box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    /* ダークモード対応 */
-    @media (prefers-color-scheme: dark) {
-        .interview-exam-page {
-            background: #1a1a1a;
-            color: #ffffff;
+}
+
+.btn-sm {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-width: auto;
         }
         
-        .interview-exam-container {
-            background: #2d2d2d;
-        }
-        
-        .registration-form {
-            background: #3d3d3d;
-            border-color: #4d4d4d;
-            color: #ffffff;
-        }
-        
-        .form-section {
-            background: #3d3d3d;
-            border-color: #4d4d4d;
-        }
-        
-        .form-group input,
-        .form-group select {
-            background: #4d4d4d;
-            border-color: #5d5d5d;
-            color: #ffffff;
-        }
-        
-        .form-group label {
-            color: #ffffff;
-        }
-        
-        .section-title {
-            color: #ffffff;
-        }
-        
-        .btn-group button {
-            background: #4d4d4d;
-            border-color: #5d5d5d;
-            color: #ffffff;
-        }
-        
-        .btn-group button:hover {
-            background: #2C7744;
-            color: #ffffff;
-        }
-        
-        .stage-item {
-            background: #3d3d3d;
-            border-color: #4d4d4d;
-        }
-        
-        .stage-header {
-            background: linear-gradient(135deg, #4d4d4d 0%, #3d3d3d 100%);
-            border-color: #4d4d4d;
-        }
-        
-        .stage-title {
-            color: #ffffff;
-        }
-        
-        .stage-notes {
-            background: #4d4d4d;
-            border-color: #5d5d5d;
-            color: #ffffff;
-        }
-        
-        .form-title {
-            color: #ffffff;
-            background: linear-gradient(135deg, rgba(44, 119, 68, 0.3), rgba(92, 165, 100, 0.3));
-            border-color: rgba(44, 119, 68, 0.5);
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-        }
+.form-buttons {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    margin-top: 32px;
+    flex-wrap: wrap;
     }
 
-    /* レスポンシブ対応の強化 */
+/* レスポンシブ対応 */
     @media (max-width: 768px) {
         .interview-exam-container {
             padding: 16px;
@@ -1066,14 +1051,6 @@ function enableDragAndDrop() {
         
         .form-section {
             padding: 20px;
-        }
-        
-        .btn-group {
-            flex-direction: column;
-        }
-        
-        .btn-group button {
-            width: 100%;
         }
         
         .form-buttons {
@@ -1107,261 +1084,84 @@ function enableDragAndDrop() {
         }
     }
 
-    /* アクセシビリティの向上 */
-    .btn:focus,
-    .form-group input:focus,
-    .form-group select:focus,
-    .btn-group button:focus {
-        outline: 3px solid #2C7744;
-        outline-offset: 2px;
+/* ダークモード対応 */
+@media (prefers-color-scheme: dark) {
+    .interview-exam-page {
+        background: #2c2f34;
+        color: #f4f6f8;
     }
-
-    /* 高コントラストモード対応 */
-    @media (prefers-contrast: high) {
+    
+    .interview-exam-container {
+        background: #23272b;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    
         .registration-form,
         .form-section {
-            border: 2px solid #2c3e50;
-        }
-        
-        .btn,
-        .btn-group button {
-            border: 2px solid #2c3e50;
+        background: #2c2f34;
+        border-color: #4d4d4d;
         }
         
         .form-title {
-            border: 2px solid #2c3e50;
-            background: #ffffff;
-            color: #000000;
+        color: #ffffff;
+        background: linear-gradient(135deg, rgba(44, 119, 68, 0.3), rgba(92, 165, 100, 0.3));
+        border-color: rgba(44, 119, 68, 0.5);
+    }
+    
+    .section-title {
+        color: #ffffff;
+    }
+    
+    .form-group label {
+        color: #f4f6f8;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        background: #4d4d4d;
+        border-color: #5d5d5d;
+        color: #ffffff;
         }
-    }
-
-    /* 検索機能のスタイル */
-    .search-input-container {
-        position: relative;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .search-input-container input {
-        flex: 1;
-    }
-
-    .search-btn {
-        background: #2C7744;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        padding: 8px 12px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: background-color 0.3s ease;
-    }
-
-    .search-btn:hover {
-        background: #1e5a2e;
-    }
-
-
-
-    /* アニメーションの最適化 */
-    .page-header,
-    .registration-form {
-        animation: fadeInUp 0.4s ease forwards;
-    }
-
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-</style>
-
-<script>
-// 検索機能の実装
-
-
-
-function openCompanySearch() {
-    const searchTerm = document.getElementById('companyName').value.trim();
-    const url = '${pageContext.request.contextPath}/SearchServlet?type=company&term=' + encodeURIComponent(searchTerm) + '&view=popup';
     
-    console.log('企業検索URL:', url);
-    
-    const popup = window.open(url, 'companySearch', 'width=800,height=600,scrollbars=yes,resizable=yes');
-    
-    // ポップアップがブロックされた場合の処理
-    if (!popup || popup.closed || typeof popup.closed == 'undefined') {
-        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
-    } else {
-        console.log('企業検索ポップアップを開きました');
-    }
-}
-
-function openStudentSearch() {
-    const searchTerm = document.getElementById('studentName').value.trim();
-    const url = '${pageContext.request.contextPath}/SearchServlet?type=student&term=' + encodeURIComponent(searchTerm) + '&view=popup';
-    
-    console.log('学生検索URL:', url);
-    
-    const popup = window.open(url, 'studentSearch', 'width=800,height=600,scrollbars=yes,resizable=yes');
-    
-    // ポップアップがブロックされた場合の処理
-    if (!popup || popup.closed || typeof popup.closed == 'undefined') {
-        alert('ポップアップがブロックされました。ブラウザの設定でポップアップを許可してください。');
-    } else {
-        console.log('学生検索ポップアップを開きました');
-    }
-}
-
-
-
-// 検索結果を受け取る関数
-function setSearchResult(id, name, type) {
-    if (type === 'company') {
-        document.getElementById('companyName').value = name;
-        document.getElementById('companyId').value = id;
-        
-        // 選択されたことを視覚的に示す
-        const companyInput = document.getElementById('companyName');
-        companyInput.style.backgroundColor = '#e8f5e8';
-        setTimeout(() => {
-            companyInput.style.backgroundColor = '';
-        }, 1000);
-        
-    } else if (type === 'student') {
-        document.getElementById('studentName').value = name;
-        document.getElementById('studentId').value = id;
-        
-        // 選択されたことを視覚的に示す
-        const studentInput = document.getElementById('studentName');
-        studentInput.style.backgroundColor = '#e8f5e8';
-        setTimeout(() => {
-            studentInput.style.backgroundColor = '';
-        }, 1000);
-    }
-}
-
-// ローカルストレージから検索結果を取得（フォールバック）
-function checkLocalStorageResult() {
-    const stored = localStorage.getItem('selectedResult');
-    if (stored) {
-        try {
-            const result = JSON.parse(stored);
-            const now = new Date().getTime();
-            
-            // 5分以内の結果のみ有効
-            if (now - result.timestamp < 300000) {
-                setSearchResult(result.id, result.name, result.type);
-                localStorage.removeItem('selectedResult');
-            }
-        } catch (e) {
-            console.error('ローカルストレージの結果を解析できませんでした:', e);
-        }
-    }
-}
-
-// テキストエリアの自動リサイズ機能
-function autoResize(textarea) {
-    // 一度高さをリセット
-    textarea.style.height = 'auto';
-    // スクロールハイトを取得して高さを設定
-    const scrollHeight = textarea.scrollHeight;
-    const minHeight = 60; // 最小高さ（3行分）
-    let newHeight = Math.max(scrollHeight, minHeight);
-    textarea.style.height = newHeight + 'px';
-    // スクロールバー制御は不要
-}
-
-// ページ読み込み時の初期化
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('ページ読み込み完了');
-    checkLocalStorageResult();
-    
-    // 既存のテキストエリアに自動リサイズを適用
-    const textareas = document.querySelectorAll('.stage-notes');
-    textareas.forEach(textarea => {
-        autoResize(textarea);
-    });
-    
-    // Flatpickrを全ての.stage-dateに適用
-    flatpickr('.stage-date', {
-        dateFormat: 'Y-m-d',
-        locale: 'ja',
-        allowInput: true,
-        disableMobile: true,
-        // カスタムアイコンや色はCSSで調整
-    });
-});
-</script>
-
-<style>
-    /* Flatpickrカスタム: システムの緑・角丸・フォント */
-.flatpickr-calendar {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    border-radius: 12px;
-    border: 2px solid #2C7744;
-    box-shadow: 0 4px 24px rgba(44,119,68,0.08);
-}
-.flatpickr-months .flatpickr-month {
-    background: #2C7744;
-    color: #fff;
-    border-radius: 12px 12px 0 0;
-}
-.flatpickr-weekdays {
-    background: #e8f5e8;
-    color: #2C7744;
-}
-.flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day:hover {
-    background: #2C7744;
-    color: #fff;
-    border-radius: 8px;
-}
-.flatpickr-day.today {
-    border-color: #2C7744;
-}
-.flatpickr-input[readonly] {
-    background: #fff;
-    color: #2C7744;
-    border: 1.5px solid #2C7744;
-    border-radius: 6px;
-}
-
-/* ダークモード対応 */
-@media (prefers-color-scheme: dark) {
-    .flatpickr-calendar {
+    .stage-card {
         background: #2c2f34;
-        border-color: #7fffd4;
-        color: #f4f6f8;
+        border-color: #4d4d4d;
     }
-    .flatpickr-months .flatpickr-month {
-        background: #7fffd4;
-        color: #2c2f34;
+    
+    .stage-header {
+        background: linear-gradient(135deg, #4d4d4d 0%, #3d3d3d 100%);
+        border-bottom-color: #4d4d4d;
+}
+    
+        .stage-title {
+        color: #ffffff;
     }
-    .flatpickr-weekdays {
-        background: #3d3d3d;
-        color: #7fffd4;
+    
+
+    
+    .stage-notes {
+        background: #4d4d4d;
+        border-color: #5d5d5d;
+        color: #ffffff;
     }
-    .flatpickr-day {
-        color: #f4f6f8;
+    
+    .form-title {
+        color: #ffffff;
+        background: linear-gradient(135deg, rgba(44, 119, 68, 0.3), rgba(92, 165, 100, 0.3));
+        border-color: rgba(44, 119, 68, 0.5);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
-    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange, .flatpickr-day:hover {
-        background: #7fffd4;
-        color: #2c2f34;
-    }
-    .flatpickr-day.today {
-        border-color: #7fffd4;
-    }
-    .flatpickr-input[readonly] {
-        background: #23272b;
-        color: #7fffd4;
-        border-color: #7fffd4;
-    }
+}
+
+.notes-textarea {
+    resize: none;
+    overflow: hidden;
+    min-height: 80px;
+    /* 右下のリサイズカーソルを消す（Chrome/Safari） */
+}
+.notes-textarea::-webkit-resizer {
+    display: none;
 }
 </style>
 
