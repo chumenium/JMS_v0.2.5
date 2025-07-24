@@ -8,201 +8,198 @@
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
 <style>
-    .applicant-container {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 20px;
-        background: #f8f9fa;
-        min-height: 100vh;
-    }
-    
-    .applicant-header {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 10px;
-        margin-bottom: 30px;
-        text-align: center;
-    }
-    
-    .search-section {
-        background: white;
-        border-radius: 10px;
-        padding: 25px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .search-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-    
-    .form-group {
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .form-group label {
-        margin-bottom: 5px;
-        font-weight: 600;
-        color: #333;
-    }
-    
-    .form-group input,
-    .form-group select {
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-        color: white;
-        padding: 12px 24px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        margin: 5px;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
-        color: white;
-        text-decoration: none;
-    }
-    
-    .applicant-table {
-        background: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-    
-    .table-header {
-        background: #007bff;
-        color: white;
-        padding: 20px;
-    }
-    
-    .table-responsive {
-        overflow-x: auto;
-    }
-    
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    
-    th, td {
-        padding: 12px;
-        text-align: left;
-        border-bottom: 1px solid #ddd;
-    }
-    
-    th {
-        background: #f8f9fa;
-        font-weight: 600;
-        color: #333;
-        position: sticky;
-        top: 0;
-    }
-    
-    tr:hover {
-        background: #f8f9fa;
-    }
-    
-    .status-badge {
-        padding: 4px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-        text-align: center;
-        display: inline-block;
-        min-width: 80px;
-    }
-    
-    .status-applying {
-        background: #fff3cd;
-        color: #856404;
-    }
-    
-    .status-interview {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .status-result {
-        background: #d1ecf1;
-        color: #0c5460;
-    }
-    
-    .status-pass {
-        background: #d4edda;
-        color: #155724;
-    }
-    
-    .status-fail {
-        background: #f8d7da;
-        color: #721c24;
-    }
-    
-    .summary-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .summary-card {
-        background: white;
-        border-radius: 10px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        border-left: 4px solid #007bff;
-    }
-    
-    .summary-number {
-        font-size: 2em;
-        font-weight: bold;
-        color: #007bff;
-        margin-bottom: 10px;
-    }
-    
-    .no-data {
-        text-align: center;
-        padding: 50px;
-        color: #666;
-        font-style: italic;
-    }
-    
-    @media (max-width: 768px) {
-        .search-grid {
-            grid-template-columns: 1fr;
-        }
-        
-        .summary-cards {
-            grid-template-columns: repeat(2, 1fr);
-        }
-        
-        .applicant-container {
-            padding: 10px;
-        }
-        
-        th, td {
-            padding: 8px;
-            font-size: 12px;
-        }
-    }
+
+
+/* 全体コンテナ */
+.applicant-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+/* ヘッダー */
+.applicant-header {
+    background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* 検索セクション */
+.search-section {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 検索フィールドグリッド */
+.search-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+/* フォームグループ */
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* プライマリボタン */
+.btn-primary {
+    background: linear-gradient(135deg, #2C7744 0%, #5CA564 100%);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 5px;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(44, 119, 68, 0.2);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(44, 119, 68, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* 受験者テーブル全体 */
+.applicant-table {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.table-header {
+    background: #2C7744;
+    color: white;
+    padding: 20px;
+}
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background: #f8f9fa;
+    font-weight: 600;
+    color: #333;
+    position: sticky;
+    top: 0;
+}
+
+tr:hover {
+    background: #f8f9fa;
+}
+
+/* 状態バッジ */
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    display: inline-block;
+    min-width: 80px;
+}
+
+.status-applying {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-interview {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-result {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.status-pass {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-fail {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* 概要カード */
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #2C7744;
+}
+
+.summary-number {
+    font-size: 2em;
+    font-weight: bold;
+    color: #2C7744;
+    margin-bottom: 10px;
+}
+
+/* データなし時の表示 */
+.no-data {
+    text-align: center;
+    padding: 50px;
+    color: #666;
+    font-style: italic;
+}
+
+
+
 </style>
 </head>
 
@@ -241,146 +238,150 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <div class="applicant-container">
-            <div class="applicant-header">
-                <h1>📊 受験者一覧</h1>
-                <p>企業の選考に応募した学生の一覧と進捗状況</p>
-            </div>
-
-            <!-- 統計サマリー -->
-            <div class="summary-cards">
-                <div class="summary-card">
-                    <div class="summary-number">0</div>
-                    <div>総応募者数</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number">0</div>
-                    <div>選考中</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number">0</div>
-                    <div>内定者数</div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-number">0</div>
-                    <div>不合格者数</div>
-                </div>
-            </div>
-
-            <!-- 検索フィルター -->
-            <div class="search-section">
-                <h3>🔍 検索・フィルター</h3>
-                <form method="get" action="${pageContext.request.contextPath}/StatusServlet">
-                    <input type="hidden" name="view" value="applicantList">
-                    <div class="search-grid">
-                        <div class="form-group">
-                            <label for="searchCompany">企業名</label>
-                            <input type="text" id="searchCompany" name="searchCompany" placeholder="企業名で検索">
-                        </div>
-                        <div class="form-group">
-                            <label for="searchStudent">学生名</label>
-                            <input type="text" id="searchStudent" name="searchStudent" placeholder="学生名で検索">
-                        </div>
-                        <div class="form-group">
-                            <label for="searchStatus">選考状況</label>
-                            <select id="searchStatus" name="searchStatus">
-                                <option value="">すべて</option>
-                                <option value="書類選考">書類選考</option>
-                                <option value="一次面接">一次面接</option>
-                                <option value="二次面接">二次面接</option>
-                                <option value="最終面接">最終面接</option>
-                                <option value="内定">内定</option>
-                                <option value="不合格">不合格</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="searchClass">クラス</label>
-                            <select id="searchClass" name="searchClass">
-                                <option value="">すべて</option>
-                                <option value="IT2A">IT2A</option>
-                                <option value="IT2B">IT2B</option>
-                                <option value="IT1A">IT1A</option>
-                                <option value="IT1B">IT1B</option>
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit" class="btn-primary">🔍 検索</button>
-                    <button type="button" class="btn-primary" onclick="clearSearch()">🔄 クリア</button>
-                </form>
-            </div>
-
-            <!-- 受験者一覧テーブル -->
-            <div class="applicant-table">
-                <div class="table-header">
-                    <h3>📋 受験者一覧</h3>
-                </div>
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>学生ID</th>
-                                <th>学生名</th>
-                                <th>クラス</th>
-                                <th>企業名</th>
-                                <th>職種</th>
-                                <th>応募日</th>
-                                <th>選考状況</th>
-                                <th>最終更新日</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- サンプルデータ（実際の実装では動的に生成） -->
-                            <tr>
-                                <td>S2024001</td>
-                                <td>山田太郎</td>
-                                <td>IT2A</td>
-                                <td>株式会社サンプル</td>
-                                <td>システムエンジニア</td>
-                                <td>2025-01-15</td>
-                                <td><span class="status-badge status-interview">一次面接</span></td>
-                                <td>2025-01-20</td>
-                                <td>
-                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024001" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>S2024002</td>
-                                <td>佐藤花子</td>
-                                <td>IT2B</td>
-                                <td>テクノロジー株式会社</td>
-                                <td>プログラマー</td>
-                                <td>2025-01-10</td>
-                                <td><span class="status-badge status-pass">内定</span></td>
-                                <td>2025-01-18</td>
-                                <td>
-                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024002" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>S2024003</td>
-                                <td>田中次郎</td>
-                                <td>IT2A</td>
-                                <td>イノベーション企業</td>
-                                <td>Webデザイナー</td>
-                                <td>2025-01-12</td>
-                                <td><span class="status-badge status-applying">書類選考</span></td>
-                                <td>2025-01-12</td>
-                                <td>
-                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024003" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- データが存在しない場合の表示 -->
-                <div class="no-data" style="display: none;">
-                    <p>📝 現在、受験者データがありません。</p>
-                    <p>学生が企業に応募すると、ここに表示されます。</p>
-                </div>
-            </div>
-        </div>
+    	<section class="bg1 bg-pattern1" role="main" aria-label="背景色：黒">
+	        <div class="applicant-container">
+	            <div class="applicant-header">
+	                <h1>📊 受験者一覧</h1>
+	                <p>企業の選考に応募した学生の一覧と進捗状況</p>
+	            </div>
+	
+	            <!-- 統計サマリー -->
+	            <div class="summary-cards">
+	                <div class="summary-card">
+	                    <div class="summary-number">0</div>
+	                    <div>総応募者数</div>
+	                </div>
+	                <div class="summary-card">
+	                    <div class="summary-number">0</div>
+	                    <div>選考中</div>
+	                </div>
+	                <div class="summary-card">
+	                    <div class="summary-number">0</div>
+	                    <div>内定者数</div>
+	                </div>
+	                <div class="summary-card">
+	                    <div class="summary-number">0</div>
+	                    <div>不合格者数</div>
+	                </div>
+	            </div>
+	
+	            <!-- 検索フィルター -->
+	            <div class="search-section">
+	                <h3>🔍 検索・フィルター</h3>
+	                <form method="get" action="${pageContext.request.contextPath}/StatusServlet">
+	                    <input type="hidden" name="view" value="applicantList">
+	                    <div class="search-grid">
+	                        <div class="form-group">
+	                            <label for="searchCompany">企業名</label>
+	                            <input type="text" id="searchCompany" name="searchCompany" placeholder="企業名で検索">
+	                        </div>
+	                        <div class="form-group">
+	                            <label for="searchStudent">学生名</label>
+	                            <input type="text" id="searchStudent" name="searchStudent" placeholder="学生名で検索">
+	                        </div>
+	                        <div class="form-group">
+	                            <label for="searchStatus">選考状況</label>
+	                            <select id="searchStatus" name="searchStatus">
+	                                <option value="">すべて</option>
+	                                <option value="書類選考">書類選考</option>
+	                                <option value="一次面接">一次面接</option>
+	                                <option value="二次面接">二次面接</option>
+	                                <option value="最終面接">最終面接</option>
+	                                <option value="内定">内定</option>
+	                                <option value="不合格">不合格</option>
+	                            </select>
+	                        </div>
+	                        <div class="form-group">
+	                            <label for="searchClass">クラス</label>
+	                            <select id="searchClass" name="searchClass">
+	                                <option value="">すべて</option>
+	                                <option value="IT2A">IT2A</option>
+	                                <option value="IT2B">IT2B</option>
+	                                <option value="IT1A">IT1A</option>
+	                                <option value="IT1B">IT1B</option>
+	                            </select>
+	                        </div>
+	                    </div>
+	                    <button type="submit" class="btn-primary">🔍 検索</button>
+	                    <button type="button" class="btn-primary" onclick="clearSearch()">🔄 クリア</button>
+	                </form>
+	            </div>
+	
+	            <!-- 受験者一覧テーブル -->
+	            <div class="applicant-table">
+	                <div class="table-header">
+	                    <h3>📋 受験者一覧</h3>
+	                </div>
+	                <div class="table-responsive">
+	                    <table>
+	                        <thead>
+	                            <tr>
+	                                <th>学生ID</th>
+	                                <th>学生名</th>
+	                                <th>クラス</th>
+	                                <th>企業名</th>
+	                                <th>職種</th>
+	                                <th>応募日</th>
+	                                <th>選考状況</th>
+	                                <th>最終更新日</th>
+	                                <th>操作</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <!-- サンプルデータ（実際の実装では動的に生成） -->
+	                            <!-- <td style="color: #000000">を入れること
+	                            または <tr style="color: #000000">を入れること！！！-->
+	                            <tr style="color: #000000">
+	                                <td>S2024001</td>
+	                                <td>山田太郎</td>
+	                                <td>IT2A</td>
+	                                <td>株式会社サンプル</td>
+	                                <td>システムエンジニア</td>
+	                                <td>2025-01-15</td>
+	                                <td><span class="status-badge status-interview">一次面接</span></td>
+	                                <td>2025-01-20</td>
+	                                <td>
+	                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024001" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
+	                                </td>
+	                            </tr>
+	                            <tr style="color: #000000">
+	                                <td>S2024002</td>
+	                                <td>佐藤花子</td>
+	                                <td>IT2B</td>
+	                                <td>テクノロジー株式会社</td>
+	                                <td>プログラマー</td>
+	                                <td>2025-01-10</td>
+	                                <td><span class="status-badge status-pass">内定</span></td>
+	                                <td>2025-01-18</td>
+	                                <td>
+	                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024002" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
+	                                </td>
+	                            </tr>
+	                            <tr style="color: #000000">
+	                                <td>S2024003</td>
+	                                <td>田中次郎</td>
+	                                <td>IT2A</td>
+	                                <td>イノベーション企業</td>
+	                                <td>Webデザイナー</td>
+	                                <td>2025-01-12</td>
+	                                <td><span class="status-badge status-applying">書類選考</span></td>
+	                                <td>2025-01-12</td>
+	                                <td>
+	                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024003" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
+	                                </td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+	                </div>
+	                
+	                <!-- データが存在しない場合の表示 -->
+	                <div class="no-data" style="display: none;">
+	                    <p>📝 現在、受験者データがありません。</p>
+	                    <p>学生が企業に応募すると、ここに表示されます。</p>
+	                </div>
+	            </div>
+	        </div>
+	    </section>
     </main>
 
     <!--▼▼▼▼▼ここから「フッター」-->
