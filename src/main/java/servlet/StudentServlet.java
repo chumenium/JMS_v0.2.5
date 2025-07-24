@@ -184,7 +184,7 @@ public class StudentServlet extends HttpServlet {
                     sc.setAttribute("totalPages", totalPages);
                     CompanyDAO CompanyDAO = new CompanyDAO();
                     List<CompanyBean> companies = CompanyDAO.getAllCompanies();
-                    List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+                    List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment(companies);
                     sc.setAttribute("companies", companies);
                     sc.setAttribute("comNumData", comNumData);
                     System.out.println("企業情報のデータをセット");
