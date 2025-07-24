@@ -477,85 +477,88 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main style="padding-top: 70px; padding-bottom: 100px;">
-        <div class="student-list-container">
-            <!-- ページヘッダー -->
-            <header class="page-header" role="banner">
-                <h1 class="page-title">学生一覧管理</h1>
-                <nav class="breadcrumb" aria-label="パンくずリスト">
-                    <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
-                    <span class="separator" aria-hidden="true">/</span>
-                    <a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a>
-                    <span class="separator" aria-hidden="true">/</span>
-                    <span>学生一覧管理</span>
-                </nav>
-            </header>
-
-            <!-- 検索バー -->
-            <form class="search-bar" method="post" action="StudentServlet" id="searchForm">
-                <input type="hidden" name="action" value="search">
-                <input type="text" name="keyword" placeholder="氏名・学籍番号・クラスなどで検索..." aria-label="検索キーワード" value="${keyword != null ? keyword : ''}" id="searchInput">
-                <button type="submit" aria-label="検索" id="searchButton">🔍 検索</button>
-                <a href="StudentServlet" class="show-all-btn" id="showAllButton" aria-label="すべて表示">📋 すべて表示</a>
-            </form>
-            
-            <!-- 検索中アニメーション -->
-            <div id="searchLoading" class="search-loading" style="display: none;">
-                <div class="loading-spinner"></div>
-                <span>検索中...</span>
-            </div>
-
-            <!-- 学生一覧表 -->
-            <table class="student-table" aria-label="学生一覧">
-                <thead>
-                    <tr>
-                        <th>学籍番号</th>
-                        <th>氏名</th>
-                        <th>クラス</th>
-                        <th>在籍状況</th>
-                        <th>操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <c:choose>
-                        <c:when test="${not empty students and students[0].size() > 0}">
-                            <c:forEach var="i" begin="0" end="${students[0].size()-1}">
-                                <tr>
-                                    <td>${students[0][i]}</td>
-                                    <td>${students[1][i]}</td>
-                                    <td>${students[2][i]}</td>
-                                    <td>${students[3][i]}</td>
-                                    <td>
-                                        <a href="StudentViewServlet?id=${students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
-                                        <a href="StudentDetailServlet?id=${students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                        </c:when>
-                        <c:otherwise>
-                            <tr>
-                                <td colspan="5" style="text-align:center; padding: 40px; color: #6c757d; font-style: italic;">
-                                    該当する学生がいません
-                                </td>
-                            </tr>
-                        </c:otherwise>
-                    </c:choose>
-                </tbody>
-            </table>
-            <!-- ページネーション -->
-            <nav class="pagination" aria-label="ページネーション">
-                <c:if test="${totalPages gt 1}">
-                    <c:forEach var="p" begin="1" end="${totalPages}">
-                        <form method="get" action="StudentServlet" style="display:inline;">
-                            <input type="hidden" name="page" value="${p}">
-                            <c:if test="${not empty keyword}">
-                                <input type="hidden" name="keyword" value="${keyword}">
-                            </c:if>
-                            <button type="submit" class="${p == currentPage ? 'active' : ''}" aria-label="ページ ${p} に移動">${p}</button>
-                        </form>
-                    </c:forEach>
-                </c:if>
-            </nav>
-        </div>
+    	<section class="bg1 bg-pattern1" role="main" aria-label="背景色：黒">	
+	        <div class="student-list-container">
+	            <!-- ページヘッダー -->
+	            <header class="page-header" role="banner">
+	                <h1 class="page-title">学生一覧管理</h1>
+	                <nav class="breadcrumb" aria-label="パンくずリスト">
+	                    <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
+	                    <span class="separator" aria-hidden="true">/</span>
+	                    <a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a>
+	                    <span class="separator" aria-hidden="true">/</span>
+	                    <span>学生一覧管理</span>
+	                </nav>
+	            </header>
+	
+	            <!-- 検索バー -->
+	            <form class="search-bar" method="post" action="StudentServlet" id="searchForm">
+	                <input type="hidden" name="action" value="search">
+	                <input type="text" name="keyword" placeholder="氏名・学籍番号・クラスなどで検索..." aria-label="検索キーワード" value="${keyword != null ? keyword : ''}" id="searchInput">
+	                <button type="submit" aria-label="検索" id="searchButton">🔍 検索</button>
+	                <a href="StudentServlet" class="show-all-btn" id="showAllButton" aria-label="すべて表示">📋 すべて表示</a>
+	            </form>
+	            
+	            <!-- 検索中アニメーション -->
+	            <div id="searchLoading" class="search-loading" style="display: none;">
+	                <div class="loading-spinner"></div>
+	                <span>検索中...</span>
+	            </div>
+	
+	            <!-- 学生一覧表 -->
+	            <table class="student-table" aria-label="学生一覧">
+	                <thead>
+	                    <tr>
+	                        <th>学籍番号</th>
+	                        <th>氏名</th>
+	                        <th>クラス</th>
+	                        <th>在籍状況</th>
+	                        <th>操作</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <c:choose>
+	                        <c:when test="${not empty students and students[0].size() > 0}">
+	                            <c:forEach var="i" begin="0" end="${students[0].size()-1}">
+	                                <tr>
+	                                <!-- 直接文字色を黒へ変更 -->
+	                                    <td style="color: #000000">${students[0][i]}</td>
+	                                    <td style="color: #000000">${students[1][i]}</td>
+	                                    <td style="color: #000000">${students[2][i]}</td>
+	                                    <td style="color: #000000">${students[3][i]}</td>
+	                                    <td>
+	                                        <a href="StudentViewServlet?id=${students[0][i]}" class="action-btn" aria-label="学生詳細を表示">詳細</a>
+	                                        <a href="StudentDetailServlet?id=${students[0][i]}" class="action-btn secondary" aria-label="学生情報を編集">編集</a>
+	                                    </td>
+	                                </tr>
+	                            </c:forEach>
+	                        </c:when>
+	                        <c:otherwise>
+	                            <tr>
+	                                <td colspan="5" style="text-align:center; padding: 40px; color: #6c757d; font-style: italic;">
+	                                    該当する学生がいません
+	                                </td>
+	                            </tr>
+	                        </c:otherwise>
+	                    </c:choose>
+	                </tbody>
+	            </table>
+	            <!-- ページネーション -->
+	            <nav class="pagination" aria-label="ページネーション">
+	                <c:if test="${totalPages gt 1}">
+	                    <c:forEach var="p" begin="1" end="${totalPages}">
+	                        <form method="get" action="StudentServlet" style="display:inline;">
+	                            <input type="hidden" name="page" value="${p}">
+	                            <c:if test="${not empty keyword}">
+	                                <input type="hidden" name="keyword" value="${keyword}">
+	                            </c:if>
+	                            <button type="submit" class="${p == currentPage ? 'active' : ''}" aria-label="ページ ${p} に移動">${p}</button>
+	                        </form>
+	                    </c:forEach>
+	                </c:if>
+	            </nav>
+	        </div>
+	      </section>
     </main>
 
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->

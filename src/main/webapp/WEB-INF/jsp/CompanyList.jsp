@@ -413,116 +413,118 @@
     </header>
 
     <main>
-        <div class="company-list-container">
-            <!-- ページヘッダー -->
-            <header class="page-header" role="banner">
-                <h1 class="page-title">企業一覧</h1>
-                <p class="page-subtitle">登録されている企業の一覧を表示します</p>
-                <nav class="breadcrumb" aria-label="パンくずリスト">
-                    <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
-                    <span class="separator" aria-hidden="true">/</span>
-                    <a href="CompanyManagementServlet">企業管理</a>
-                    <span class="separator" aria-hidden="true">/</span>
-                    <span>企業一覧</span>
-                </nav>
-            </header>
-
-            <!-- 統計情報 -->
-            <div class="stats-container">
-                <div class="stat-card">
-                    <span class="stat-number"><%= totalCompanies != null ? totalCompanies : 0 %></span>
-                    <span class="stat-label">総企業数</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number"><%= recruitmentCompanies != null ? recruitmentCompanies : 0 %></span>
-                    <span class="stat-label">採用実績あり</span>
-                </div>
-                <div class="stat-card">
-                    <span class="stat-number"><%= (totalCompanies != null && recruitmentCompanies != null) ? totalCompanies - recruitmentCompanies : 0 %></span>
-                    <span class="stat-label">採用実績なし</span>
-                </div>
-            </div>
-
-            <!-- 操作ボタン -->
-            <div class="action-buttons">
-                <a href="CreateCompanyServlet" class="action-btn">
-                    <i class="fas fa-plus"></i>新規企業登録
-                </a>
-                <a href="CompanyManagementServlet" class="action-btn secondary">
-                    <i class="fas fa-arrow-left"></i>企業管理に戻る
-                </a>
-            </div>
-
-            <!-- 企業一覧テーブル -->
-            <div class="company-table-container">
-                <% if (companies != null && !companies.isEmpty()) { %>
-                    <table class="company-table">
-                        <thead>
-                            <tr>
-                                <th>企業名</th>
-                                <th>職種</th>
-                                <th>勤務地</th>
-                                <th>採用実績</th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <% for (int i = 0; i < companies.size(); i++) {
-                                beans.CompanyBean company = companies.get(i);
-                                List<String> occupations = company.getOccupations();
-                                List<String> workPlaces = company.getWorkPlaces();
-                            %>
-                            <tr>
-                              <td><%= company.getCompanyName() %></td>
-                              <td>
-                                <% if (occupations != null && !occupations.isEmpty()) { %>
-                                    <% for (int j = 0; j < occupations.size(); j++) { %>
-                                        <span><%= occupations.get(j) %></span><% if (j != occupations.size()-1) { %>, <% } %>
-                                    <% } %>
-                                <% } else { %>
-                                    <span style="color:#aaa;">未設定</span>
-                                <% } %>
-                              </td>
-                              <td>
-                                <% if (workPlaces != null && !workPlaces.isEmpty()) { %>
-                                    <% for (int j = 0; j < workPlaces.size(); j++) { %>
-                                        <span><%= workPlaces.get(j) %></span><% if (j != workPlaces.size()-1) { %>, <% } %>
-                                    <% } %>
-                                <% } else { %>
-                                    <span style="color:#aaa;">未設定</span>
-                                <% } %>
-                              </td>
-                              <td>
-                                <% if (company.getRecruitmentResults()) { %>
-                                  <span class="status-badge success">あり</span>
-                                <% } else { %>
-                                  <span class="status-badge warning">なし</span>
-                                <% } %>
-                              </td>
-                              <td>
-                                <a href="CompanyDetailServlet?companyId=<%= company.getCompanyId() %>" class="table-action-btn" style="background-color: #28a745; color: white;">
-                                  <i class="fas fa-eye"></i>詳細
-                                </a>
-                                <a href="CompanyDetailServlet?companyId=<%= company.getCompanyId() %>&mode=edit" class="table-action-btn edit">
-                                  <i class="fas fa-edit"></i>編集
-                                </a>
-                              </td>
-                            </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                <% } else { %>
-                    <div class="empty-state">
-                        <div class="empty-state-icon">🏢</div>
-                        <h3 class="empty-state-title">企業が登録されていません</h3>
-                        <p class="empty-state-description">新しい企業を登録して、就職活動をサポートしましょう。</p>
-                        <a href="CreateCompanyServlet" class="action-btn">
-                            <i class="fas fa-plus"></i>新規企業登録
-                        </a>
-                    </div>
-                <% } %>
-            </div>
-        </div>
+    	<section class="bg1 bg-pattern1" role="main" aria-label="背景色：黒">	
+	        <div class="company-list-container">
+	            <!-- ページヘッダー -->
+	            <header class="page-header" role="banner">
+	                <h1 class="page-title">企業一覧</h1>
+	                <p class="page-subtitle">登録されている企業の一覧を表示します</p>
+	                <nav class="breadcrumb" aria-label="パンくずリスト">
+	                    <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
+	                    <span class="separator" aria-hidden="true">/</span>
+	                    <a href="CompanyManagementServlet">企業管理</a>
+	                    <span class="separator" aria-hidden="true">/</span>
+	                    <span>企業一覧</span>
+	                </nav>
+	            </header>
+	
+	            <!-- 統計情報 -->
+	            <div class="stats-container">
+	                <div class="stat-card">
+	                    <span class="stat-number"><%= totalCompanies != null ? totalCompanies : 0 %></span>
+	                    <span class="stat-label">総企業数</span>
+	                </div>
+	                <div class="stat-card">
+	                    <span class="stat-number"><%= recruitmentCompanies != null ? recruitmentCompanies : 0 %></span>
+	                    <span class="stat-label">採用実績あり</span>
+	                </div>
+	                <div class="stat-card">
+	                    <span class="stat-number"><%= (totalCompanies != null && recruitmentCompanies != null) ? totalCompanies - recruitmentCompanies : 0 %></span>
+	                    <span class="stat-label">採用実績なし</span>
+	                </div>
+	            </div>
+	
+	            <!-- 操作ボタン -->
+	            <div class="action-buttons">
+	                <a href="CreateCompanyServlet" class="action-btn">
+	                    <i class="fas fa-plus"></i>新規企業登録
+	                </a>
+	                <a href="CompanyManagementServlet" class="action-btn secondary">
+	                    <i class="fas fa-arrow-left"></i>企業管理に戻る
+	                </a>
+	            </div>
+	
+	            <!-- 企業一覧テーブル -->
+	            <div class="company-table-container">
+	                <% if (companies != null && !companies.isEmpty()) { %>
+	                    <table class="company-table">
+	                        <thead>
+	                            <tr>
+	                                <th>企業名</th>
+	                                <th>職種</th>
+	                                <th>勤務地</th>
+	                                <th>採用実績</th>
+	                                <th>操作</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <% for (int i = 0; i < companies.size(); i++) {
+	                                beans.CompanyBean company = companies.get(i);
+	                                List<String> occupations = company.getOccupations();
+	                                List<String> workPlaces = company.getWorkPlaces();
+	                            %>
+	                            <tr>
+	                              <td style="color: #000000"><%= company.getCompanyName() %></td>
+	                              <td style="color: #000000">
+	                                <% if (occupations != null && !occupations.isEmpty()) { %>
+	                                    <% for (int j = 0; j < occupations.size(); j++) { %>
+	                                        <span><%= occupations.get(j) %></span><% if (j != occupations.size()-1) { %>, <% } %>
+	                                    <% } %>
+	                                <% } else { %>
+	                                    <span style="color:#aaa;">未設定</span>
+	                                <% } %>
+	                              </td>
+	                              <td style="color: #000000">
+	                                <% if (workPlaces != null && !workPlaces.isEmpty()) { %>
+	                                    <% for (int j = 0; j < workPlaces.size(); j++) { %>
+	                                        <span><%= workPlaces.get(j) %></span><% if (j != workPlaces.size()-1) { %>, <% } %>
+	                                    <% } %>
+	                                <% } else { %>
+	                                    <span style="color:#aaa;">未設定</span>
+	                                <% } %>
+	                              </td>
+	                              <td style="color: #000000">
+	                                <% if (company.getRecruitmentResults()) { %>
+	                                  <span class="status-badge success">あり</span>
+	                                <% } else { %>
+	                                  <span class="status-badge warning">なし</span>
+	                                <% } %>
+	                              </td>
+	                              <td>
+	                                <a href="CompanyDetailServlet?companyId=<%= company.getCompanyId() %>" class="table-action-btn" style="background-color: #28a745; color: white;">
+	                                  <i class="fas fa-eye"></i>詳細
+	                                </a>
+	                                <a href="CompanyDetailServlet?companyId=<%= company.getCompanyId() %>&mode=edit" class="table-action-btn edit">
+	                                  <i class="fas fa-edit"></i>編集
+	                                </a>
+	                              </td>
+	                            </tr>
+	                            <% } %>
+	                        </tbody>
+	                    </table>
+	                <% } else { %>
+	                    <div class="empty-state">
+	                        <div class="empty-state-icon">🏢</div>
+	                        <h3 class="empty-state-title">企業が登録されていません</h3>
+	                        <p class="empty-state-description">新しい企業を登録して、就職活動をサポートしましょう。</p>
+	                        <a href="CreateCompanyServlet" class="action-btn">
+	                            <i class="fas fa-plus"></i>新規企業登録
+	                        </a>
+	                    </div>
+	                <% } %>
+	            </div>
+	        </div>
+	    </section>
     </main>
 
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->
