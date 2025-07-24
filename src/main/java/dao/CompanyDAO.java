@@ -280,6 +280,7 @@ public class CompanyDAO {
      * 企業情報を更新（新しいCompanyBean構造対応）
      */
     public boolean updateCompanyBean(beans.CompanyBean company) {
+        System.out.print("登録開始");
         Connection conn = null;
         try {
             conn = DBConnection.getConnection();
@@ -316,7 +317,7 @@ public class CompanyDAO {
                 stmt.setInt(1, company.getCompanyId());
                 stmt.executeUpdate();
             }
-            
+            System.out.print("職種登録開始");
             // 新しい職種を登録
             if (company.getOccupations() != null) {
                 String insertOccupationSql = "INSERT INTO company_occupation_tbl (companys_id, occupation_id) VALUES (?, ?)";
@@ -344,7 +345,7 @@ public class CompanyDAO {
                     }
                 }
             }
-            
+            System.out.print("勤務地登録開始");
             // 新しい勤務地を登録
             if (company.getWorkPlaces() != null) {
                 String insertWorkPlaceSql = "INSERT INTO company_work_place_tbl (companys_id, work_place_id) VALUES (?, ?)";
@@ -441,28 +442,18 @@ public class CompanyDAO {
     /**
      * 企業数を取得
      */
-    public List<Integer> getCompanyCountRecruitment() {
-        String sql = "SELECT COUNT(*) FROM companys_tbl";
-        String sql2 = "SELECT COUNT(*) FROM companys_tbl WHERE recruitment_results = true";
-        List<Integer> data = new ArrayList<>();
-        try (Connection conn = DBConnection.getConnection()){
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                data.add(rs.getInt(1));
+    public List<Integer> getCompanyCountRecruitment(List<CompanyBean> companys) {
+        int companyNum = companys.size();
+        int recNum = 0;
+        for(CompanyBean company : companys){
+            if(company.getRecruitmentResults()){
+                recNum++;
             }
-
-            PreparedStatement stmt2 = conn.prepareStatement(sql2);
-            ResultSet rs2 = stmt2.executeQuery();
-            if (rs2.next()) {
-                data.add(rs2.getInt(1));
-            }
-            return data;
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
         }
-        return null;
+        List<Integer> data = new ArrayList<>();
+        data.add(companyNum);
+        data.add(recNum);
+        return data;
     }
 
     /**
@@ -687,52 +678,75 @@ public class CompanyDAO {
             
             // 既存の職種・勤務地を削除
             String deleteOccupationsSql = "DELETE FROM company_occupation_tbl WHERE companys_id=?";
-            try (PreparedStatement stmt3 = conn.prepareStatement(deleteOccupationsSql)) {
-                stmt3.setInt(1, company.getCompanyId());
-                stmt3.executeUpdate();
+            try (PreparedStatement delestmt = conn.prepareStatement(deleteOccupationsSql)) {
+                delestmt.setInt(1, company.getCompanyId());
+                delestmt.executeUpdate();
             }
             
             String deleteWorkPlacesSql = "DELETE FROM company_work_place_tbl WHERE companys_id=?";
-            try (PreparedStatement stmt4 = conn.prepareStatement(deleteWorkPlacesSql)) {
-                stmt4.setInt(1, company.getCompanyId());
-                stmt4.executeUpdate();
+            try (PreparedStatement delestmt2 = conn.prepareStatement(deleteWorkPlacesSql)) {
+                delestmt2.setInt(1, company.getCompanyId());
+                delestmt2.executeUpdate();
             }
             
+            System.out.print("職種登録開始");
             // 新しい職種を登録
             if (company.getOccupations() != null) {
                 String insertOccupationSql = "INSERT INTO company_occupation_tbl (companys_id, occupation_id) VALUES (?, ?)";
-                try (PreparedStatement stmt5 = conn.prepareStatement(insertOccupationSql)) {
+                try (PreparedStatement inocstmt = conn.prepareStatement(insertOccupationSql)) {
                     for (String occupation : company.getOccupations()) {
                         if (occupation != null && !occupation.trim().isEmpty()) {
-                            int occupationId = getOccupationIdByName(occupation);
+                            int occupationId = 0;//getOccupationIdByName(occupation);
+                            //職種IDをget
+                            String getocsql = "SELECT occupation_id FROM occupations_tbl WHERE occupation = ?";
+                            PreparedStatement getocstmt = conn.prepareStatement(getocsql);
+                            
+                            getocstmt.setString(1, occupation);
+                            ResultSet getocrs = getocstmt.executeQuery();
+                            
+                            if (getocrs.next()) {
+                                occupationId = getocrs.getInt("occupation_id");
+                            }
+                            //ここまで
                             if (occupationId > 0) {
-                                stmt5.setInt(1, company.getCompanyId());
-                                stmt5.setInt(2, occupationId);
-                                stmt5.executeUpdate();
+                                inocstmt.setInt(1, company.getCompanyId());
+                                inocstmt.setInt(2, occupationId);
+                                inocstmt.executeUpdate();
                             }
                         }
                     }
                 }
             }
-            
+            System.out.print("勤務地登録開始");
             // 新しい勤務地を登録
             if (company.getWorkPlaces() != null) {
                 String insertWorkPlaceSql = "INSERT INTO company_work_place_tbl (companys_id, work_place_id) VALUES (?, ?)";
-                try (PreparedStatement stmt6 = conn.prepareStatement(insertWorkPlaceSql)) {
+                try (PreparedStatement inwostmt = conn.prepareStatement(insertWorkPlaceSql)) {
                     for (String workPlace : company.getWorkPlaces()) {
                         if (workPlace != null && !workPlace.trim().isEmpty()) {
-                            int workPlaceId = getWorkPlaceIdByName(workPlace);
+                            int workPlaceId = 0;//getWorkPlaceIdByName(workPlace);
+                            //勤務地IDをget
+                            String inwosql = "SELECT id FROM work_place_tbl WHERE work_place = ?";
+                            PreparedStatement getwostmt = conn.prepareStatement(inwosql);
+                            getwostmt.setString(1, workPlace);
+                            ResultSet getwors = getwostmt.executeQuery();
+                            if (getwors.next()) {
+                                workPlaceId = getwors.getInt("id");
+                            }
+                            //ここまで
                             if (workPlaceId > 0) {
-                                stmt6.setInt(1, company.getCompanyId());
-                                stmt6.setInt(2, workPlaceId);
-                                stmt6.executeUpdate();
+                                inwostmt.setInt(1, company.getCompanyId());
+                                inwostmt.setInt(2, workPlaceId);
+                                inwostmt.executeUpdate();
                             }
                         }
                     }
                 }
             }
+
             
-            conn.commit();
+            
+            //conn.commit();
             return true;
 
         } catch (Exception e) {

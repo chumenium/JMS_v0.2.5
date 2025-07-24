@@ -1,9 +1,8 @@
 package servlet;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.List;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -186,7 +185,7 @@ public class CompanyDetailServlet extends HttpServlet {
                 List<CompanyBean> companies = CompanyDAO.getAllCompanies();
                 ServletContext sc = getServletContext();
                 sc.setAttribute("companies", companies);
-                List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+                List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment(companies);
                 sc.setAttribute("comNumData", comNumData);
                 System.out.println("CompanyDetailServlet: Delete successful, redirecting to CompanyListServlet");
                 response.sendRedirect(request.getContextPath() + "/CompanyListServlet?message=deleted");
@@ -265,12 +264,12 @@ public class CompanyDetailServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/CompanyDetailServlet?companyId=" + companyId);
             
 
-            CompanyDAO CompanyDAO = new CompanyDAO();
-            List<CompanyBean> companies = CompanyDAO.getAllCompanies();
-            ServletContext sc = getServletContext();
-            sc.setAttribute("companies", companies);
-            List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
-            sc.setAttribute("comNumData", comNumData);
+            // CompanyDAO CompanyDAO = new CompanyDAO();
+            // List<CompanyBean> companies = CompanyDAO.getAllCompanies();
+            // ServletContext sc = getServletContext();
+            // sc.setAttribute("companies", companies);
+            // List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment(companies);
+            // sc.setAttribute("comNumData", comNumData);
 
         } catch (NumberFormatException e) {
             request.setAttribute("errorMessage", "入力データに不正な値が含まれています。");

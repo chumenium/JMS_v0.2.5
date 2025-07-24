@@ -2,7 +2,6 @@ package servlet;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletContext;
@@ -50,7 +49,7 @@ public class CompanyManagementServlet extends HttpServlet {
         ServletContext sc = getServletContext();
         List<CompanyBean> companies = (List<CompanyBean>)sc.getAttribute("companies");
         request.setAttribute("companies", companies);
-        List<Integer> numdata = CompanyDAO.getCompanyCountRecruitment();
+        List<Integer> numdata = CompanyDAO.getCompanyCountRecruitment(companies);
         // 統計情報を取得
         int totalCompanies = numdata.get(0);
         int recruitmentCompanies = numdata.get(1);
@@ -154,14 +153,14 @@ public class CompanyManagementServlet extends HttpServlet {
             company.setOccupations(occupations);
             company.setWorkPlaces(workPlaces);
             // 職種・勤務地を登録
-            CompanyDAO.addCompanyAndGetId(companyName, company);
-            success = CompanyDAO.updateCompanyBean(company);
+            success = CompanyDAO.addCompanyAndGetId(companyName, company);
+            //success = CompanyDAO.updateCompanyBean(company);
         //}
         if (success) {
             List<CompanyBean> companies = CompanyDAO.getAllCompanies();
             ServletContext sc = getServletContext();
             sc.setAttribute("companies", companies);
-            List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+            List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment(companies);
             sc.setAttribute("companies", companies);
             sc.setAttribute("comNumData", comNumData);
             request.setAttribute("successMessage", "企業の登録が完了しました。");
@@ -206,7 +205,7 @@ public class CompanyManagementServlet extends HttpServlet {
                 List<CompanyBean> companies = CompanyDAO.getAllCompanies();
                 ServletContext sc = getServletContext();
                 sc.setAttribute("companies", companies);
-                List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment();
+                List<Integer> comNumData = CompanyDAO.getCompanyCountRecruitment(companies);
                 sc.setAttribute("comNumData", comNumData);
                 request.setAttribute("successMessage", "企業情報の更新が完了しました。");
             } else {
