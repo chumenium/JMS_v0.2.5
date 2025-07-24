@@ -249,19 +249,19 @@ tr:hover {
 	            <div class="summary-cards">
 	                <div class="summary-card">
 	                    <div class="summary-number">0</div>
-	                    <div>総応募者数</div>
+	                    <div style="color: #000000">総応募者数</div>
 	                </div>
 	                <div class="summary-card">
 	                    <div class="summary-number">0</div>
-	                    <div>選考中</div>
+	                    <div style="color: #000000">選考中</div>
 	                </div>
 	                <div class="summary-card">
 	                    <div class="summary-number">0</div>
-	                    <div>内定者数</div>
+	                    <div style="color: #000000">内定者数</div>
 	                </div>
 	                <div class="summary-card">
 	                    <div class="summary-number">0</div>
-	                    <div>不合格者数</div>
+	                    <div style="color: #000000">不合格者数</div>
 	                </div>
 	            </div>
 	
