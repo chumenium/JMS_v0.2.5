@@ -621,7 +621,7 @@
             <section class="quick-actions" role="region" aria-label="操作一覧">
                 <h2>🚀 操作一覧</h2>
                 <div class="action-buttons">
-                    <a href="CompanyServlet" class="action-btn" aria-label="企業一覧画面へ">
+                    <a href="CompanyListServlet" class="action-btn" aria-label="企業一覧画面へ">
                         <i class="fas fa-list" aria-hidden="true"></i>企業一覧を表示
                     </a>
                     <a href="JobHuntingSearchServlet" class="action-btn" aria-label="就活情報検索画面へ">
@@ -665,7 +665,7 @@
                             <span class="stat-label">募集中企業</span>
                         </div>
                     </div>
-                    <a href="CompanyServlet" class="card-link" aria-label="学生一覧を表示">
+                    <a href="CompanyListServlet" class="card-link" aria-label="学生一覧を表示">
                         企業一覧を表示
                     </a>
                 </article>
