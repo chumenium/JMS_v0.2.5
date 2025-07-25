@@ -1,3 +1,28 @@
+<!--*
+：：：色のテーマは緑：：：
+検索結果画面
+
+******教員-生徒-どちらにも表示されるページ****
+******権限によって表示されるボタンが変わる****
+
+:::権限一覧:::
+
+{
+  "teacher":           "教員",
+  "headmaster": "教務部長_校長",
+  "egd":      "就職指導部",
+  "admin":             "管理者",
+  "student":           "学生"
+}
+
+||**検索結果用**||
+
+**
+
+*-->
+
+<!--KCS_JMS_PROJECT-->
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page import="java.util.*" %>
 <%@ page import="java.sql.*" %>
