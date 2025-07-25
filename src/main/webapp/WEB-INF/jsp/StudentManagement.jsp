@@ -683,7 +683,7 @@
                     </a>
                 </article>
             </section>
-        </div>
+        </section>
     </main>
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->
     <div class="text-slide-wrapper">

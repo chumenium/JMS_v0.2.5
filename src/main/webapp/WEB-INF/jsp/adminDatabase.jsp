@@ -519,7 +519,7 @@ DB用画面
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">管理者設定</a></li>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase">管理者設定</a></li>
                 <% } %>
                 <!-- 教師権限のナビゲーション -->
                 <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role)) { %>

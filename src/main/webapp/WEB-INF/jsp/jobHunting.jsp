@@ -593,7 +593,7 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <div class="student-management-container">
+     <section class="custom-section" role="main" aria-label="幅調整用">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
                 <h1 class="page-title">就活管理</h1>
@@ -691,8 +691,7 @@
                         選考ステージを登録
                     </a>
                 </article>
-            </section>
-        </div>
+           </section>
     </main>
 
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->

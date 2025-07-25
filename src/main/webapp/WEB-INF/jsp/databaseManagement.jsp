@@ -584,7 +584,7 @@ DB管理用画面
                    class="btn btn-success">
                     🔍 整合性チェック
                 </a>
-                <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp" 
+                <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase" 
                    class="btn btn-danger">
                     ← システム管理に戻る
                 </a>
@@ -641,7 +641,7 @@ DB管理用画面
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">管理者設定</a></li>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase">管理者設定</a></li>
                 <% } %>
                 <!-- 教師権限のナビゲーション -->
                 <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role)) { %>
@@ -684,7 +684,7 @@ DB管理用画面
                 <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
                 <li><a href="${pageContext.request.contextPath}/StatusServlet?view=CompanyManagement">企業管理</a></li>
                 <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a></li>
-                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">管理者設定</a></li>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase">管理者設定</a></li>
             <% } %>
             <!-- 教師権限のナビゲーション -->
             <% if ("teacher".equals(role) || "headmaster".equals(role) || "egd".equals(role)) { %>
