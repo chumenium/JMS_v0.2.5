@@ -144,6 +144,9 @@ public class StatusServlet extends HttpServlet {
 					case "adminDatabase":
 						nextPage = "/WEB-INF/jsp/adminDatabase.jsp";
 						break;
+					case "InterviewExamInput":
+						nextPage = "/WEB-INF/jsp/InterviewExamInput.jsp";
+						break;
 						
 
 	            }

@@ -630,7 +630,7 @@
                     <a href="StatusServlet?view=SelectionStage" class="action-btn secondary" aria-label="選考ステージ登録画面へ">
                         <i class="fas fa-edit" aria-hidden="true"></i>選考ステージ登録
                     </a>
-                    <a href="StatusServlet?view=         " class="action-btn secondary" aria-label="試験面接情報入力画面へ">
+                    <a href="StatusServlet?view=InterviewExamInput" class="action-btn secondary" aria-label="試験面接情報入力画面へ">
                         <i class="fas fa-exam" aria-hidden="true"></i>試験面接情報入力
                     </a>
                     <a href="StatusServlet?view=       " class="action-btn secondary" aria-label="書類提出チェック画面へ">
