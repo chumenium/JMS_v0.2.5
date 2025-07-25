@@ -51,7 +51,7 @@
     }
 
     .company-list-container {
-        max-width: 1400px;
+        max-width: 3000px;
         margin: 0 auto;
         padding: 24px;
         min-height: 100vh;
@@ -378,6 +378,33 @@
         font-size: 16px;
         margin-bottom: 24px;
     }
+    
+    /* 幅間調整用 */
+	.custom-section {
+    width: 100vw;           /* ビューポート全体の横幅を使用 */
+    max-width: none;        /* 最大幅の制限を解除 */
+    margin: 0;
+    padding: 40px 32px;
+    margin-top: 50px; /* ← ヘッダーとの距離をここで確保 */
+    margin-bottom: 30px; /* ← 例えば60pxで広めに */
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #fff;
+	}
+	
+	
+	
+	@media (max-width: 768px) {
+	    .custom-section {
+	        padding: 32px 16px;
+	    }
+	}
+
+	@media (max-width: 480px) {
+	    .custom-section {
+	        padding: 24px 12px;
+	    }
+	}
 </style>
 </head>
 <body class="company-list-page">
@@ -413,7 +440,7 @@
     </header>
 
     <main>
-    	<section class="bg1 bg-pattern1" role="main" aria-label="背景色：黒">	
+    <section class="custom-section" role="main" aria-label="幅調整用">
 	        <div class="company-list-container">
 	            <!-- ページヘッダー -->
 	            <header class="page-header" role="banner">
