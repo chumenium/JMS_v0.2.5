@@ -56,11 +56,46 @@
   String companyName = request.getParameter("companyName");
   String studentName = request.getParameter("studentName");
   
+  // セッションからも取得
+  if (companyId == null || companyId.isEmpty()) {
+    Object sessionCompanyId = session.getAttribute("companys_id");
+    if (sessionCompanyId != null) {
+      companyId = sessionCompanyId.toString();
+    }
+  }
+  if (studentId == null || studentId.isEmpty()) {
+    Object sessionStudentId = session.getAttribute("student_id");
+    if (sessionStudentId != null) {
+      studentId = sessionStudentId.toString();
+    }
+  }
+  
+  // 学生権限の場合はセッションからstudent_idを取得して強制的にセット
+  if ("student".equals(role)) {
+    Object sessionStudentId = session.getAttribute("student_id");
+    System.out.println("SelectionStage.jsp - sessionStudentId: " + sessionStudentId);
+    if (sessionStudentId != null) {
+      studentId = sessionStudentId.toString();
+      // 学生名もセッションから取得
+      Object studentObj = session.getAttribute("student");
+      if (studentObj != null) {
+        try {
+          // beans.StudentBeansのgetName()をリフレクションで呼び出し
+          java.lang.reflect.Method getName = studentObj.getClass().getMethod("getName");
+          studentName = (String)getName.invoke(studentObj);
+        } catch (Exception e) {
+          // 失敗時は何もしない
+        }
+      }
+    }
+  }
+  
   // デバッグ用ログ
   System.out.println("SelectionStage.jsp - companyId: " + companyId);
   System.out.println("SelectionStage.jsp - studentId: " + studentId);
   System.out.println("SelectionStage.jsp - companyName: " + companyName);
   System.out.println("SelectionStage.jsp - studentName: " + studentName);
+  System.out.println("SelectionStage.jsp - hidden studentId value: " + (studentId != null ? studentId : ""));
   
   // メッセージを取得
   String successMessage = (String) request.getAttribute("successMessage");
@@ -132,10 +167,7 @@
                         <div class="form-group">
                             <label for="studentName">学生名 <span class="required">*</span></label>
                             <div class="search-input-container">
-                                <input type="text" id="studentName" name="studentName" 
-                                       value="<%= "student".equals(role) ? username : (studentName != null ? studentName : "") %>" 
-                                       required placeholder="学生名を入力" autocomplete="off"
-                                       <%= "student".equals(role) ? "readonly" : "" %>>
+                                <input type="text" id="studentName" name="studentName" value="<%= studentName != null ? studentName : "" %>" required placeholder="学生名を入力" autocomplete="off" <%= "student".equals(role) ? "readonly" : "" %>>
                                 <button type="button" class="search-btn" onclick="openStudentSearch()" title="学生を検索"
                                         <%= "student".equals(role) ? "style='display:none;'" : "" %>>
                                     🔍
@@ -180,7 +212,7 @@
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label>ステージ種別 <span class="required">*</span></label>
-                                        <select name="stages[0].type" required>
+                                        <select name="stages.type" required>
                                             <option value="">選択してください</option>
                                             <option value="説明会">説明会</option>
                                             <option value="書類選考">書類選考</option>
@@ -198,15 +230,15 @@
                                     </div>
                                     <div class="form-group">
                                         <label>実施日</label>
-                                        <input type="date" name="stages[0].date" class="date-input">
+                                        <input type="date" name="stages.date" class="date-input">
                                     </div>
                                     <div class="form-group">
                                         <label>実施時間</label>
-                                        <input type="time" name="stages[0].time">
+                                        <input type="time" name="stages.time">
                                     </div>
                                     <div class="form-group">
                                         <label>実施形式</label>
-                                        <select name="stages[0].format">
+                                        <select name="stages.format">
                                             <option value="">選択してください</option>
                                             <option value="個人">個人</option>
                                             <option value="集団">集団</option>
@@ -217,13 +249,13 @@
                                     </div>
                                     <div class="form-group full-width">
                                         <label>備考・特記事項</label>
-                                        <textarea name="stages[0].notes" rows="3" 
+                                        <textarea name="stages.notes" rows="3" 
                                                   placeholder="特記事項があれば入力してください"
                                                   class="notes-textarea"></textarea>
                                     </div>
                                     <div class="form-group">
                                         <label>ステータス</label>
-                                        <select name="stages[0].status">
+                                        <select name="stages.status">
                                             <option value="予定">予定</option>
                                             <option value="実施済み">実施済み</option>
                                             <option value="合格">合格</option>
@@ -373,7 +405,7 @@ function addStage() {
             <div class="form-grid">
                 <div class="form-group">
                     <label>ステージ種別 <span class="required">*</span></label>
-                    <select name="stages[${newStageNumber-1}].type" required>
+                    <select name="stages.type" required>
                         <option value="">選択してください</option>
                         <option value="説明会">説明会</option>
                         <option value="書類選考">書類選考</option>
@@ -391,15 +423,15 @@ function addStage() {
                 </div>
                 <div class="form-group">
                     <label>実施日</label>
-                    <input type="date" name="stages[${newStageNumber-1}].date" class="date-input">
+                    <input type="date" name="stages.date" class="date-input">
                 </div>
                 <div class="form-group">
                     <label>実施時間</label>
-                    <input type="time" name="stages[${newStageNumber-1}].time">
+                    <input type="time" name="stages.time">
                 </div>
                 <div class="form-group">
                     <label>実施形式</label>
-                    <select name="stages[${newStageNumber-1}].format">
+                    <select name="stages.format">
                         <option value="">選択してください</option>
                         <option value="個人">個人</option>
                         <option value="集団">集団</option>
@@ -410,13 +442,13 @@ function addStage() {
                 </div>
                 <div class="form-group full-width">
                     <label>備考・特記事項</label>
-                    <textarea name="stages[${newStageNumber-1}].notes" rows="3" 
+                    <textarea name="stages.notes" rows="3" 
                               placeholder="特記事項があれば入力してください"
                               class="notes-textarea"></textarea>
                 </div>
                 <div class="form-group">
                     <label>ステータス</label>
-                    <select name="stages[${newStageNumber-1}].status">
+                    <select name="stages.status">
                         <option value="予定">予定</option>
                         <option value="実施済み">実施済み</option>
                         <option value="合格">合格</option>
@@ -589,9 +621,17 @@ function setSearchResult(id, name, type) {
     if (type === 'company') {
         document.getElementById('companyName').value = name;
         document.getElementById('companyId').value = id;
+        var hiddenCompanyId = document.querySelector('input[type="hidden"][name="companyId"]');
+        if (hiddenCompanyId) hiddenCompanyId.value = id;
     } else if (type === 'student') {
         document.getElementById('studentName').value = name;
-        document.getElementById('studentId').value = id;
+        // 学生権限以外の場合のみhidden studentIdをセット
+        var isStudent = '<%= "student".equals(role) %>' === 'true';
+        if (!isStudent) {
+            document.getElementById('studentId').value = id;
+            var hiddenStudentId = document.querySelector('input[type="hidden"][name="studentId"]');
+            if (hiddenStudentId) hiddenStudentId.value = id;
+        }
     }
 }
 
@@ -661,6 +701,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         });
+    }
+
+    // hiddenフィールドの値が正しいかチェックし、必要なら再セット
+    var companyNameInput = document.getElementById('companyName');
+    var companyIdInput = document.getElementById('companyId');
+    if (companyNameInput && companyIdInput && !companyIdInput.value) {
+        // 企業名が入力済みでIDが空なら、サーバー側で取得したIDをセット
+        companyIdInput.value = '<%= companyId != null ? companyId : "" %>';
+    }
+    var studentNameInput = document.getElementById('studentName');
+    var studentIdInput = document.getElementById('studentId');
+    if (studentNameInput && studentIdInput && !studentIdInput.value) {
+        studentIdInput.value = '<%= studentId != null ? studentId : "" %>';
     }
 });
 </script>

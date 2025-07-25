@@ -132,12 +132,19 @@ public class LoginServlet extends HttpServlet {
 							session.setAttribute("username", displayName);
 							session.setAttribute("id", userId);
 							session.setAttribute("role", userRole);
+							// 学生権限の場合はstudent_idも保存
+							if ("student".equals(userRole)) {
+								session.setAttribute("student_id", userId);
+							}
 
 							// デバッグログ
 							System.out.println("LoginServlet: セッション接続完了");
 							System.out.println("LoginServlet: username = " + displayName);
 							System.out.println("LoginServlet: id = " + userId);
 							System.out.println("LoginServlet: role = " + userRole);
+							if ("student".equals(userRole)) {
+								System.out.println("LoginServlet: student_id = " + userId);
+							}
 
 							// ログイン成功時はStatusServletにリダイレクト
 

@@ -106,10 +106,10 @@ public class SelectionStageServlet extends HttpServlet {
             String selectionStatus = request.getParameter("selectionStatus");
             
             // 選考ステージの配列パラメータを取得
-            String[] stageTypes = request.getParameterValues("stages[].type");
-            String[] stageDates = request.getParameterValues("stages[].date");
-            String[] stageTimes = request.getParameterValues("stages[].time");
-            String[] stageFormats = request.getParameterValues("stages[].format");
+            String[] stageTypes = request.getParameterValues("stages.type");
+            String[] stageDates = request.getParameterValues("stages.date");
+            String[] stageTimes = request.getParameterValues("stages.time");
+            String[] stageFormats = request.getParameterValues("stages.format");
             
             // デバッグ用ログ
             System.out.println("=== 選考ステージ登録開始 ===");
