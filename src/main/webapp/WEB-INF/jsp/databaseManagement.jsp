@@ -311,7 +311,7 @@
         <nav>
             <ul>
                 <li><a href="${pageContext.request.contextPath}/DashboardServlet">ホーム</a></li>
-                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase">システム管理</a></li>
                 <li><a href="extension.html">お問い合わせ</a></li>
                 <li><a href="${pageContext.request.contextPath}/LogoutServlet">ログアウト</a></li>
             </ul>

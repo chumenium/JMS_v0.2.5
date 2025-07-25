@@ -542,7 +542,7 @@
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
                 <% } %>
                 <% if ("admin".equals(role)) { %>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase">システム管理</a></li>
                 <% } %>
                 <li><a href="extension.html">お問い合わせ</a></li>
                 <% if (username != null) { %>
@@ -678,7 +678,7 @@
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
                 <% } %>
                 <% if ("admin".equals(role)) { %>
-                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
+                    <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase">システム管理</a></li>
                 <% } %>
                 <li><a href="extension.html">お問い合わせ</a></li>
             </ul>
@@ -725,7 +725,7 @@
                 <li><a href="${pageContext.request.contextPath}/StatusServlet?view=applicantList">受験者一覧</a></li>
             <% } %>
             <% if ("admin".equals(role)) { %>
-                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase.jsp">システム管理</a></li>
+                <li><a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase">システム管理</a></li>
             <% } %>
             <li><a href="extension.html">お問い合わせ</a></li>
             <% if (username != null) { %>
