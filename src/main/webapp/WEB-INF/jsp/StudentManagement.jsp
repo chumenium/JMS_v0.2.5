@@ -226,7 +226,7 @@
         grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
         gap: 24px;
         margin-bottom: 32px;
-        max-width: 1200px;
+        max-width: 2000px;
         margin-left: auto;
         margin-right: auto;
     }
@@ -513,6 +513,36 @@
         font-size: 8vw;
         opacity: 0.08;
     }
+    
+    
+    
+    
+	/* 幅間調整用 */
+	.custom-section {
+    width: 100vw;           /* ビューポート全体の横幅を使用 */
+    max-width: none;        /* 最大幅の制限を解除 */
+    margin: 0;
+    padding: 40px 32px;
+    margin-top: 50px; /* ← ヘッダーとの距離をここで確保 */
+    margin-bottom: 30px; /* ← 例えば60pxで広めに */
+    box-sizing: border-box;
+    background-color: #fff;
+    color: #fff;
+	}
+	
+	
+	
+	@media (max-width: 768px) {
+	    .custom-section {
+	        padding: 32px 16px;
+	    }
+	}
+
+	@media (max-width: 480px) {
+	    .custom-section {
+	        padding: 24px 12px;
+	    }
+	}
 </style>
 
 </head>
@@ -563,7 +593,7 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <div class="student-management-container">
+    <section class="custom-section" role="main" aria-label="幅調整用">
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
                 <h1 class="page-title">学生管理</h1>
@@ -589,7 +619,7 @@
 
             <!-- 操作一覧 -->
             <section class="quick-actions" role="region" aria-label="操作一覧">
-                <h2>🚀 操作一覧</h2>
+                <h2 style="color: #000000">🚀 操作一覧</h2>
                 <div class="action-buttons">
                     <a href="StudentServlet" class="action-btn" aria-label="学生一覧を表示">
                         <i class="fas fa-list" aria-hidden="true"></i>学生一覧を表示
@@ -655,7 +685,6 @@
             </section>
         </div>
     </main>
-
     <!--▼▼▼▼▼ここから「テキストスライドショー」-->
     <div class="text-slide-wrapper">
         <div class="text-slide">

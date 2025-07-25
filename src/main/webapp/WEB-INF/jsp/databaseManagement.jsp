@@ -411,7 +411,7 @@ DB管理用画面
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <section class="custom-section" role="main" aria-label="ダッシュボードメイン">
+        <section class="custom-section" role="main" aria-label="幅調整用">
             <div class=" db-header">
                 <h1>🗄️ データベース管理</h1>
                 <p>データベースの統計情報、バックアップ、最適化、整合性チェック</p>
