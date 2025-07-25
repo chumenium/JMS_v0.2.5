@@ -387,6 +387,34 @@
         0% { transform: rotate(0deg); }
         100% { transform: rotate(360deg); }
     }
+    
+    /* 幅間調整用 */
+	.custom-section {
+    width: 100vw;           /* ビューポート全体の横幅を使用 */
+    max-width: none;        /* 最大幅の制限を解除 */
+    margin: 0;
+    padding: 40px 32px;
+    margin-top: 80px; /* ← ヘッダーとの距離をここで確保 */
+    margin-bottom: 30px; /* ← 例えば60pxで広めに */
+    box-sizing: border-box;
+    background-color: #000;
+    color: #fff;
+	}
+	
+	
+	
+	@media (max-width: 768px) {
+	    .custom-section {
+	        padding: 32px 16px;
+	    }
+	}
+
+	@media (max-width: 480px) {
+	    .custom-section {
+	        padding: 24px 12px;
+	    }
+	}
+    
 </style>
 </head>
 
@@ -454,8 +482,8 @@
 
     <main>
         <!--▼▼▼▼▼ここから「ダッシュボードメイン」-->
-        <section class="bg1 bg-pattern1" role="main" aria-label="ダッシュボードメイン">
-            <div class="dashboard-container">
+        <section class="custom-section" role="main" aria-label="ダッシュボードメイン">
+            
                 <!-- ダッシュボードヘッダー -->
                 <div class="dashboard-header">
                     <div class="user-info">
@@ -642,8 +670,7 @@
                         </div>
                     <% } %>
                 </div>
-            </div>
-        </section>
+        	</section>
         <!--▲▲▲▲▲ここまで「ダッシュボードメイン」-->
 
         <!--▼▼▼▼▼ここから「お知らせセクション」-->
