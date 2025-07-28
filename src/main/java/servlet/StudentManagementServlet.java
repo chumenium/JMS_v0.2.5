@@ -44,6 +44,7 @@ public class StudentManagementServlet extends HttpServlet {
         // 権限チェック
         if (role == null || 
             (!"teacher".equals(role) && 
+             !"egd".equals(role) && 
              !"headmaster".equals(role) && 
              !"admin".equals(role))) {
             response.sendRedirect(request.getContextPath() + "/error/access-denied.html");

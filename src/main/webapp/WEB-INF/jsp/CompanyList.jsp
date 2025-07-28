@@ -472,6 +472,7 @@
 	            </div>
 	
 	            <!-- 操作ボタン -->
+                <%if(!role.equals("student")){%>
 	            <div class="action-buttons">
 	                <a href="CreateCompanyServlet" class="action-btn">
 	                    <i class="fas fa-plus"></i>新規企業登録
@@ -480,6 +481,13 @@
 	                    <i class="fas fa-arrow-left"></i>企業管理に戻る
 	                </a>
 	            </div>
+                <%}else{%>
+                    <div class="action-buttons">
+                        <a href="StatusServlet?view=DashBoard" class="action-btn secondary">
+                            <i class="fas fa-arrow-left"></i>ダッシュボードに戻る
+                        </a>
+                    </div>
+                <%}%>
 	
 	            <!-- 企業一覧テーブル -->
 	            <div class="company-table-container">
@@ -491,7 +499,9 @@
 	                                <th>職種</th>
 	                                <th>勤務地</th>
 	                                <th>採用実績</th>
+                                    <%if(!role.equals("student")){%>
 	                                <th>操作</th>
+                                    <%}%>
 	                            </tr>
 	                        </thead>
 	                        <tbody>
@@ -527,6 +537,7 @@
 	                                  <span class="status-badge warning">なし</span>
 	                                <% } %>
 	                              </td>
+                                  <%if(!role.equals("student")){%>
 	                              <td>
 	                                <a href="CompanyDetailServlet?companyId=<%= company.getCompanyId() %>" class="table-action-btn" style="background-color: #28a745; color: white;">
 	                                  <i class="fas fa-eye"></i>詳細
@@ -535,6 +546,7 @@
 	                                  <i class="fas fa-edit"></i>編集
 	                                </a>
 	                              </td>
+                                  <%}%>
 	                            </tr>
 	                            <% } %>
 	                        </tbody>
