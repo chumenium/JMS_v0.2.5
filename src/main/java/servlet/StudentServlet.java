@@ -376,12 +376,23 @@ public class StudentServlet extends HttpServlet {
                         sc.setAttribute("currentPage", page);
                         sc.setAttribute("totalPages", totalPages);
 
+						int cnt = 0;
+						int allcnt = 0;
+						for(String enrollmentStatus : enrollmentStatuss){
+							allcnt++;
+							if(enrollmentStatus.equals("活動中")){
+								cnt++;
+							}
+						}
+						request.setAttribute("allcnt",allcnt);
+						request.setAttribute("cnt",cnt);
                     } catch (Exception e) {
                         System.err.println("General error in StudentServlet doGet: " + e.getMessage());
                         e.printStackTrace();
                         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                         response.getWriter().println("Error: " + e.getMessage());
                     }
+                    
                     request.getRequestDispatcher("/WEB-INF/jsp/StudentManagement.jsp").forward(request, response);
                 } else {
                     request.setAttribute("errorMessage", "データ登録に失敗しました。" );
