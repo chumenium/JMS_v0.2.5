@@ -107,6 +107,17 @@
     <url-pattern>/SelectionStageViewServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- 選考ステージ編集サーブレット -->
+  <servlet>
+    <servlet-name>SelectionStageEditServlet</servlet-name>
+    <servlet-class>servlet.SelectionStageEditServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>SelectionStageEditServlet</servlet-name>
+    <url-pattern>/SelectionStageEditServlet</url-pattern>
+  </servlet-mapping>
+  
   <!-- 面接・試験表示サーブレット -->
   <servlet>
     <servlet-name>InterviewExamViewServlet</servlet-name>

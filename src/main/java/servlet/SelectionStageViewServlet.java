@@ -28,6 +28,14 @@ public class SelectionStageViewServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        String action = request.getParameter("action");
+        
+        // 編集アクションの場合
+        if ("edit".equals(action)) {
+            handleEditAction(request, response);
+            return;
+        }
+        
         System.out.println("=== 選考ステージ確認画面開始 ===");
         
         // セッションの確認
@@ -131,5 +139,60 @@ public class SelectionStageViewServlet extends HttpServlet {
             throws ServletException, IOException {
         // POSTリクエストはGETと同じ処理
         doGet(request, response);
+    }
+    
+    private void handleEditAction(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        String studentId = request.getParameter("studentId");
+        String companyId = request.getParameter("companyId");
+        
+        System.out.println("=== 選考ステージ編集画面開始 ===");
+        System.out.println("SelectionStageViewServlet - studentId: " + studentId);
+        System.out.println("SelectionStageViewServlet - companyId: " + companyId);
+        
+        if (studentId == null || companyId == null) {
+            System.out.println("SelectionStageViewServlet - パラメータが不足しています");
+            response.sendRedirect(request.getContextPath() + "/SelectionStageViewServlet");
+            return;
+        }
+        
+        try {
+            SelectionStageDAO selectionStageDAO = new SelectionStageDAO();
+            
+            // 選考ステージの基本情報を取得
+            Map<String, Object> selectionStage = selectionStageDAO.getSelectionStageById(
+                Integer.parseInt(studentId), 
+                Integer.parseInt(companyId), 
+                0
+            );
+            
+            if (selectionStage == null) {
+                request.setAttribute("errorMessage", "選考ステージが見つかりませんでした。");
+                response.sendRedirect(request.getContextPath() + "/SelectionStageViewServlet");
+                return;
+            }
+            
+            // 選考ステージの詳細情報を取得
+            List<Map<String, Object>> selectionStages = selectionStageDAO.getSelectionStageDetails(
+                Integer.parseInt(studentId), 
+                Integer.parseInt(companyId)
+            );
+            
+            // 選考ステージタイプを取得
+            List<Map<String, Object>> selectionTypes = selectionStageDAO.getAllSelectionTypes();
+            
+            request.setAttribute("selectionStage", selectionStage);
+            request.setAttribute("selectionStages", selectionStages);
+            request.setAttribute("selectionTypes", selectionTypes);
+            
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/SelectionStageEdit.jsp");
+            dispatcher.forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "選考ステージの取得に失敗しました。");
+            response.sendRedirect(request.getContextPath() + "/SelectionStageViewServlet");
+        }
     }
 } 
