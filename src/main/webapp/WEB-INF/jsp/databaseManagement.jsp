@@ -397,7 +397,7 @@ DB管理用画面
                 <!-- 生徒権限のナビゲーション -->
                 <% if ("student".equals(role)) { %>
                     <li><a href="${pageContext.request.contextPath}/SelectionStageServlet">選考ステージ登録</a></li>
-                    <li><a href="${pageContext.request.contextPath}/InterviewExamInputServlet">試験面接情報</a></li>
+                    <li><a href="${pageContext.request.contextPath}/SelectionStageViewServlet">選考ステージ確認</a></li>
                     <li><a href="${pageContext.request.contextPath}/CompanyListServlet">企業一覧</a></li>
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">書類提出チェック</a></li>
                 <% } %>
@@ -695,7 +695,7 @@ DB管理用画面
             <!-- 生徒権限のナビゲーション -->
             <% if ("student".equals(role)) { %>
                 <li><a href="${pageContext.request.contextPath}/SelectionStageServlet">選考ステージ登録</a></li>
-                <li><a href="${pageContext.request.contextPath}/InterviewExamInputServlet">試験面接情報</a></li>
+                <li><a href="${pageContext.request.contextPath}/SelectionStageViewServlet">選考ステージ確認</a></li>
                 <li><a href="${pageContext.request.contextPath}/CompanyListServlet">企業一覧</a></li>
                 <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">書類提出チェック</a></li>
             <% } %>

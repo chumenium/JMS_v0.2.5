@@ -626,7 +626,7 @@
             <!-- ページヘッダー -->
             <header class="page-header" role="banner">
                 <h1 class="page-title">就活管理</h1>
-                <p class="page-subtitle">就活の選考ステージ登録や試験面接情報の入力、書類チェック、<br>受験予定者抽出、活動報告自動出力などの画面に遷移できます。</p>
+                <p class="page-subtitle">就活の選考ステージ登録や選考ステージ確認、書類チェック、<br>受験予定者抽出、活動報告自動出力などの画面に遷移できます。</p>
                 <nav class="breadcrumb" aria-label="パンくずリスト">
                     <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
                     <span class="separator" aria-hidden="true">/</span>
@@ -659,8 +659,8 @@
                     <a href="StatusServlet?view=SelectionStage" class="action-btn secondary" aria-label="選考ステージ登録画面へ">
                         <i class="fas fa-edit" aria-hidden="true"></i>選考ステージ登録
                     </a>
-                    <a href="InterviewExamInputServlet" class="action-btn secondary" aria-label="試験面接情報入力画面へ">
-                        <i class="fas fa-exam" aria-hidden="true"></i>試験面接情報入力
+                    <a href="SelectionStageViewServlet" class="action-btn secondary" aria-label="選考ステージ確認画面へ">
+                        <i class="fas fa-exam" aria-hidden="true"></i>選考ステージ確認
                     </a>
                     <a href="StatusServlet?view=       " class="action-btn secondary" aria-label="書類提出チェック画面へ">
                         <i class="fas fa-Document submission" aria-hidden="true"></i>書類提出チェック

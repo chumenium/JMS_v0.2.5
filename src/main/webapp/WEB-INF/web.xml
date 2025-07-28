@@ -98,13 +98,13 @@
   
   <!-- 面接・試験入力サーブレット -->
   <servlet>
-    <servlet-name>InterviewExamInputServlet</servlet-name>
-    <servlet-class>servlet.InterviewExamInputServlet</servlet-class>
+    <servlet-name>SelectionStageViewServlet</servlet-name>
+    <servlet-class>servlet.SelectionStageViewServlet</servlet-class>
   </servlet>
   
   <servlet-mapping>
-    <servlet-name>InterviewExamInputServlet</servlet-name>
-    <url-pattern>/InterviewExamInputServlet</url-pattern>
+    <servlet-name>SelectionStageViewServlet</servlet-name>
+    <url-pattern>/SelectionStageViewServlet</url-pattern>
   </servlet-mapping>
   
   <!-- 面接・試験表示サーブレット -->

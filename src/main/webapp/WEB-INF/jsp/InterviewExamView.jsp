@@ -252,7 +252,7 @@
         
         <!-- 操作ボタン -->
         <div style="text-align: center; margin-top: 30px;">
-            <a href="${pageContext.request.contextPath}/InterviewExamInputServlet" class="btn btn-success">新規登録</a>
+            <a href="${pageContext.request.contextPath}/SelectionStageViewServlet" class="btn btn-success">選考ステージ確認</a>
             <a href="${pageContext.request.contextPath}/CompanyDetailServlet?id=${company.companysId}" class="btn btn-primary">企業詳細へ戻る</a>
             <a href="${pageContext.request.contextPath}/CompanyListServlet" class="btn btn-secondary">企業一覧へ</a>
         </div>

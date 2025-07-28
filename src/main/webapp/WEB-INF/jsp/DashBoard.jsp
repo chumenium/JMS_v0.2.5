@@ -467,7 +467,7 @@
                 <!-- 生徒権限のナビゲーション -->
                 <% if ("student".equals(role)) { %>
                     <li><a href="${pageContext.request.contextPath}/SelectionStageServlet">選考ステージ登録</a></li>
-                    <li><a href="${pageContext.request.contextPath}/InterviewExamInputServlet">試験面接情報</a></li>
+                    <li><a href="${pageContext.request.contextPath}/SelectionStageViewServlet">選考ステージ確認</a></li>
                     <li><a href="${pageContext.request.contextPath}/CompanyListServlet">企業一覧</a></li>
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">書類提出チェック</a></li>
                 <% } %>
@@ -624,12 +624,12 @@
                         <!-- 就職管理 - 試験面接情報 -->
                         <div class="feature-card">
                             <span class="feature-icon">📋</span>
-                            <h3 class="feature-title">試験面接情報</h3>
+                            <h3 class="feature-title">選考ステージ確認</h3>
                             <p class="feature-description">
                                 面接や試験の日程・結果を記録し、管理できます。
                             </p>
-                            <a href="${pageContext.request.contextPath}/InterviewExamInputServlet" class="feature-link">
-                                試験面接情報を開く
+                            <a href="${pageContext.request.contextPath}/SelectionStageViewServlet" class="feature-link">
+                                選考ステージ確認を開く
                             </a>
                         </div>
 
@@ -654,6 +654,14 @@
                             </p>
                             <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting" class="feature-link">
                                 書類提出チェックを開く
+                            </a>
+                        </div>
+
+                        <!-- 就職管理 - 選考ステージ確認 -->
+                        <div class="feature-card">
+                            <h3 class="feature-title">選考ステージ確認</h3>
+                            <a href="${pageContext.request.contextPath}/SelectionStageViewServlet" class="feature-link">
+                                選考ステージ確認を開く
                             </a>
                         </div>
                     <% } %>
@@ -796,7 +804,7 @@
             <!-- 生徒権限のナビゲーション -->
             <% if ("student".equals(role)) { %>
                 <li><a href="${pageContext.request.contextPath}/SelectionStageServlet">選考ステージ登録</a></li>
-                <li><a href="${pageContext.request.contextPath}/InterviewExamInputServlet">試験面接情報</a></li>
+                <li><a href="${pageContext.request.contextPath}/SelectionStageViewServlet">選考ステージ確認</a></li>
                 <li><a href="${pageContext.request.contextPath}/CompanyListServlet">企業一覧</a></li>
                 <li><a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">書類提出チェック</a></li>
             <% } %>
