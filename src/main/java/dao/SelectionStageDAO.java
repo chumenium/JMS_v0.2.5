@@ -425,7 +425,7 @@ public class SelectionStageDAO {
                     stage.put("companys_id", rs.getInt("companys_id"));
                     stage.put("company_name", rs.getString("company_name"));
                     stage.put("student_name", rs.getString("student_name"));
-                    stage.put("status", rs.getString("status"));
+                    stage.put("status", rs.getString("activity_status"));
                     return stage;
                 }
             }

@@ -151,8 +151,10 @@ public class SelectionStageViewServlet extends HttpServlet {
         System.out.println("SelectionStageViewServlet - studentId: " + studentId);
         System.out.println("SelectionStageViewServlet - companyId: " + companyId);
         
-        if (studentId == null || companyId == null) {
+        // nullや"null"文字列の場合はエラー扱い
+        if (studentId == null || companyId == null || "null".equals(studentId) || "null".equals(companyId)) {
             System.out.println("SelectionStageViewServlet - パラメータが不足しています");
+            request.setAttribute("errorMessage", "学生IDまたは企業IDが正しく取得できませんでした。");
             response.sendRedirect(request.getContextPath() + "/SelectionStageViewServlet");
             return;
         }
