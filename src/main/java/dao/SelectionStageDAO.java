@@ -168,8 +168,8 @@ public class SelectionStageDAO {
     /**
      * 学生IDで選考ステージ情報一覧を取得
      */
-    public List<Map<String, Object>> getSelectionStagesByStudentId(String studentId) {
-        List<Map<String, Object>> stages = new ArrayList<>();
+    public List<Object> getSelectionStagesByStudentId(String studentId) {
+        List<Object> stages = new ArrayList<>();
         String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
                     "FROM job_activity_detail_tbl jad " +
                     "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
@@ -206,8 +206,8 @@ public class SelectionStageDAO {
     /**
      * 企業IDで選考ステージ情報一覧を取得
      */
-    public List<Map<String, Object>> getSelectionStagesByCompanyId(String companyId) {
-        List<Map<String, Object>> stages = new ArrayList<>();
+    public List<Object> getSelectionStagesByCompanyId(String companyId) {
+        List<Object> stages = new ArrayList<>();
         String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
                     "FROM job_activity_detail_tbl jad " +
                     "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
@@ -288,10 +288,51 @@ public class SelectionStageDAO {
     }
     
     /**
+     * 企業と学生の両方を指定して選考ステージ情報を取得
+     */
+    public List<Object> getSelectionStagesByCompanyAndStudent(String companyId, String studentId) {
+        List<Object> stages = new ArrayList<>();
+        String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
+                    "FROM job_activity_detail_tbl jad " +
+                    "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
+                    "LEFT JOIN companys_tbl c ON jad.companys_id = c.companys_id " +
+                    "LEFT JOIN students_tbl st ON jad.student_id = st.student_id " +
+                    "WHERE jad.companys_id = ? AND jad.student_id = ? " +
+                    "ORDER BY jad.date DESC, jad.time DESC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, Integer.parseInt(companyId));
+            stmt.setString(2, studentId);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> stage = new HashMap<>();
+                    stage.put("student_id", rs.getString("student_id"));
+                    stage.put("companys_id", rs.getInt("companys_id"));
+                    stage.put("selection_id", rs.getInt("selection_id"));
+                    stage.put("selection_name", rs.getString("selection_name"));
+                    stage.put("company_name", rs.getString("company_name"));
+                    stage.put("student_name", rs.getString("student_name"));
+                    stage.put("date", rs.getDate("date"));
+                    stage.put("time", rs.getTime("time"));
+                    stage.put("venue", rs.getString("venue"));
+                    stage.put("remarks", rs.getString("remarks"));
+                    stages.add(stage);
+                }
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return stages;
+    }
+    
+    /**
      * 全ての選考ステージ情報を取得
      */
-    public List<Map<String, Object>> getAllSelectionStages() {
-        List<Map<String, Object>> stages = new ArrayList<>();
+    public List<Object> getAllSelectionStages() {
+        List<Object> stages = new ArrayList<>();
         String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
                     "FROM job_activity_detail_tbl jad " +
                     "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
@@ -316,6 +357,46 @@ public class SelectionStageDAO {
                 stage.put("venue", rs.getString("venue"));
                 stage.put("remarks", rs.getString("remarks"));
                 stages.add(stage);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return stages;
+    }
+    
+    /**
+     * 選考ステージ種類を指定して選考ステージ情報を取得
+     */
+    public List<Object> getSelectionStagesByType(String selectionType) {
+        List<Object> stages = new ArrayList<>();
+        String sql = "SELECT jad.*, s.selection_name, c.company_name, st.name as student_name " +
+                    "FROM job_activity_detail_tbl jad " +
+                    "LEFT JOIN selection_tbl s ON jad.selection_id = s.selection_id " +
+                    "LEFT JOIN companys_tbl c ON jad.companys_id = c.companys_id " +
+                    "LEFT JOIN students_tbl st ON jad.student_id = st.student_id " +
+                    "WHERE s.selection_name = ? " +
+                    "ORDER BY jad.date DESC, jad.time DESC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, selectionType);
+            
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Map<String, Object> stage = new HashMap<>();
+                    stage.put("student_id", rs.getString("student_id"));
+                    stage.put("companys_id", rs.getInt("companys_id"));
+                    stage.put("selection_id", rs.getInt("selection_id"));
+                    stage.put("selection_name", rs.getString("selection_name"));
+                    stage.put("company_name", rs.getString("company_name"));
+                    stage.put("student_name", rs.getString("student_name"));
+                    stage.put("date", rs.getDate("date"));
+                    stage.put("time", rs.getTime("time"));
+                    stage.put("venue", rs.getString("venue"));
+                    stage.put("remarks", rs.getString("remarks"));
+                    stages.add(stage);
+                }
             }
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();

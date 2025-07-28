@@ -22,41 +22,11 @@ public class SearchServlet extends HttpServlet {
         
         String searchType = request.getParameter("type"); // "company" または "student"
         String searchTerm = request.getParameter("term");
-        String view = request.getParameter("view"); // "popup" の場合はポップアップ表示
         
-        // ポップアップ表示の場合
-        if ("popup".equals(view)) {
-            request.setAttribute("searchType", searchType);
-            request.setAttribute("searchTerm", searchTerm);
-            request.getRequestDispatcher("/WEB-INF/jsp/SearchResults.jsp").forward(request, response);
-            return;
-        }
-        
-        // JSON APIの場合（既存の機能）
-        if (searchType == null || searchTerm == null || searchTerm.trim().isEmpty()) {
-            response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write("[]");
-            return;
-        }
-        
-        try (Connection conn = DBConnection.getConnection()) {
-            List<SearchResult> results = new ArrayList<>();
-            
-            if ("company".equals(searchType)) {
-                results = searchCompanies(conn, searchTerm.trim());
-            } else if ("student".equals(searchType)) {
-                results = searchStudents(conn, searchTerm.trim());
-            }
-            
-            // JSONレスポンスを返す
-            response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write(convertToJson(results));
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.setContentType("application/json; charset=UTF-8");
-            response.getWriter().write("[]");
-        }
+        // 検索結果画面を表示
+        request.setAttribute("searchType", searchType);
+        request.setAttribute("searchTerm", searchTerm);
+        request.getRequestDispatcher("/WEB-INF/jsp/SearchResults.jsp").forward(request, response);
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 

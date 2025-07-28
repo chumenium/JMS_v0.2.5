@@ -438,7 +438,19 @@
             setTimeout(() => {
                 // 親ウィンドウに結果を送信
                 if (window.opener && !window.opener.closed) {
-                    window.opener.setSearchResult(id, name, type);
+                    if (type === 'company') {
+                        if (window.opener.selectCompany) {
+                            window.opener.selectCompany(id, name);
+                        } else if (window.opener.setSearchResult) {
+                            window.opener.setSearchResult(id, name, type);
+                        }
+                    } else if (type === 'student') {
+                        if (window.opener.selectStudent) {
+                            window.opener.selectStudent(id, name);
+                        } else if (window.opener.setSearchResult) {
+                            window.opener.setSearchResult(id, name, type);
+                        }
+                    }
                     window.close();
                 } else {
                     // フォールバック: ローカルストレージを使用

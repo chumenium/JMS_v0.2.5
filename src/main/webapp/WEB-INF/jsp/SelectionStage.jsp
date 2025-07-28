@@ -628,7 +628,7 @@ function setSearchResult(id, name, type) {
         // 学生権限以外の場合のみhidden studentIdをセット
         var isStudent = '<%= "student".equals(role) %>' === 'true';
         if (!isStudent) {
-            document.getElementById('studentId').value = id;
+        document.getElementById('studentId').value = id;
             var hiddenStudentId = document.querySelector('input[type="hidden"][name="studentId"]');
             if (hiddenStudentId) hiddenStudentId.value = id;
         }
