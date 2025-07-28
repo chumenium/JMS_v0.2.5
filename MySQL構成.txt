@@ -132,6 +132,12 @@ ALTER TABLE job_activity_detail_tbl
 
 ALTER TABLE job_activity_detail_tbl
   ADD process_type ENUM('選択してください', '説明会', '書類選考', '筆記試験', '適性検査', '1次面接', '2次面接', '3次面接', '最終面接', 'グループディスカッション', 'プレゼンテーション', '実技試験', 'その他')
+
+ALTER TABLE job_activity_tbl
+  ADD occupation_id INT,
+  ADD CONSTRAINT fk_job_activity_occupation
+    FOREIGN KEY (occupation_id) REFERENCES occupations_tbl(occupation_id);
+
 -------------------------------------------
 
 テストデータ

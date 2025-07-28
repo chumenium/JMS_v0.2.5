@@ -21,6 +21,7 @@
 
 
 <!-- 受験者一覧画面用 -->
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="beans.ExamineeBean"%>
 <% 
   String username = (String) session.getAttribute("username"); 
   String role     = (String) session.getAttribute("role"); 
@@ -42,9 +43,10 @@
   // エラーメッセージを取得
   String errorMessage = (String) request.getAttribute("errorMessage");
   String successMessage = (String) request.getAttribute("successMessage");
+  java.util.List<ExamineeBean> examinees = (java.util.List<ExamineeBean>)request.getAttribute("examinees");
 %>
 
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -368,10 +370,34 @@ tr:hover {
 	                            <label for="searchClass">クラス</label>
 	                            <select id="searchClass" name="searchClass">
 	                                <option value="">すべて</option>
-	                                <option value="IT2A">IT2A</option>
-	                                <option value="IT2B">IT2B</option>
-	                                <option value="IT1A">IT1A</option>
-	                                <option value="IT1B">IT1B</option>
+                                    <option value="R1A1">R1A1</option>
+	                                <option value="R1A2">R1A2</option>
+                                    <option value="R2A1">R2A1</option>
+                                    <option value="R2A2">R2A2</option>
+                                    <option value="R3A1">R3A1</option>
+	                                <option value="R3A2">R3A2</option>
+                                    <option value="R4A1">R4A1</option>
+	                                <option value="R4A2">R4A2</option>
+	                                <option value="S3A1">S3A1</option>
+	                                <option value="S3A2">S3A2</option>
+	                                <option value="S2A1">S2A1</option>
+	                                <option value="S2A1">S2A1</option>
+                                    <option value="S1A1">S1A1</option>
+	                                <option value="S1A2">S1A2</option>
+                                    <option value="M3G1">M3G1</option>
+	                                <option value="M3G2">M3G2</option>
+                                    <option value="M2G1">M2G1</option>
+	                                <option value="M2G2">M2G2</option>
+                                    <option value="M1G1">M1G1</option>
+	                                <option value="M1G2">M1G2</option>
+                                    <option value="G2G1">G2G1</option>
+	                                <option value="G2G2">G2G2</option>
+                                    <option value="G1G1">G1G1</option>
+	                                <option value="G1G2">G1G2</option>
+                                    <option value="J2S1">J2S1</option>
+	                                <option value="J2S2">J2S2</option>
+                                    <option value="J1S1">J1S1</option>
+	                                <option value="J1S2">J1S2</option>
 	                            </select>
 	                        </div>
 	                    </div>
@@ -393,8 +419,8 @@ tr:hover {
 	                                <th>学生名</th>
 	                                <th>クラス</th>
 	                                <th>企業名</th>
-	                                <th>職種</th>
-	                                <th>応募日</th>
+	                                <!-- <th>職種</th>
+	                                <th>応募日</th> -->
 	                                <th>選考状況</th>
 	                                <th>最終更新日</th>
 	                                <th>操作</th>
@@ -404,45 +430,19 @@ tr:hover {
 	                            <!-- サンプルデータ（実際の実装では動的に生成） -->
 	                            <!-- <td style="color: #000000">を入れること
 	                            または <tr style="color: #000000">を入れること！！！-->
-	                            <tr style="color: #000000">
-	                                <td>S2024001</td>
-	                                <td>山田太郎</td>
-	                                <td>IT2A</td>
-	                                <td>株式会社サンプル</td>
-	                                <td>システムエンジニア</td>
-	                                <td>2025-01-15</td>
-	                                <td><span class="status-badge status-interview">一次面接</span></td>
-	                                <td>2025-01-20</td>
-	                                <td>
-	                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024001" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
-	                                </td>
-	                            </tr>
-	                            <tr style="color: #000000">
-	                                <td>S2024002</td>
-	                                <td>佐藤花子</td>
-	                                <td>IT2B</td>
-	                                <td>テクノロジー株式会社</td>
-	                                <td>プログラマー</td>
-	                                <td>2025-01-10</td>
-	                                <td><span class="status-badge status-pass">内定</span></td>
-	                                <td>2025-01-18</td>
-	                                <td>
-	                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024002" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
-	                                </td>
-	                            </tr>
-	                            <tr style="color: #000000">
-	                                <td>S2024003</td>
-	                                <td>田中次郎</td>
-	                                <td>IT2A</td>
-	                                <td>イノベーション企業</td>
-	                                <td>Webデザイナー</td>
-	                                <td>2025-01-12</td>
-	                                <td><span class="status-badge status-applying">書類選考</span></td>
-	                                <td>2025-01-12</td>
-	                                <td>
-	                                    <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024003" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
-	                                </td>
-	                            </tr>
+                                <% for(ExamineeBean examinee : examinees){%>
+                                    <tr style="color: #000000">
+                                        <td><%= examinee.getStudentId()%></td>
+                                        <td><%= examinee.getStudentName()%></td>
+                                        <td><%= examinee.getClassName()%></td>
+                                        <td><%= examinee.getCompanyName()%></td>
+                                        <td><span class="status-badge status-interview"><%= examinee.getSelection()%></span></td>
+                                        <td><%= examinee.getData()%></td>
+                                        <td>
+                                            <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=S2024001" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
+                                        </td>
+                                    </tr>
+                                <%}%>
 	                        </tbody>
 	                    </table>
 	                </div>

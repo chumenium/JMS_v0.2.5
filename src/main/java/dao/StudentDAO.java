@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import beans.ExamineeBean;
 import beans.StudentBeans;
 import utils.DBConnection;
 
@@ -344,5 +345,29 @@ public class StudentDAO {
             e.printStackTrace();
         }
         return students;
+    }
+
+    public List<ExamineeBean> getExamineeBean() {
+        List<ExamineeBean> examineeBeans = new ArrayList<>();
+        String sql = "SELECT ranked.student_id,s.name AS student_name,CONCAT(s.department, s.class) AS class,c.company_name,se.selection_name,ranked.date FROM (SELECT *,ROW_NUMBER() OVER (PARTITION BY student_id, companys_id ORDER BY date DESC, time DESC) AS rn FROM job_activity_detail_tbl) AS ranked JOIN students_tbl s ON ranked.student_id = s.student_id JOIN companys_tbl c ON ranked.companys_id = c.companys_id JOIN selection_tbl se ON ranked.selection_id = se.selection_id WHERE ranked.rn = 1";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                ExamineeBean examineeBean = new ExamineeBean();
+                examineeBean.setStudentId(rs.getInt("student_id"));
+                examineeBean.setStudentName(rs.getString("student_name"));
+                examineeBean.setClassName(rs.getString("class"));
+                examineeBean.setCompanyName(rs.getString("company_name"));
+                examineeBean.setSelection(rs.getString("selection_name"));
+                examineeBean.setData(rs.getString("date"));
+                examineeBeans.add(examineeBean);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return examineeBeans;
     }
 } 

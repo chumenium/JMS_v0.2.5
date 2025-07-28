@@ -11,6 +11,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+import beans.ExamineeBean;
+import dao.StudentDAO;
+
 /**
  * Servlet implementation class statusServlet
  */
@@ -115,6 +118,9 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/CompanyList.jsp";
 	                    break;
 	                case "applicantList":
+						StudentDAO StudentDAO = new StudentDAO();
+						List<ExamineeBean> examinees= StudentDAO.getExamineeBean();
+						request.setAttribute("examinees",examinees);
 	                    nextPage = "/WEB-INF/jsp/applicantList.jsp";
 	                    break;
 	                case "studentList":
@@ -140,12 +146,6 @@ public class StatusServlet extends HttpServlet {
 						break;
 					case "CreateCompany":
 						nextPage = "/WEB-INF/jsp/CreateCompany.jsp";
-						break;
-					case "adminDatabase":
-						nextPage = "/WEB-INF/jsp/adminDatabase.jsp";
-						break;
-					case "InterviewExamInput":
-						nextPage = "/WEB-INF/jsp/InterviewExamInput.jsp";
 						break;
 						
 
