@@ -785,7 +785,45 @@ function copyToClipboard(text) {
 }
 
 function showMaintenanceTab() {
-    alert('メンテナンス機能は開発中です。\n\n現在利用可能な機能:\n- データベース最適化\n- 整合性チェック');
+    // メンテナンスタブの内容を表示
+    const tabContent = document.querySelector('.tab-content');
+    const activePane = tabContent.querySelector('.tab-pane.active');
+    if (activePane) {
+        activePane.classList.remove('active');
+    }
+    
+    // メンテナンスタブの内容を作成
+    const maintenancePane = document.createElement('div');
+    maintenancePane.className = 'tab-pane active';
+    maintenancePane.innerHTML = `
+        <h3>🔧 データベースメンテナンス</h3>
+        <div class="alert alert-info">
+            <strong>メンテナンス機能:</strong>
+            <ul>
+                <li><strong>データベース最適化:</strong> テーブルの最適化、インデックスの再構築、統計情報の更新</li>
+                <li><strong>整合性チェック:</strong> テーブル構造の整合性確認、外部キー制約の検証</li>
+                <li>処理時間はデータ量によって変動します</li>
+                <li>実行前に必ずバックアップを取得することを推奨します</li>
+            </ul>
+        </div>
+        <div class="action-buttons">
+            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=optimize" 
+               class="btn btn-warning" onclick="return confirmAction('データベースを最適化しますか？\n\n注意: この操作は時間がかかる場合があります。')">
+                🚀 データベース最適化
+            </a>
+            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=check" 
+               class="btn btn-success" onclick="return confirmAction('整合性チェックを実行しますか？')">
+                🔍 整合性チェック
+            </a>
+        </div>
+    `;
+    
+    tabContent.appendChild(maintenancePane);
+    
+    // タブのアクティブ状態を更新
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    event.target.classList.add('active');
 }
 
 // ページ読み込み時の処理

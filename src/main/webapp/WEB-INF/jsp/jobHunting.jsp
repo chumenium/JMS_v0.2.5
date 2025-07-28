@@ -662,15 +662,6 @@
                     <a href="SelectionStageViewServlet" class="action-btn secondary" aria-label="選考ステージ確認画面へ">
                         <i class="fas fa-exam" aria-hidden="true"></i>選考ステージ確認
                     </a>
-                    <a href="StatusServlet?view=       " class="action-btn secondary" aria-label="書類提出チェック画面へ">
-                        <i class="fas fa-Document submission" aria-hidden="true"></i>書類提出チェック
-                    </a>
-                     <a href="StatusServlet?view=      " class="action-btn secondary" aria-label="受験予定者抽出画面へ">
-                        <i class="fas fa-Examination" aria-hidden="true"></i>受験予定者抽出
-                    </a>
-                     <a href="StatusServlet?view=        " class="action-btn secondary" aria-label="活動報告自動出力画面へ">
-                        <i class="fas fa-Activity Report" aria-hidden="true"></i>活動報告自動出力画面
-                    </a>
                 </div>
             </section>
 

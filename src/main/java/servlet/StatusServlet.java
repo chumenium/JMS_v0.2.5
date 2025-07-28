@@ -135,7 +135,7 @@ public class StatusServlet extends HttpServlet {
 	                                case "InterviewExamInput.jsp":
                     nextPage = "/WEB-INF/jsp/SelectionStage.jsp";
                     break;
-                case "SelectionStage":
+                	case "SelectionStage":
                     nextPage = "/WEB-INF/jsp/SelectionStage.jsp";
                     break;
 	                default:
@@ -147,7 +147,10 @@ public class StatusServlet extends HttpServlet {
 					case "CreateCompany":
 						nextPage = "/WEB-INF/jsp/CreateCompany.jsp";
 						break;
-						
+					case "adminDatabase":
+						nextPage = "/WEB-INF/jsp/adminDatabase.jsp";
+						break;
+				
 
 	            }
 	        }
