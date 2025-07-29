@@ -781,11 +781,17 @@ public class CompanyDAO {
         }
         int a = 0;
         for(String tmp1 :tmp){
+            System.out.println(tmp1);
             if(tmp1.equals("内定承諾")){
                 a++;
             }
         }
-        double c = (a/b) * 100;
+        System.out.println(a);
+        System.out.println(b);
+        
+
+        double c = ((a*100)/b);
+        System.out.println(c);
         return c;
     }
 } 

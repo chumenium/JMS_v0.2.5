@@ -517,6 +517,18 @@ public class StudentServlet extends HttpServlet {
                 // 学生情報を削除する（`studentClass` で削除）
             	String student_id = request.getParameter("student_id");
 
+                //データ削除
+                String sql4 = "DELETE FROM job_activity_tbl WHERE student_id = ?";
+                PreparedStatement stmt4 = conn.prepareStatement(sql4);
+                stmt4.setString(1, student_id);
+                int rowsInserted4 = stmt4.executeUpdate();
+
+                //データ削除
+                String sql5 = "DELETE FROM job_activity_detail_tbl WHERE student_id = ?";
+                PreparedStatement stmt5 = conn.prepareStatement(sql5);
+                stmt5.setString(1, student_id);
+                int rowsInserted5 = stmt5.executeUpdate();
+
                 //希望勤務地中間テーブルからデータ削除
                 String sql3 = "DELETE FROM students_work_place_tbl WHERE student_id = ?";
                 PreparedStatement stmt3 = conn.prepareStatement(sql3);

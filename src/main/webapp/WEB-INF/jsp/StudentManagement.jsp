@@ -657,7 +657,7 @@
                             <span class="stat-label">就職活動中</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number"><%= aaa %>%</span>
+                            <span class="stat-number"><%= aaa %>パーセント</span>
                             <span class="stat-label">内定率</span>
                         </div>
                     </div>
