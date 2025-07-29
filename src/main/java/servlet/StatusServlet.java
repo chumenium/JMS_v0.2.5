@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import beans.ExamineeBean;
+import dao.CompanyDAO;
 import dao.StudentDAO;
 
 /**
@@ -97,6 +98,9 @@ public class StatusServlet extends HttpServlet {
 						}
 						request.setAttribute("allcnt",allcnt);
 						request.setAttribute("cnt",cnt);
+						CompanyDAO cdao = new CompanyDAO();
+						double aaa = cdao.getSyuusyokuritu();
+						request.setAttribute("aaa",aaa);
 	                    nextPage = "/WEB-INF/jsp/StudentManagement.jsp";
 	                    break;
 	                case "DashBoard":

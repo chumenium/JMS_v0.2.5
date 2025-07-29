@@ -32,6 +32,7 @@
   String role     = (String) session.getAttribute("role");
   int allcnt = (Integer)request.getAttribute("allcnt"); 
   int cnt = (Integer)request.getAttribute("cnt");
+  double aaa = (double)request.getAttribute("aaa");
   
   // デバッグ用：セッション情報をコンソールに出力
   System.out.println("StudentManagement.jsp - username: " + username);
@@ -654,6 +655,10 @@
                         <div class="stat-item">
                             <span class="stat-number"><%= cnt %></span>
                             <span class="stat-label">就職活動中</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number"><%= aaa %>%</span>
+                            <span class="stat-label">内定率</span>
                         </div>
                     </div>
                     <a href="StudentServlet" class="card-link" aria-label="学生一覧を表示">

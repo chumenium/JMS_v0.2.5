@@ -102,15 +102,24 @@ public class CompanyDAO {
         String sql = "DELETE FROM companys_tbl WHERE companys_id=?";
         String sql2 = "DELETE FROM company_occupation_tbl WHERE companys_id=?";
         String sql3 = "DELETE FROM company_work_place_tbl WHERE companys_id=?";
+        String sql4 = "DELETE FROM job_activity_tbl WHERE companys_id=?";
+        String sql5 = "DELETE FROM job_activity_detail_tbl WHERE companys_id=?";
+        
         System.out.println("CompanyDAO: deleteCompany called with ID = " + companyId);
         
         try (Connection conn = DBConnection.getConnection()){
             PreparedStatement stmt = conn.prepareStatement(sql);
             PreparedStatement stmt2 = conn.prepareStatement(sql2);
             PreparedStatement stmt3 = conn.prepareStatement(sql3);
+            PreparedStatement stmt4 = conn.prepareStatement(sql4);
+            PreparedStatement stmt5 = conn.prepareStatement(sql5);
             stmt.setInt(1, companyId);
             stmt2.setInt(1, companyId);
             stmt3.setInt(1, companyId);
+            stmt4.setInt(1, companyId);
+            stmt5.setInt(1, companyId);
+            int result4 = stmt4.executeUpdate();
+            int result5 = stmt5.executeUpdate();
             int result2 = stmt2.executeUpdate();
             int result3 = stmt3.executeUpdate();
             int result = stmt.executeUpdate();
@@ -753,5 +762,30 @@ public class CompanyDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public double getSyuusyokuritu(){
+        ArrayList<String> tmp = new ArrayList<>();
+        String sql = "select activity_status from job_activity_tbl";
+        int b = 0;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                tmp.add(rs.getString("activity_status"));
+                b++;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        int a = 0;
+        for(String tmp1 :tmp){
+            if(tmp1.equals("内定承諾")){
+                a++;
+            }
+        }
+        double c = (a/b) * 100;
+        return c;
     }
 } 
