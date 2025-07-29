@@ -48,7 +48,7 @@ public class SelectionStageServlet extends HttpServlet {
             CompanyDAO companyDAO = new CompanyDAO();
             
             // 選考ステージ一覧を取得
-            List<Map<String, Object>> selectionStages = selectionStageDAO.getAllSelectionStages();
+            List<Object> selectionStages = selectionStageDAO.getAllSelectionStages();
             request.setAttribute("selectionStages", selectionStages);
             
             // 学生一覧を取得

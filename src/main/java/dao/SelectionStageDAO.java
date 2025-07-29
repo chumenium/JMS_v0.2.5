@@ -145,7 +145,7 @@ public class SelectionStageDAO {
     /**
      * job_activity_tblの選考ステータスを更新
      */
-    private void updateJobActivityStatus(String studentId, int companyId, String selectionStatus) {
+    private void updateJobActivityStatus(int i, int companyId, String selectionStatus) {
         String sql = "INSERT INTO job_activity_tbl (student_id, companys_id, activity_status, reporte_date) " +
                     "VALUES (?, ?, ?, CURDATE()) " +
                     "ON DUPLICATE KEY UPDATE activity_status = ?, reporte_date = CURDATE()";
@@ -153,7 +153,7 @@ public class SelectionStageDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setString(1, studentId);
+            stmt.setInt(1, i);
             stmt.setInt(2, companyId);
             stmt.setString(3, selectionStatus);
             stmt.setString(4, selectionStatus);
