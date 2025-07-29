@@ -26,6 +26,9 @@
 <!-- バックエンドとの接続のやり取りがあるためいったん放置 -->
 
 
+
+
+
 <!--▼▼▼▼▼スコープから取得する情報　これをもとに判定をしていく -->
 <% 
   String username = (String) session.getAttribute("username"); 
