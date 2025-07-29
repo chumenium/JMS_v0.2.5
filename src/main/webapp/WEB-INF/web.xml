@@ -262,6 +262,17 @@
     <url-pattern>/JobHuntingSearchServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- マスターデータ管理サーブレット -->
+  <servlet>
+    <servlet-name>MasterDataManagementServlet</servlet-name>
+    <servlet-class>servlet.MasterDataManagementServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>MasterDataManagementServlet</servlet-name>
+    <url-pattern>/MasterDataManagementServlet</url-pattern>
+  </servlet-mapping>
+  
   <!-- バックアップディレクトリの設定 -->
   <context-param>
     <param-name>backup-directory</param-name>

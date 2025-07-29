@@ -433,10 +433,9 @@ DB用画面
 	
 	                <div class="admin-card">
 	                    <h3>🏢 マスターデータ管理</h3>
-	                    <p style="color: #000000">職種、業界、勤務地などのマスターデータを管理します。</p>
-	                    <a href="#" class="admin-btn" onclick="showComingSoon()">職種マスター</a>
-	                    <a href="#" class="admin-btn" onclick="showComingSoon()">業界マスター</a>
-	                    <a href="#" class="admin-btn" onclick="showComingSoon()">勤務地マスター</a>
+	                    <p style="color: #000000">職種、勤務地などのマスターデータを管理します。</p>
+	                    <a href="${pageContext.request.contextPath}/MasterDataManagementServlet?action=occupations" class="admin-btn">職種管理</a>
+	                    <a href="${pageContext.request.contextPath}/MasterDataManagementServlet?action=workplaces" class="admin-btn">勤務地管理</a>
 	                </div>
 	
 	                <div class="admin-card">
