@@ -76,7 +76,7 @@ public class SelectionStageDAO {
                 }
                 
                 // job_activity_tblに選考ステータスを登録・更新
-                updateJobActivityStatus(studentId, Integer.parseInt(companyId), selectionStatus);
+                updateJobActivityStatus(Integer.parseInt(studentId), Integer.parseInt(companyId), selectionStatus);
                 
                 // トランザクションコミット
                 conn.commit();
@@ -145,7 +145,7 @@ public class SelectionStageDAO {
     /**
      * job_activity_tblの選考ステータスを更新
      */
-    private void updateJobActivityStatus(int i, int companyId, String selectionStatus) {
+    public boolean updateJobActivityStatus(int studentId, int companyId, String selectionStatus) {
         String sql = "INSERT INTO job_activity_tbl (student_id, companys_id, activity_status, reporte_date) " +
                     "VALUES (?, ?, ?, CURDATE()) " +
                     "ON DUPLICATE KEY UPDATE activity_status = ?, reporte_date = CURDATE()";
@@ -153,15 +153,17 @@ public class SelectionStageDAO {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
-            stmt.setInt(1, i);
+            stmt.setInt(1, studentId);
             stmt.setInt(2, companyId);
             stmt.setString(3, selectionStatus);
             stmt.setString(4, selectionStatus);
             
             stmt.executeUpdate();
+            return true;
             
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
+            return false;
         }
     }
     
