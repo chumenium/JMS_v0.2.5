@@ -673,7 +673,7 @@
 	            <header class="page-header" role="banner">
 	                <h1 class="page-title">選考ステージ確認</h1>
 	                <nav class="breadcrumb" aria-label="パンくずリスト">
-	                    <a href="${pageContext.request.contextPath}/StatusServlet?view=DashBoard">ダッシュボード</a>
+	                    <a href="${pageContext.request.contextPath}/DashboardServlet">ダッシュボード</a>
 	                    <span class="separator" aria-hidden="true">/</span>
 	                    <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting">就職管理</a>
 	                    <span class="separator" aria-hidden="true">/</span>
@@ -826,7 +826,7 @@
         </div>
         <div>
             <ul>
-                <li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
+                <li><a href="${pageContext.request.contextPath}/DashboardServlet">ホーム</a></li>
                 <!-- 権限に応じた機能リンク -->
                 <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
                     <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
@@ -873,7 +873,7 @@
     <p class="logo"><img src="images/logo.png" alt="Job Management System"></p>
     <nav>
         <ul>
-            <li><a href="javascript:void(0);" onclick="location.reload();">ホーム</a></li>
+            <li><a href="${pageContext.request.contextPath}/DashboardServlet">ホーム</a></li>
             <!-- 権限に応じた機能リンク -->
             <% if ("teacher".equals(role) || "headmaster".equals(role) || "admin".equals(role)) { %>
                 <li><a href="${pageContext.request.contextPath}/StatusServlet?view=studentManagement">学生管理</a></li>
