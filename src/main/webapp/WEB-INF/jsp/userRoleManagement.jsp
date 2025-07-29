@@ -39,6 +39,8 @@
         padding: 20px;
         background: #f8f9fa;
         min-height: 100vh;
+        margin-top: 60px; /* ← ヘッダーとの距離をここで確保 */
+	    margin-bottom: 60px; /* ← 例えば60pxで広めに */
     }
     
     .role-header {
@@ -46,8 +48,10 @@
         color: white;
         padding: 30px;
         border-radius: 10px;
+         margin-top: 110px;
         margin-bottom: 30px;
         text-align: center;
+        
     }
     
     .stats-grid {
@@ -311,7 +315,6 @@
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <section class="custom-section" role="main" aria-label="幅調整用">
             <div class="role-header">
                 <h1>👥 ユーザー権限管理</h1>
                 <p>システムユーザーの権限設定を行います</p>
@@ -419,12 +422,11 @@
             </div>
 
             <!-- 戻るボタン -->
-            <div style="text-align: center; margin-top: 30px;">
+            <div style="text-align: center; margin-top: 50px; margin-bottom: 50px;">
                 <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase" class="btn btn-primary">
                     ← 管理者設定に戻る
                 </a>
             </div>
-        </section>
     </main>
 
     <!--▼▼▼▼▼ここから「フッター」-->

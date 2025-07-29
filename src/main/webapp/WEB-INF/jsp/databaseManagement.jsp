@@ -35,22 +35,27 @@ DB管理用画面
 <meta name="description" content="本アプリは就職対策アプリです。">
 <link rel="stylesheet" href="css/style.css">
 <style>
-    .db-container {
-        max-width: 4000px;
-        margin: 0 auto;
-        padding: 40px;
-        background: #f8f9fa;
-        min-height: 100vh;
-    }
+	    .db-container {
+	    width: 90vw;         /* 画面の横幅全体を使う */
+	    padding: 20px;
+	    background: #f8f9fa;
+	    min-height: 100vh;
+	    box-sizing: border-box;
+	}
     
-    .db-header {
-        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-        color: white;
-        padding: 30px;
-        border-radius: 10px;
-        margin-bottom: 30px;
-        text-align: center;
-    }
+    
+	    .db-header {
+	    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+	    color: white;
+	    padding: 30px;
+	    border-radius: 10px;
+	    margin-bottom: 30px;
+	    margin-top: 100px; /* ← ヘッダーとの距離をここで確保 */
+   		margin-bottom: 40px; /* ← 例えば60pxで広めに */
+	    text-align: center;
+	    box-sizing: border-box; /* パディングの分も含めてサイズ調整 */
+	}
+    
     
     .nav-tabs {
         display: flex;
@@ -360,19 +365,19 @@ DB管理用画面
         }
         
         
-        
 	/* 幅間調整用 */
 		.custom-section {
-	    width: 200vw;           /* ビューポート全体の横幅を使用 */
+	    width: 100vw;           /* ビューポート全体の横幅を使用 */
 	    max-width: none;        /* 最大幅の制限を解除 */
 	    margin: 0;
 	    padding: 40px 32px;
-	    margin-top: 80px; /* ← ヘッダーとの距離をここで確保 */
-	    margin-bottom: 20px; /* ← 例えば60pxで広めに */
+	    margin-top: 60px; /* ← ヘッダーとの距離をここで確保 */
+	    margin-bottom: 60px; /* ← 例えば60pxで広めに */
 	    box-sizing: border-box;
-	    background-color: #ffffff;
+	    background-color: #ebd0b8f6;
 	    color: #fff;
 		}
+			
 		
 		
 		
@@ -387,7 +392,8 @@ DB管理用画面
 		        padding: 24px 12px;
 		    }
 		}
-    }
+		
+		
 </style>
 </head>
 
@@ -465,315 +471,313 @@ DB管理用画面
     <!--▲▲▲▲▲ここまで「ヘッダー」-->
 
     <main>
-        <section class="custom-section" role="main" aria-label="幅調整用">
-            <div class=" db-header">
-                <h1>🗄️ データベース管理</h1>
-                <p>データベースの統計情報、バックアップ、最適化、整合性チェック</p>
-            </div>
-
-            <!-- メッセージ表示 -->
-            <% if (successMessage != null) { %>
-                <div class="alert alert-success">
-                    <strong>成功:</strong> <%= successMessage %>
-                </div>
-            <% } %>
-            
-            <% if (errorMessage != null) { %>
-                <div class="alert alert-danger">
-                    <strong>エラー:</strong> <%= errorMessage %>
-                </div>
-            <% } %>
-
-            <!-- ナビゲーションタブ -->
-            <div class="nav-tabs">
-                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=statistics" 
-                   class="nav-tab <%= request.getParameter("action") == null || "statistics".equals(request.getParameter("action")) ? "active" : "" %>">
-                    📊 統計情報
-                </a>
-                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=tables" 
-                   class="nav-tab <%= "tables".equals(request.getParameter("action")) ? "active" : "" %>">
-                    📋 テーブル一覧
-                </a>
-                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=users" 
-                   class="nav-tab <%= "users".equals(request.getParameter("action")) ? "active" : "" %>">
-                    👥 ユーザー管理
-                </a>
-                <a href="#" class="nav-tab" onclick="showBackupTab()">
-                    💾 バックアップ
-                </a>
-                <a href="#" class="nav-tab" onclick="showMaintenanceTab()">
-                    🔧 メンテナンス
-                </a>
-            </div>
-
-            <!-- タブコンテンツ -->
-            <div class="tab-content">
-                <!-- 統計情報タブ -->
-                <% if (statistics != null) { %>
-                    <div class="tab-pane active">
-                        <h3>📊 データベース統計情報</h3>
-                        
-                        <% if (statistics.get("error") != null) { %>
-                            <div class="alert alert-danger">
-                                <strong>データベース接続エラー:</strong> <%= statistics.get("error") %>
-                            </div>
-                        <% } %>
-                        
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-label">データベース名</div>
-                                <div class="stat-value"><%= statistics.get("databaseName") != null ? statistics.get("databaseName") : "不明" %></div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">バージョン</div>
-                                <div class="stat-value"><%= statistics.get("databaseVersion") != null ? statistics.get("databaseVersion") : "不明" %></div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">ドライバー</div>
-                                <div class="stat-value"><%= statistics.get("driverName") != null ? statistics.get("driverName") : "不明" %></div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">データベースサイズ</div>
-                                <div class="stat-value"><%= statistics.get("databaseSizeMB") != null ? statistics.get("databaseSizeMB") + " MB" : "不明" %></div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">接続URL</div>
-                                <div class="stat-value"><%= statistics.get("connectionUrl") != null ? statistics.get("connectionUrl") : "不明" %></div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-label">接続時刻</div>
-                                <div class="stat-value"><%= statistics.get("connectionTime") != null ? statistics.get("connectionTime") : "不明" %></div>
-                            </div>
-                        </div>
-                        
-                        <!-- テーブル統計 -->
-                        <% if (statistics.get("tableCounts") != null) { %>
-                            <h4>📋 テーブル統計</h4>
-                            <div class="stats-grid">
-                                <% 
-                                Map<String, Integer> tableCounts = (Map<String, Integer>) statistics.get("tableCounts");
-                                String[] tableNames = {"students_tbl", "companys_tbl", "occupations_tbl", "work_place_tbl"};
-                                String[] tableDisplayNames = {"学生テーブル", "企業テーブル", "職種テーブル", "勤務地テーブル"};
-                                for (int i = 0; i < tableNames.length; i++) {
-                                    Integer count = tableCounts.get(tableNames[i]);
-                                    String displayCount = (count != null && count >= 0) ? String.valueOf(count) : "テーブルなし";
-                                %>
-                                    <div class="stat-card">
-                                        <div class="stat-label"><%= tableDisplayNames[i] %></div>
-                                        <div class="stat-value"><%= displayCount %></div>
-                                    </div>
-                                <% } %>
-                            </div>
-                        <% } %>
-                    </div>
-                <% } %>
-
-                <!-- テーブル一覧タブ -->
-                <% if (tables != null) { %>
-                    <div class="tab-pane active">
-                        <h3>📋 テーブル詳細情報</h3>
-                        
-                        <% if (tables.isEmpty()) { %>
-                            <div class="alert alert-info">
-                                <strong>情報:</strong> テーブル情報を取得できませんでした。
-                            </div>
-                        <% } else { %>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>テーブル名</th>
-                                            <th>レコード数</th>
-                                            <th>サイズ (MB)</th>
-                                            <th>エンジン</th>
-                                            <th>文字コード</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% for (Map<String, Object> table : tables) { %>
-                                            <tr>
-                                                <td><%= table.get("name") != null ? table.get("name") : "不明" %></td>
-                                                <td><%= table.get("rows") != null ? table.get("rows") : "不明" %></td>
-                                                <td><%= table.get("sizeMB") != null ? table.get("sizeMB") : "不明" %></td>
-                                                <td><%= table.get("engine") != null ? table.get("engine") : "不明" %></td>
-                                                <td><%= table.get("collation") != null ? table.get("collation") : "不明" %></td>
-                                            </tr>
-                                        <% } %>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <% } %>
-                    </div>
-                <% } %>
-
-                <!-- ユーザー管理タブ -->
-                <% if (users != null) { %>
-                    <div class="tab-pane active">
-                        <h3>👥 ユーザー権限管理</h3>
-                        
-                        <!-- 権限別統計 -->
-                        <% if (roleCounts != null && !roleCounts.isEmpty()) { %>
-                            <div class="stats-grid">
-                                <% 
-                                String[] roleNames = {"student", "teacher", "headmaster", "egd", "admin"};
-                                String[] roleDisplayNames = {"学生", "教員", "校長・教務部長", "就職指導部", "システム管理者"};
-                                for (int i = 0; i < roleNames.length; i++) {
-                                    int count = roleCounts.getOrDefault(roleNames[i], 0);
-                                %>
-                                    <div class="stat-card">
-                                        <div class="stat-label"><%= roleDisplayNames[i] %></div>
-                                        <div class="stat-value"><%= count %> 名</div>
-                                    </div>
-                                <% } %>
-                            </div>
-                        <% } %>
-                        
-                        <!-- ユーザー一覧 -->
-                        <% if (users.isEmpty()) { %>
-                            <div class="alert alert-info">
-                                <strong>情報:</strong> 登録されているユーザーがありません。
-                            </div>
-                        <% } else { %>
-                            <div class="table-responsive">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>ユーザーID</th>
-                                            <th>表示名</th>
-                                            <th>現在の権限</th>
-                                            <th>権限変更</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <% for (Map<String, Object> user : users) { %>
-                                            <tr>
-                                                <td><%= user.get("id") %></td>
-                                                <td><%= user.get("display_name") != null ? user.get("display_name") : user.get("id") %></td>
-                                                <td>
-                                                    <% 
-                                                    String currentRole = (String) user.get("role");
-                                                    String roleDisplayName = "";
-                                                    switch(currentRole) {
-                                                        case "student": roleDisplayName = "学生"; break;
-                                                        case "teacher": roleDisplayName = "教員"; break;
-                                                        case "headmaster": roleDisplayName = "校長・教務部長"; break;
-                                                        case "egd": roleDisplayName = "就職指導部"; break;
-                                                        case "admin": roleDisplayName = "システム管理者"; break;
-                                                        default: roleDisplayName = currentRole; break;
-                                                    }
-                                                    %>
-                                                    <span class="role-badge role-<%= currentRole %>"><%= roleDisplayName %></span>
-                                                </td>
-                                                <td>
-                                                    <% if (!"admin".equals(user.get("id"))) { %>
-                                                        <form method="post" action="${pageContext.request.contextPath}/DatabaseManagementServlet" style="display: inline;">
-                                                            <input type="hidden" name="action" value="updateRole">
-                                                            <input type="hidden" name="userId" value="<%= user.get("id") %>">
-                                                            <select name="newRole" class="role-select" onchange="confirmRoleChange(this)" data-original-role="<%= currentRole %>">
-                                                                <option value="student" <%= "student".equals(currentRole) ? "selected" : "" %>>学生</option>
-                                                                <option value="teacher" <%= "teacher".equals(currentRole) ? "selected" : "" %>>教員</option>
-                                                                <option value="headmaster" <%= "headmaster".equals(currentRole) ? "selected" : "" %>>校長・教務部長</option>
-                                                                <option value="egd" <%= "egd".equals(currentRole) ? "selected" : "" %>>就職指導部</option>
-                                                                <option value="admin" <%= "admin".equals(currentRole) ? "selected" : "" %>>システム管理者</option>
-                                                            </select>
-                                                        </form>
-                                                    <% } else { %>
-                                                        <span style="color: #999; font-style: italic;">変更不可</span>
-                                                    <% } %>
-                                                </td>
-                                            </tr>
-                                        <% } %>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <% } %>
-                        
-                        <div class="alert alert-info">
-                            <strong>注意:</strong> 
-                            <ul>
-                                <li>管理者（admin）の権限は変更できません</li>
-                                <li>権限を変更すると、次回ログイン時から新しい権限が適用されます</li>
-                                <li>学生権限の場合は、students_tblテーブルに対応するレコードが必要です</li>
-                                <li>教員権限の場合は、teacher_tblテーブルに対応するレコードが必要です</li>
-                                <li>権限変更は即座に反映されます</li>
-                            </ul>
-                        </div>
-                    </div>
-                <% } %>
-
-                <!-- デフォルト表示（統計情報がない場合） -->
-                <% if (statistics == null && tables == null && users == null) { %>
-                    <div class="tab-pane active">
-                        <h3>📊 データベース管理</h3>
-                        
-                        <div class="action-buttons">
-                            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=statistics" class="btn btn-primary">
-                                📊 統計情報を表示
-                            </a>
-                            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=tables" class="btn btn-success">
-                                📋 テーブル一覧を表示
-                            </a>
-                            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=users" class="btn btn-warning">
-                                👥 ユーザー管理
-                            </a>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <strong>情報:</strong> データベース管理機能を使用するには、上記のボタンから操作を選択してください。
-                        </div>
-                    </div>
-                <% } %>
-            </div>
-
-            <!-- アクションボタン -->
-            <div class="action-buttons">
-                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=backup" 
-                   class="btn btn-primary">
-                    💾 バックアップ実行（ダウンロード）
-                </a>
-                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=optimize" 
-                   class="btn btn-warning" onclick="return confirmAction('データベースを最適化しますか？')">
-                    🚀 データベース最適化
-                </a>
-                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=check" 
-                   class="btn btn-success">
-                    🔍 整合性チェック
-                </a>
-                <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase" 
-                   class="btn btn-danger">
-                    ← システム管理に戻る
-                </a>
-            </div>
-
-            <!-- 結果表示エリア -->
-            <% if (optimizationResults != null && !optimizationResults.isEmpty()) { %>
-                <div class="alert alert-info">
-                    <h5>最適化結果:</h5>
-                    <div class="result-list">
-                        <% for (String result : optimizationResults) { %>
-                            <div class="result-item"><%= result %></div>
-                        <% } %>
-                    </div>
-                </div>
-            <% } %>
-
-            <% if (checkResults != null && !checkResults.isEmpty()) { %>
-                <div class="alert alert-info">
-                    <h5>整合性チェック結果:</h5>
-                    <div class="result-list">
-                        <% for (String result : checkResults) { %>
-                            <div class="result-item"><%= result %></div>
-                        <% } %>
-                    </div>
-                </div>
-            <% } %>
-
-            <!-- ローディング表示 -->
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                処理中です。しばらくお待ちください...
-            </div>
-        </section>
+	            <div class=" db-header">
+	                <h1>🗄️ データベース管理</h1>
+	                <p>データベースの統計情報、バックアップ、最適化、整合性チェック</p>
+	            </div>
+	
+	            <!-- メッセージ表示 -->
+	            <% if (successMessage != null) { %>
+	                <div class="alert alert-success">
+	                    <strong>成功:</strong> <%= successMessage %>
+	                </div>
+	            <% } %>
+	            
+	            <% if (errorMessage != null) { %>
+	                <div class="alert alert-danger">
+	                    <strong>エラー:</strong> <%= errorMessage %>
+	                </div>
+	            <% } %>
+	
+	            <!-- ナビゲーションタブ -->
+	            <div class="nav-tabs">
+	                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=statistics" 
+	                   class="nav-tab <%= request.getParameter("action") == null || "statistics".equals(request.getParameter("action")) ? "active" : "" %>">
+	                    📊 統計情報
+	                </a>
+	                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=tables" 
+	                   class="nav-tab <%= "tables".equals(request.getParameter("action")) ? "active" : "" %>">
+	                    📋 テーブル一覧
+	                </a>
+	                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=users" 
+	                   class="nav-tab <%= "users".equals(request.getParameter("action")) ? "active" : "" %>">
+	                    👥 ユーザー管理
+	                </a>
+	                <a href="#" class="nav-tab" onclick="showBackupTab()">
+	                    💾 バックアップ
+	                </a>
+	                <a href="#" class="nav-tab" onclick="showMaintenanceTab()">
+	                    🔧 メンテナンス
+	                </a>
+	            </div>
+	
+	            <!-- タブコンテンツ -->
+	            <div class="tab-content">
+	                <!-- 統計情報タブ -->
+	                <% if (statistics != null) { %>
+	                    <div class="tab-pane active">
+	                        <h3>📊 データベース統計情報</h3>
+	                        
+	                        <% if (statistics.get("error") != null) { %>
+	                            <div class="alert alert-danger">
+	                                <strong>データベース接続エラー:</strong> <%= statistics.get("error") %>
+	                            </div>
+	                        <% } %>
+	                        
+	                        <div class="stats-grid">
+	                            <div class="stat-card">
+	                                <div class="stat-label">データベース名</div>
+	                                <div class="stat-value"><%= statistics.get("databaseName") != null ? statistics.get("databaseName") : "不明" %></div>
+	                            </div>
+	                            <div class="stat-card">
+	                                <div class="stat-label">バージョン</div>
+	                                <div class="stat-value"><%= statistics.get("databaseVersion") != null ? statistics.get("databaseVersion") : "不明" %></div>
+	                            </div>
+	                            <div class="stat-card">
+	                                <div class="stat-label">ドライバー</div>
+	                                <div class="stat-value"><%= statistics.get("driverName") != null ? statistics.get("driverName") : "不明" %></div>
+	                            </div>
+	                            <div class="stat-card">
+	                                <div class="stat-label">データベースサイズ</div>
+	                                <div class="stat-value"><%= statistics.get("databaseSizeMB") != null ? statistics.get("databaseSizeMB") + " MB" : "不明" %></div>
+	                            </div>
+	                            <div class="stat-card">
+	                                <div class="stat-label">接続URL</div>
+	                                <div class="stat-value"><%= statistics.get("connectionUrl") != null ? statistics.get("connectionUrl") : "不明" %></div>
+	                            </div>
+	                            <div class="stat-card">
+	                                <div class="stat-label">接続時刻</div>
+	                                <div class="stat-value"><%= statistics.get("connectionTime") != null ? statistics.get("connectionTime") : "不明" %></div>
+	                            </div>
+	                        </div>
+	                        
+	                        <!-- テーブル統計 -->
+	                        <% if (statistics.get("tableCounts") != null) { %>
+	                            <h4>📋 テーブル統計</h4>
+	                            <div class="stats-grid">
+	                                <% 
+	                                Map<String, Integer> tableCounts = (Map<String, Integer>) statistics.get("tableCounts");
+	                                String[] tableNames = {"students_tbl", "companys_tbl", "occupations_tbl", "work_place_tbl"};
+	                                String[] tableDisplayNames = {"学生テーブル", "企業テーブル", "職種テーブル", "勤務地テーブル"};
+	                                for (int i = 0; i < tableNames.length; i++) {
+	                                    Integer count = tableCounts.get(tableNames[i]);
+	                                    String displayCount = (count != null && count >= 0) ? String.valueOf(count) : "テーブルなし";
+	                                %>
+	                                    <div class="stat-card">
+	                                        <div class="stat-label"><%= tableDisplayNames[i] %></div>
+	                                        <div class="stat-value"><%= displayCount %></div>
+	                                    </div>
+	                                <% } %>
+	                            </div>
+	                        <% } %>
+	                    </div>
+	                <% } %>
+	
+	                <!-- テーブル一覧タブ -->
+	                <% if (tables != null) { %>
+	                    <div class="tab-pane active">
+	                        <h3>📋 テーブル詳細情報</h3>
+	                        
+	                        <% if (tables.isEmpty()) { %>
+	                            <div class="alert alert-info">
+	                                <strong>情報:</strong> テーブル情報を取得できませんでした。
+	                            </div>
+	                        <% } else { %>
+	                            <div class="table-responsive">
+	                                <table>
+	                                    <thead>
+	                                        <tr>
+	                                            <th>テーブル名</th>
+	                                            <th>レコード数</th>
+	                                            <th>サイズ (MB)</th>
+	                                            <th>エンジン</th>
+	                                            <th>文字コード</th>
+	                                        </tr>
+	                                    </thead>
+	                                    <tbody>
+	                                        <% for (Map<String, Object> table : tables) { %>
+	                                            <tr>
+	                                                <td><%= table.get("name") != null ? table.get("name") : "不明" %></td>
+	                                                <td><%= table.get("rows") != null ? table.get("rows") : "不明" %></td>
+	                                                <td><%= table.get("sizeMB") != null ? table.get("sizeMB") : "不明" %></td>
+	                                                <td><%= table.get("engine") != null ? table.get("engine") : "不明" %></td>
+	                                                <td><%= table.get("collation") != null ? table.get("collation") : "不明" %></td>
+	                                            </tr>
+	                                        <% } %>
+	                                    </tbody>
+	                                </table>
+	                            </div>
+	                        <% } %>
+	                    </div>
+	                <% } %>
+	
+	                <!-- ユーザー管理タブ -->
+	                <% if (users != null) { %>
+	                    <div class="tab-pane active">
+	                        <h3>👥 ユーザー権限管理</h3>
+	                        
+	                        <!-- 権限別統計 -->
+	                        <% if (roleCounts != null && !roleCounts.isEmpty()) { %>
+	                            <div class="stats-grid">
+	                                <% 
+	                                String[] roleNames = {"student", "teacher", "headmaster", "egd", "admin"};
+	                                String[] roleDisplayNames = {"学生", "教員", "校長・教務部長", "就職指導部", "システム管理者"};
+	                                for (int i = 0; i < roleNames.length; i++) {
+	                                    int count = roleCounts.getOrDefault(roleNames[i], 0);
+	                                %>
+	                                    <div class="stat-card">
+	                                        <div class="stat-label"><%= roleDisplayNames[i] %></div>
+	                                        <div class="stat-value"><%= count %> 名</div>
+	                                    </div>
+	                                <% } %>
+	                            </div>
+	                        <% } %>
+	                        
+	                        <!-- ユーザー一覧 -->
+	                        <% if (users.isEmpty()) { %>
+	                            <div class="alert alert-info">
+	                                <strong>情報:</strong> 登録されているユーザーがありません。
+	                            </div>
+	                        <% } else { %>
+	                            <div class="table-responsive">
+	                                <table>
+	                                    <thead>
+	                                        <tr>
+	                                            <th>ユーザーID</th>
+	                                            <th>表示名</th>
+	                                            <th>現在の権限</th>
+	                                            <th>権限変更</th>
+	                                        </tr>
+	                                    </thead>
+	                                    <tbody>
+	                                        <% for (Map<String, Object> user : users) { %>
+	                                            <tr>
+	                                                <td><%= user.get("id") %></td>
+	                                                <td><%= user.get("display_name") != null ? user.get("display_name") : user.get("id") %></td>
+	                                                <td>
+	                                                    <% 
+	                                                    String currentRole = (String) user.get("role");
+	                                                    String roleDisplayName = "";
+	                                                    switch(currentRole) {
+	                                                        case "student": roleDisplayName = "学生"; break;
+	                                                        case "teacher": roleDisplayName = "教員"; break;
+	                                                        case "headmaster": roleDisplayName = "校長・教務部長"; break;
+	                                                        case "egd": roleDisplayName = "就職指導部"; break;
+	                                                        case "admin": roleDisplayName = "システム管理者"; break;
+	                                                        default: roleDisplayName = currentRole; break;
+	                                                    }
+	                                                    %>
+	                                                    <span class="role-badge role-<%= currentRole %>"><%= roleDisplayName %></span>
+	                                                </td>
+	                                                <td>
+	                                                    <% if (!"admin".equals(user.get("id"))) { %>
+	                                                        <form method="post" action="${pageContext.request.contextPath}/DatabaseManagementServlet" style="display: inline;">
+	                                                            <input type="hidden" name="action" value="updateRole">
+	                                                            <input type="hidden" name="userId" value="<%= user.get("id") %>">
+	                                                            <select name="newRole" class="role-select" onchange="confirmRoleChange(this)" data-original-role="<%= currentRole %>">
+	                                                                <option value="student" <%= "student".equals(currentRole) ? "selected" : "" %>>学生</option>
+	                                                                <option value="teacher" <%= "teacher".equals(currentRole) ? "selected" : "" %>>教員</option>
+	                                                                <option value="headmaster" <%= "headmaster".equals(currentRole) ? "selected" : "" %>>校長・教務部長</option>
+	                                                                <option value="egd" <%= "egd".equals(currentRole) ? "selected" : "" %>>就職指導部</option>
+	                                                                <option value="admin" <%= "admin".equals(currentRole) ? "selected" : "" %>>システム管理者</option>
+	                                                            </select>
+	                                                        </form>
+	                                                    <% } else { %>
+	                                                        <span style="color: #999; font-style: italic;">変更不可</span>
+	                                                    <% } %>
+	                                                </td>
+	                                            </tr>
+	                                        <% } %>
+	                                    </tbody>
+	                                </table>
+	                            </div>
+	                        <% } %>
+	                        
+	                        <div class="alert alert-info">
+	                            <strong>注意:</strong> 
+	                            <ul>
+	                                <li>管理者（admin）の権限は変更できません</li>
+	                                <li>権限を変更すると、次回ログイン時から新しい権限が適用されます</li>
+	                                <li>学生権限の場合は、students_tblテーブルに対応するレコードが必要です</li>
+	                                <li>教員権限の場合は、teacher_tblテーブルに対応するレコードが必要です</li>
+	                                <li>権限変更は即座に反映されます</li>
+	                            </ul>
+	                        </div>
+	                    </div>
+	                <% } %>
+	
+	                <!-- デフォルト表示（統計情報がない場合） -->
+	                <% if (statistics == null && tables == null && users == null) { %>
+	                    <div class="tab-pane active">
+	                        <h3>📊 データベース管理</h3>
+	                        
+	                        <div class="action-buttons">
+	                            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=statistics" class="btn btn-primary">
+	                                📊 統計情報を表示
+	                            </a>
+	                            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=tables" class="btn btn-success">
+	                                📋 テーブル一覧を表示
+	                            </a>
+	                            <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=users" class="btn btn-warning">
+	                                👥 ユーザー管理
+	                            </a>
+	                        </div>
+	
+	                        <div class="alert alert-info">
+	                            <strong>情報:</strong> データベース管理機能を使用するには、上記のボタンから操作を選択してください。
+	                        </div>
+	                    </div>
+	                <% } %>
+	            </div>
+	
+	            <!-- アクションボタン -->
+	            <div class="action-buttons">
+	                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=backup" 
+	                   class="btn btn-primary">
+	                    💾 バックアップ実行（ダウンロード）
+	                </a>
+	                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=optimize" 
+	                   class="btn btn-warning" onclick="return confirmAction('データベースを最適化しますか？')">
+	                    🚀 データベース最適化
+	                </a>
+	                <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=check" 
+	                   class="btn btn-success">
+	                    🔍 整合性チェック
+	                </a>
+	                <a href="${pageContext.request.contextPath}/StatusServlet?view=adminDatabase" 
+	                   class="btn btn-danger">
+	                    ← システム管理に戻る
+	                </a>
+	            </div>
+	
+	            <!-- 結果表示エリア -->
+	            <% if (optimizationResults != null && !optimizationResults.isEmpty()) { %>
+	                <div class="alert alert-info">
+	                    <h5>最適化結果:</h5>
+	                    <div class="result-list">
+	                        <% for (String result : optimizationResults) { %>
+	                            <div class="result-item"><%= result %></div>
+	                        <% } %>
+	                    </div>
+	                </div>
+	            <% } %>
+	
+	            <% if (checkResults != null && !checkResults.isEmpty()) { %>
+	                <div class="alert alert-info">
+	                    <h5>整合性チェック結果:</h5>
+	                    <div class="result-list">
+	                        <% for (String result : checkResults) { %>
+	                            <div class="result-item"><%= result %></div>
+	                        <% } %>
+	                    </div>
+	                </div>
+	            <% } %>
+	
+	            <!-- ローディング表示 -->
+	            <div id="loading" class="loading">
+	                <div class="spinner"></div>
+	                処理中です。しばらくお待ちください...
+	            </div>
     </main>
 
     <!--▼▼▼▼▼ここから「フッター」-->
