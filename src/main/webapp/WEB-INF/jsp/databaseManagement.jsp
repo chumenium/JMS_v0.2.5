@@ -652,17 +652,17 @@ DB管理用画面
                                                 <td>
                                                     <% 
                                                     String currentRole = (String) user.get("role");
-                                                    String roleDisplay = "";
+                                                    String roleDisplayName = "";
                                                     switch(currentRole) {
-                                                        case "student": roleDisplay = "学生"; break;
-                                                        case "teacher": roleDisplay = "教員"; break;
-                                                        case "headmaster": roleDisplay = "校長・教務部長"; break;
-                                                        case "egd": roleDisplay = "就職指導部"; break;
-                                                        case "admin": roleDisplay = "システム管理者"; break;
-                                                        default: roleDisplay = currentRole; break;
+                                                        case "student": roleDisplayName = "学生"; break;
+                                                        case "teacher": roleDisplayName = "教員"; break;
+                                                        case "headmaster": roleDisplayName = "校長・教務部長"; break;
+                                                        case "egd": roleDisplayName = "就職指導部"; break;
+                                                        case "admin": roleDisplayName = "システム管理者"; break;
+                                                        default: roleDisplayName = currentRole; break;
                                                     }
                                                     %>
-                                                    <span class="role-badge role-<%= currentRole %>"><%= roleDisplay %></span>
+                                                    <span class="role-badge role-<%= currentRole %>"><%= roleDisplayName %></span>
                                                 </td>
                                                 <td>
                                                     <% if (!"admin".equals(user.get("id"))) { %>
