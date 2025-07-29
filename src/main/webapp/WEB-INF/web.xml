@@ -229,6 +229,17 @@
     <url-pattern>/DatabaseManagementServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- ユーザー権限管理サーブレット -->
+  <servlet>
+    <servlet-name>UserRoleManagementServlet</servlet-name>
+    <servlet-class>servlet.UserRoleManagementServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>UserRoleManagementServlet</servlet-name>
+    <url-pattern>/UserRoleManagementServlet</url-pattern>
+  </servlet-mapping>
+  
   <!-- 就活情報検索サーブレット -->
   <servlet>
     <servlet-name>JobHuntingSearchServlet</servlet-name>

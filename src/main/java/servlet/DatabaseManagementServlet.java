@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import utils.DBConnection;
+import dao.UserDAO;
 
 /**
  * データベース管理サーブレット
@@ -61,16 +62,22 @@ public class DatabaseManagementServlet extends HttpServlet {
             } else if ("optimize".equals(action)) {
                 // データベース最適化
                 optimizeDatabase(request, response);
-                    } else if ("check".equals(action)) {
-            // データ整合性チェック
-            checkDataIntegrity(request, response);
-        } else if ("download".equals(action)) {
-            // バックアップファイルダウンロード
-            downloadBackupFile(request, response);
-        } else {
-            // デフォルト：統計情報表示
-            getDatabaseStatistics(request, response);
-        }
+            } else if ("check".equals(action)) {
+                // データ整合性チェック
+                checkDataIntegrity(request, response);
+            } else if ("users".equals(action)) {
+                // ユーザー管理
+                getUserManagement(request, response);
+            } else if ("updateRole".equals(action)) {
+                // 権限更新
+                updateUserRole(request, response);
+            } else if ("download".equals(action)) {
+                // バックアップファイルダウンロード
+                downloadBackupFile(request, response);
+            } else {
+                // デフォルト：統計情報表示
+                getDatabaseStatistics(request, response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "データベース操作中にエラーが発生しました: " + e.getMessage());
@@ -82,7 +89,28 @@ public class DatabaseManagementServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
-        doGet(request, response);
+        
+        // セッションの確認
+        HttpSession session = request.getSession(false);
+        if (session == null || session.getAttribute("id") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.html");
+            return;
+        }
+        
+        // 管理者権限チェック
+        String role = (String) session.getAttribute("role");
+        if (!"admin".equals(role)) {
+            response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
+            return;
+        }
+        
+        String action = request.getParameter("action");
+        
+        if ("updateRole".equals(action)) {
+            updateUserRole(request, response);
+        } else {
+            doGet(request, response);
+        }
     }
     
     /**
@@ -106,13 +134,18 @@ public class DatabaseManagementServlet extends HttpServlet {
             statistics.put("tableCounts", tableCounts);
             
             // データベースサイズを取得（MySQL用）
-            String sizeQuery = "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS db_size_mb " +
-                              "FROM information_schema.tables WHERE table_schema = DATABASE()";
-            try (PreparedStatement stmt = conn.prepareStatement(sizeQuery);
-                 ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    statistics.put("databaseSizeMB", rs.getDouble("db_size_mb"));
+            try {
+                String sizeQuery = "SELECT ROUND(SUM(data_length + index_length) / 1024 / 1024, 2) AS db_size_mb " +
+                                  "FROM information_schema.tables WHERE table_schema = DATABASE()";
+                try (PreparedStatement stmt = conn.prepareStatement(sizeQuery);
+                     ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        statistics.put("databaseSizeMB", rs.getDouble("db_size_mb"));
+                    }
                 }
+            } catch (SQLException e) {
+                statistics.put("databaseSizeMB", 0.0);
+                System.err.println("データベースサイズ取得エラー: " + e.getMessage());
             }
             
             // 接続情報
@@ -122,6 +155,14 @@ public class DatabaseManagementServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             statistics.put("error", "統計情報の取得に失敗しました: " + e.getMessage());
+            statistics.put("databaseName", "接続エラー");
+            statistics.put("databaseVersion", "不明");
+            statistics.put("driverName", "不明");
+            statistics.put("driverVersion", "不明");
+            statistics.put("tableCounts", new HashMap<String, Integer>());
+            statistics.put("databaseSizeMB", 0.0);
+            statistics.put("connectionUrl", "接続できませんでした");
+            statistics.put("connectionTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
         }
         
         request.setAttribute("statistics", statistics);
@@ -161,6 +202,8 @@ public class DatabaseManagementServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "テーブル一覧の取得に失敗しました: " + e.getMessage());
+            // エラーが発生しても空のリストを設定
+            tables = new ArrayList<>();
         }
         
         request.setAttribute("tables", tables);
@@ -295,7 +338,10 @@ public class DatabaseManagementServlet extends HttpServlet {
 
     } catch (Exception e) {
         e.printStackTrace();
-        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "バックアップ処理中にエラーが発生しました: " + e.getMessage());
+        // エラーが発生した場合は、エラーページにリダイレクト
+        request.setAttribute("error", "バックアップ処理中にエラーが発生しました: " + e.getMessage());
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/databaseManagement.jsp");
+        dispatcher.forward(request, response);
     }
 }
     
@@ -477,5 +523,56 @@ public class DatabaseManagementServlet extends HttpServlet {
         }
         
         return counts;
+    }
+    
+    /**
+     * ユーザー管理画面を表示
+     */
+    private void getUserManagement(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        UserDAO userDAO = new UserDAO();
+        List<Map<String, Object>> users = userDAO.getAllUsers();
+        Map<String, Integer> roleCounts = userDAO.getUserCountByRole();
+        
+        request.setAttribute("users", users);
+        request.setAttribute("roleCounts", roleCounts);
+        
+        RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/databaseManagement.jsp");
+        dispatcher.forward(request, response);
+    }
+    
+    /**
+     * ユーザー権限を更新
+     */
+    private void updateUserRole(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        String userId = request.getParameter("userId");
+        String newRole = request.getParameter("newRole");
+        
+        if (userId == null || newRole == null || userId.trim().isEmpty() || newRole.trim().isEmpty()) {
+            request.setAttribute("error", "ユーザーIDまたは権限が指定されていません");
+            getUserManagement(request, response);
+            return;
+        }
+        
+        // admin権限の変更を防ぐ
+        if ("admin".equals(userId)) {
+            request.setAttribute("error", "管理者（admin）の権限は変更できません");
+            getUserManagement(request, response);
+            return;
+        }
+        
+        UserDAO userDAO = new UserDAO();
+        boolean success = userDAO.updateUserRole(userId, newRole);
+        
+        if (success) {
+            request.setAttribute("success", "ユーザー " + userId + " の権限を " + newRole + " に更新しました");
+        } else {
+            request.setAttribute("error", "権限の更新に失敗しました");
+        }
+        
+        getUserManagement(request, response);
     }
 } 

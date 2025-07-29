@@ -425,13 +425,11 @@ DB用画面
 	                    <a href="${pageContext.request.contextPath}/DatabaseManagementServlet?action=backup" class="admin-btn" onclick="return confirm('バックアップを実行しますか？')">バックアップ実行</a>
 	                </div>
 	
-	                <div class="admin-card">
-	                    <h3>👥 ユーザー管理</h3>
-	                    <p style="color: #000000">システムユーザーの管理と権限設定を行います。</p>
-	                    <a href="${pageContext.request.contextPath}/CreateStudentServlet" class="admin-btn">学生アカウント作成</a>
-	                    <a href="#" class="admin-btn" onclick="showComingSoon()">教員アカウント管理</a>
-	                    <a href="#" class="admin-btn" onclick="showComingSoon()">権限設定</a>
-	                </div>
+	                                <div class="admin-card">
+                    <h3>👥 ユーザー管理</h3>
+                    <p style="color: #000000">システムユーザーの管理と権限設定を行います。</p>
+                    <a href="${pageContext.request.contextPath}/UserRoleManagementServlet" class="admin-btn">権限設定</a>
+                </div>
 	
 	                <div class="admin-card">
 	                    <h3>🏢 マスターデータ管理</h3>
