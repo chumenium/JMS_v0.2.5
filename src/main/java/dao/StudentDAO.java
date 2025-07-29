@@ -414,4 +414,26 @@ public class StudentDAO {
     /**
      * 指定されたIDの学生情報を取得
      */
+    public ExamineeBean getExamineeById(int studentId) {
+        String sql = "SELECT s.student_id, s.name AS student_name, CONCAT(s.department, s.class) AS class " +
+                    "FROM students_tbl s WHERE s.student_id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, studentId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                ExamineeBean examineeBean = new ExamineeBean();
+                examineeBean.setStudentId(rs.getInt("student_id"));
+                examineeBean.setStudentName(rs.getString("student_name"));
+                examineeBean.setClassName(rs.getString("class"));
+                return examineeBean;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 } 

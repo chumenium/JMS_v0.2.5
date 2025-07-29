@@ -28,6 +28,34 @@ public class SelectionStageViewServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        // 詳細アクションの場合（最初にチェック）
+        String action = request.getParameter("action");
+        String detailStudentId = request.getParameter("detailStudentId");
+        String detailCompanyId = request.getParameter("detailCompanyId");
+        
+        System.out.println("SelectionStageViewServlet - action: " + action);
+        System.out.println("SelectionStageViewServlet - 全パラメータ: " + request.getQueryString());
+        System.out.println("SelectionStageViewServlet - detailStudentId: " + detailStudentId);
+        System.out.println("SelectionStageViewServlet - detailCompanyId: " + detailCompanyId);
+        System.out.println("SelectionStageViewServlet - action == 'detail': " + ("detail".equals(action)));
+        System.out.println("SelectionStageViewServlet - detailStudentId != null: " + (detailStudentId != null));
+        
+        if ("detail".equals(action) || detailStudentId != null || detailCompanyId != null) {
+            System.out.println("SelectionStageViewServlet - 詳細アクションを実行します");
+            System.out.println("SelectionStageViewServlet - action: " + action);
+            System.out.println("SelectionStageViewServlet - detailStudentId: " + detailStudentId);
+            System.out.println("SelectionStageViewServlet - detailCompanyId: " + detailCompanyId);
+            handleDetailAction(request, response);
+            return;
+        }
+        
+        // 編集アクションの場合
+        if ("edit".equals(action)) {
+            System.out.println("SelectionStageViewServlet - 編集アクションを実行します");
+            handleEditAction(request, response);
+            return;
+        }
+        
         System.out.println("=== 選考ステージ確認画面開始 ===");
         
         // セッションの確認
@@ -133,7 +161,91 @@ public class SelectionStageViewServlet extends HttpServlet {
         doGet(request, response);
     }
     
-
+    /**
+     * 詳細アクション処理
+     */
+    private void handleDetailAction(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        String studentId = request.getParameter("detailStudentId");
+        String companyId = request.getParameter("detailCompanyId");
+        
+        System.out.println("=== 選考ステージ詳細画面開始 ===");
+        System.out.println("SelectionStageViewServlet - studentId: " + studentId);
+        System.out.println("SelectionStageViewServlet - companyId: " + companyId);
+        
+        // nullや"null"文字列の場合はエラー扱い
+        if (studentId == null || companyId == null || "null".equals(studentId) || "null".equals(companyId)) {
+            System.out.println("SelectionStageViewServlet - パラメータが不足しています");
+            request.setAttribute("errorMessage", "学生IDまたは企業IDが正しく取得できませんでした。");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/SelectionStageDetail.jsp");
+            dispatcher.forward(request, response);
+            return;
+        }
+        
+        try {
+            System.out.println("SelectionStageViewServlet - DAOの初期化を開始");
+            SelectionStageDAO selectionStageDAO = new SelectionStageDAO();
+            CompanyDAO companyDAO = new CompanyDAO();
+            StudentDAO studentDAO = new StudentDAO();
+            
+            // 選考ステージの基本情報を取得
+            System.out.println("SelectionStageViewServlet - 選考ステージ情報を取得中...");
+            List<Object> selectionStages = selectionStageDAO.getSelectionStagesByCompanyAndStudent(
+                companyId, studentId
+            );
+            
+            System.out.println("SelectionStageViewServlet - 選考ステージ取得結果: " + 
+                (selectionStages != null ? selectionStages.size() : "null") + "件");
+            
+            Map<String, Object> selectionStage = null;
+            if (selectionStages != null && !selectionStages.isEmpty()) {
+                selectionStage = (Map<String, Object>) selectionStages.get(0);
+                System.out.println("SelectionStageViewServlet - 選考ステージ情報取得成功: " + selectionStage);
+            } else {
+                System.out.println("SelectionStageViewServlet - 選考ステージが見つかりませんでした");
+                request.setAttribute("errorMessage", "選考ステージが見つかりませんでした。");
+                RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/SelectionStageDetail.jsp");
+                dispatcher.forward(request, response);
+                return;
+            }
+            
+            // 企業情報を取得
+            CompanyBean company = null;
+            try {
+                company = companyDAO.getCompanyBeanById(Integer.parseInt(companyId));
+                System.out.println("SelectionStageViewServlet - 企業情報取得成功: " + (company != null ? company.getCompanyName() : "null"));
+            } catch (Exception e) {
+                System.err.println("SelectionStageViewServlet - 企業情報取得エラー: " + e.getMessage());
+            }
+            
+            // 学生情報を取得
+            ExamineeBean student = null;
+            try {
+                student = studentDAO.getExamineeById(Integer.parseInt(studentId));
+                System.out.println("SelectionStageViewServlet - 学生情報取得成功: " + (student != null ? student.getStudentName() : "null"));
+            } catch (Exception e) {
+                System.err.println("SelectionStageViewServlet - 学生情報取得エラー: " + e.getMessage());
+            }
+            
+            // データをリクエストに設定（nullでも設定）
+            request.setAttribute("selectionStage", selectionStage);
+            request.setAttribute("company", company);
+            request.setAttribute("student", student);
+            
+            System.out.println("SelectionStageViewServlet - SelectionStageDetail.jspに遷移します");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/SelectionStageDetail.jsp");
+            dispatcher.forward(request, response);
+            System.out.println("SelectionStageViewServlet - 遷移完了");
+            
+        } catch (Exception e) {
+            System.err.println("SelectionStageViewServlet - 詳細画面遷移エラー: " + e.getMessage());
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "選考ステージの詳細取得に失敗しました: " + e.getMessage());
+            RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/SelectionStageDetail.jsp");
+            dispatcher.forward(request, response);
+        }
+    }
     
     private void handleEditAction(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {

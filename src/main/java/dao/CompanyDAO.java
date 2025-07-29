@@ -171,7 +171,35 @@ public class CompanyDAO {
         return null;
     }
     
-
+    /**
+     * 企業IDで企業情報を取得（CompanyBean形式）
+     */
+    public CompanyBean getCompanyBeanById(int companyId) {
+        String sql = "SELECT * FROM companys_tbl WHERE companys_id=?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, companyId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                CompanyBean company = new CompanyBean();
+                company.setCompanyId(rs.getInt("companys_id"));
+                company.setCompanyName(rs.getString("company_name"));
+                company.setPostCode(rs.getString("post_code"));
+                company.setAddress(rs.getString("address"));
+                company.setTel(rs.getString("tel"));
+                company.setMailAddress(rs.getString("mail_address"));
+                company.setManagerName(rs.getString("manager_name"));
+                company.setRecruitmentResults(rs.getBoolean("recruitment_results"));
+                return company;
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
     /**
      * 企業の職種リストを取得

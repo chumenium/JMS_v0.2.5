@@ -794,8 +794,14 @@
 	                                <td style="color: #000000"><%= stageMap.get("venue") != null ? stageMap.get("venue") : "" %></td>
 	                                <td style="color: #000000"><%= stageMap.get("remarks") != null ? stageMap.get("remarks") : "" %></td>
 	                                <td>
-	                                    <a href="${pageContext.request.contextPath}/SelectionStageViewServlet?action=detail&studentId=<%= stageMap.get("student_id") %>&companyId=<%= stageMap.get("companys_id") %>" class="btn-primary" aria-label="選考ステージ詳細を表示">詳細</a>
-	                                    <a href="${pageContext.request.contextPath}/SelectionStageViewServlet?action=edit&studentId=<%= stageMap.get("student_id") %>&companyId=<%= stageMap.get("companys_id") %>" class="btn-primary" aria-label="選考ステージを編集">編集</a>
+	                                    <a href="${pageContext.request.contextPath}/SelectionStageViewServlet?action=detail&detailStudentId=<%= stageMap.get("student_id") %>&detailCompanyId=<%= stageMap.get("companys_id") %>" 
+	                                       class="btn-primary" 
+	                                       aria-label="選考ステージ詳細を表示"
+	                                       style="text-decoration: none; display: inline-block; padding: 8px 16px; margin-right: 8px; border-radius: 4px;">詳細</a>
+	                                    <a href="${pageContext.request.contextPath}/SelectionStageViewServlet?action=edit&studentId=<%= stageMap.get("student_id") %>&companyId=<%= stageMap.get("companys_id") %>" 
+	                                       class="btn-primary" 
+	                                       aria-label="選考ステージを編集"
+	                                       style="text-decoration: none; display: inline-block; padding: 8px 16px; border-radius: 4px;">編集</a>
 	                                </td>
 	                            </tr>
 	                        <% } %>
@@ -1068,6 +1074,8 @@ function clearSearch() {
     // フォームを送信
     document.querySelector('form').submit();
 }
+
+
 
 
 </script>

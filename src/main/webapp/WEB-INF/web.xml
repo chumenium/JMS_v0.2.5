@@ -207,6 +207,17 @@
     <url-pattern>/StudentDetailServlet</url-pattern>
   </servlet-mapping>
   
+  <!-- 選考ステージ詳細サーブレット -->
+  <servlet>
+    <servlet-name>SelectionStageDetailServlet</servlet-name>
+    <servlet-class>servlet.SelectionStageDetailServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>SelectionStageDetailServlet</servlet-name>
+    <url-pattern>/SelectionStageDetailServlet</url-pattern>
+  </servlet-mapping>
+  
   <!-- 学生表示サーブレット -->
   <servlet>
     <servlet-name>StudentViewServlet</servlet-name>
