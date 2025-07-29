@@ -104,6 +104,12 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/StudentManagement.jsp";
 	                    break;
 	                case "DashBoard":
+						String role2 = (String) session.getAttribute("role");
+						if(!role2.equals("student")){
+							StudentDAO studentDao2 = new StudentDAO();
+							List<ExamineeBean> oneweekData = studentDao2.getExamineeBeanSchedule();
+							request.setAttribute("oneweekData",oneweekData);
+						}
 	                    nextPage = "/WEB-INF/jsp/DashBoard.jsp";
 	                    break;
 	                case "jobHunting":

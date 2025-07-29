@@ -23,7 +23,7 @@
 
 <!--KCS_JMS_PROJECT-->
 
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" import="beans.ExamineeBean"%>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -502,6 +502,35 @@
                     </div>
                 </div>
 
+                <!-- 一週間後までの予定 -->
+                <%if(!role.equals("student")){%>
+                <% java.util.List<ExamineeBean> oneweekData = (java.util.List<ExamineeBean>)request.getAttribute("oneweekData"); %>
+                    <div>
+                        <h3>一週間後までの予定</h3>
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>企業名</th>
+                                    <th>クラス</th>
+                                    <th>学生名</th>
+                                    <th>選考段階</th>
+                                    <th>実施予定日</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <%for(ExamineeBean examineeData : oneweekData){%>
+                                    <tr>
+                                        <td><%=examineeData.getStudentId()%></td>
+                                        <td><%=examineeData.getClassName()%></td>
+                                        <td><%=examineeData.getStudentName()%></td>
+                                        <td><%=examineeData.getSelection()%></td>
+                                        <td><%=examineeData.getData()%></td>
+                                    </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                <%}%>
                 <!-- メインコンテンツ -->
                 <div class="dashboard-main" role="region" aria-label="機能メニュー">
                     

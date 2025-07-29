@@ -17,7 +17,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import beans.ExamineeBean;
 import beans.StudentBeans;
+import dao.StudentDAO;
 import utils.DBConnection;
 
 /**
@@ -190,6 +192,12 @@ public class LoginServlet extends HttpServlet {
 									student.setDesiredWorkPlace(wps);
 								}
 								session.setAttribute("student", student);
+							}
+							
+							if(!userRole.equals("student")){
+								StudentDAO studentDao2 = new StudentDAO();
+								List<ExamineeBean> oneweekData = studentDao2.getExamineeBeanSchedule();
+								request.setAttribute("oneweekData",oneweekData);
 							}
 							response.sendRedirect(request.getContextPath() + "/StatusServlet?view=DashBoard");
 						} else {
