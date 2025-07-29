@@ -34,7 +34,7 @@ DB用画面
 <link rel="stylesheet" href="css/style.css">
 <style>
     .admin-container {
-        max-width: 1200px;
+        max-width: 3000px;
         margin: 0 auto;
         padding: 20px;
         background: #f8f9fa;
@@ -304,7 +304,7 @@ DB用画面
 	
 	/* 幅間調整用 */
 	.custom-section {
-    width: 100vw;           /* ビューポート全体の横幅を使用 */
+    width: 200vw;           /* ビューポート全体の横幅を使用 */
     max-width: none;        /* 最大幅の制限を解除 */
     margin: 0;
     padding: 40px 32px;

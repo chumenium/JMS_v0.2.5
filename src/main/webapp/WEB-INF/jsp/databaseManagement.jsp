@@ -36,9 +36,9 @@ DB管理用画面
 <link rel="stylesheet" href="css/style.css">
 <style>
     .db-container {
-        max-width: 1400px;
+        max-width: 4000px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 40px;
         background: #f8f9fa;
         min-height: 100vh;
     }
@@ -111,8 +111,8 @@ DB管理用画面
     
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
         margin-bottom: 30px;
     }
     
@@ -131,7 +131,7 @@ DB管理用画面
     }
     
     .stat-value {
-        font-size: 24px;
+        font-size: 15px;
         font-weight: bold;
         color: #28a745;
     }
@@ -363,11 +363,11 @@ DB管理用画面
         
 	/* 幅間調整用 */
 		.custom-section {
-	    width: 100vw;           /* ビューポート全体の横幅を使用 */
+	    width: 200vw;           /* ビューポート全体の横幅を使用 */
 	    max-width: none;        /* 最大幅の制限を解除 */
 	    margin: 0;
 	    padding: 40px 32px;
-	    margin-top: 100px; /* ← ヘッダーとの距離をここで確保 */
+	    margin-top: 80px; /* ← ヘッダーとの距離をここで確保 */
 	    margin-bottom: 20px; /* ← 例えば60pxで広めに */
 	    box-sizing: border-box;
 	    background-color: #ffffff;
