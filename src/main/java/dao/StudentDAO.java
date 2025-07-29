@@ -410,4 +410,8 @@ public class StudentDAO {
         }
         return examineeNum;
     }
+    
+    /**
+     * 指定されたIDの学生情報を取得
+     */
 } 

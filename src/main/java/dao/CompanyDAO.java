@@ -133,73 +133,7 @@ public class CompanyDAO {
         
     }
     
-    /**
-     * 企業IDで企業情報を取得（新しいCompanyBean構造対応）
-     */
-    public beans.CompanyBean getCompanyBeanById(int companyId) {
-        String sql = "SELECT * FROM companys_tbl WHERE companys_id=?";
-        System.out.println("CompanyDAO: getCompanyBeanById called with ID = " + companyId);
-        
-        try (Connection conn = DBConnection.getConnection()){
-             PreparedStatement stmt = conn.prepareStatement(sql);
-            
-            System.out.println("CompanyDAO: Database connection established");
-            stmt.setInt(1, companyId);
-            ResultSet rs = stmt.executeQuery();
-            
-            if (rs.next()) {
-                beans.CompanyBean company = new beans.CompanyBean();
-                company.setCompanyId(rs.getInt("companys_id"));
-                company.setCompanyName(rs.getString("company_name"));
-                company.setPostCode(rs.getString("post_code"));
-                company.setAddress(rs.getString("address"));
-                company.setTel(rs.getString("tel"));
-                company.setMailAddress(rs.getString("mail_address"));
-                company.setManagerName(rs.getString("manager_name"));
-                company.setRecruitmentResults(rs.getBoolean("recruitment_results"));
-                
-                // 職種と勤務地のリストを取得
-                List<String> occupations = new ArrayList<>();
-                String sql2 = "SELECT o.occupation FROM company_occupation_tbl co " +
-                            "JOIN occupations_tbl o ON co.occupation_id = o.occupation_id " +
-                            "WHERE co.companys_id = ?";
-                     PreparedStatement stmt2 = conn.prepareStatement(sql2);
-                    
-                    stmt2.setInt(1, companyId);
-                    ResultSet rs2 = stmt2.executeQuery();
-                    
-                    while (rs2.next()) {
-                        occupations.add(rs2.getString("occupation"));
-                    }
 
-                List<String> workPlaces = new ArrayList<>();
-                String sql3 = "SELECT wp.work_place FROM company_work_place_tbl cwp " +
-                            "JOIN work_place_tbl wp ON cwp.work_place_id = wp.id " +
-                            "WHERE cwp.companys_id = ?";
-                
-                PreparedStatement stmt3 = conn.prepareStatement(sql3);
-                stmt3.setInt(1, companyId);
-                ResultSet rs3 = stmt3.executeQuery();
-                
-                while (rs3.next()) {
-                    workPlaces.add(rs3.getString("work_place"));
-                }
-                //List<String> occupations = getCompanyOccupations(companyId);
-                //List<String> workPlaces = getCompanyWorkPlaces(companyId);
-                company.setOccupations(occupations);
-                company.setWorkPlaces(workPlaces);
-                
-                System.out.println("CompanyDAO: Found company data = " + company);
-                return company;
-            } else {
-                System.out.println("CompanyDAO: No company found with ID = " + companyId);
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            System.out.println("CompanyDAO: Error in getCompanyBeanById: " + e.getMessage());
-            e.printStackTrace();
-        }
-        return null;
-    }
     
     /**
      * 企業IDで企業情報を取得（従来のMap形式）
@@ -236,6 +170,8 @@ public class CompanyDAO {
         }
         return null;
     }
+    
+
     
     /**
      * 企業の職種リストを取得

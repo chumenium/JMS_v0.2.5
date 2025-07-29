@@ -28,14 +28,6 @@ public class SelectionStageViewServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        String action = request.getParameter("action");
-        
-        // 編集アクションの場合
-        if ("edit".equals(action)) {
-            handleEditAction(request, response);
-            return;
-        }
-        
         System.out.println("=== 選考ステージ確認画面開始 ===");
         
         // セッションの確認
@@ -140,6 +132,8 @@ public class SelectionStageViewServlet extends HttpServlet {
         // POSTリクエストはGETと同じ処理
         doGet(request, response);
     }
+    
+
     
     private void handleEditAction(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {

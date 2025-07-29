@@ -406,36 +406,7 @@ public class SelectionStageDAO {
         return stages;
     }
     
-    // 選考ステージの基本情報を取得
-    public Map<String, Object> getSelectionStageById(int studentId, int companyId, int selectionId) {
-        String sql = "SELECT ja.*, c.company_name, st.name as student_name " +
-                    "FROM job_activity_tbl ja " +
-                    "LEFT JOIN companys_tbl c ON ja.companys_id = c.companys_id " +
-                    "LEFT JOIN students_tbl st ON ja.student_id = st.student_id " +
-                    "WHERE ja.student_id = ? AND ja.companys_id = ?";
-        
-        try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, studentId);
-            stmt.setInt(2, companyId);
-            
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    Map<String, Object> stage = new HashMap<>();
-                    stage.put("student_id", rs.getString("student_id"));
-                    stage.put("companys_id", rs.getInt("companys_id"));
-                    stage.put("company_name", rs.getString("company_name"));
-                    stage.put("student_name", rs.getString("student_name"));
-                    stage.put("status", rs.getString("activity_status"));
-                    return stage;
-                }
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+
     
     // 選考ステージの詳細情報を取得
     public List<Map<String, Object>> getSelectionStageDetails(int studentId, int companyId) {
