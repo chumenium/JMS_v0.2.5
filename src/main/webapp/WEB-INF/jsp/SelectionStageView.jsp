@@ -30,9 +30,7 @@
   String username = (String) session.getAttribute("id"); 
   String role     = (String) session.getAttribute("role"); 
   
-  // デバッグ用：セッション情報をコンソールに出力
-  System.out.println("SelectionStageView.jsp - username: " + username);
-  System.out.println("SelectionStageView.jsp - role: " + role);
+
   
   // nullチェック
   if (username == null) {
@@ -473,7 +471,6 @@ tr:hover {
 	                                        <td><%= stageMap.get("remarks") != null ? stageMap.get("remarks") : "" %></td>
 	                                        <td>
 	                                            <a href="${pageContext.request.contextPath}/StudentDetailServlet?id=<%= stageMap.get("student_id") %>" class="btn-primary" style="font-size: 12px; padding: 6px 12px;">詳細</a>
-	                                            <pre><%= stageMap %></pre>
 	                                            <a href="${pageContext.request.contextPath}/SelectionStageViewServlet?action=edit&studentId=<%= stageMap.get("student_id") %>&companyId=<%= stageMap.get("companys_id") %>" class="btn-primary" style="font-size: 12px; padding: 6px 12px; margin-left: 5px;">編集</a>
 	                                        </td>
 	                                    </tr>
