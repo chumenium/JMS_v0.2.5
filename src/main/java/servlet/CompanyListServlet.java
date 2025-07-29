@@ -44,7 +44,7 @@ public class CompanyListServlet extends HttpServlet {
         
         // 権限チェック（就職指導部または管理者のみ）
         String role = (String) session.getAttribute("role");
-        if (role == null || (!role.equals("admin") && !role.equals("egd"))) {
+        if (role == null || (!role.equals("admin") && !role.equals("egd") && !role.equals("student"))) {
             response.sendRedirect(request.getContextPath() + "/error/access-denied.html");
             return;
         }

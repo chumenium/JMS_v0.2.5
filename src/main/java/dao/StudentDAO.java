@@ -370,4 +370,20 @@ public class StudentDAO {
         }
         return examineeBeans;
     }
+
+    public int getExamineeNum() {
+        String sql = "select count(*) from job_activity_detail_tbl";
+        int examineeNum = 0;
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            while (rs.next()) {
+                examineeNum = rs.getInt("count(*)");
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return examineeNum;
+    }
 } 

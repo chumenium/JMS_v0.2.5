@@ -646,7 +646,7 @@
                         </div>
 
                         <!-- 就職管理 - 書類提出チェック -->
-                        <div class="feature-card">
+                        <!-- <div class="feature-card">
                             <span class="feature-icon">📝</span>
                             <h3 class="feature-title">書類提出チェック</h3>
                             <p class="feature-description">
@@ -655,15 +655,19 @@
                             <a href="${pageContext.request.contextPath}/StatusServlet?view=jobHunting" class="feature-link">
                                 書類提出チェックを開く
                             </a>
-                        </div>
+                        </div> -->
 
                         <!-- 就職管理 - 選考ステージ確認 -->
-                        <div class="feature-card">
+                        <!-- <div class="feature-card">
+                            <span class="feature-icon">📝</span>
                             <h3 class="feature-title">選考ステージ確認</h3>
+                            <p class="feature-description">
+                                自身が登録した選考ステージを確認できます。
+                            </p>
                             <a href="${pageContext.request.contextPath}/SelectionStageViewServlet" class="feature-link">
                                 選考ステージ確認を開く
                             </a>
-                        </div>
+                        </div> -->
                     <% } %>
 
                     <!-- 権限エラー表示 -->

@@ -103,6 +103,14 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/DashBoard.jsp";
 	                    break;
 	                case "jobHunting":
+						List<Integer> numdata2 = (List<Integer>)sc.getAttribute("comNumData");
+						// 統計情報を取得
+						int totalCompanies2 = numdata2.get(0);
+						int recruitmentCompanies2 = numdata2.get(1);
+						request.setAttribute("totalCompanies", totalCompanies2);
+						request.setAttribute("recruitmentCompanies", recruitmentCompanies2);
+						StudentDAO studentDao = new StudentDAO();
+						request.setAttribute("examineeNum",studentDao.getExamineeNum());
 	                    nextPage = "/WEB-INF/jsp/jobHunting.jsp";
 	                    break;
 	                case "CompanyManagement":

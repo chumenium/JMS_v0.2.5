@@ -51,6 +51,10 @@
   
   // エラーメッセージを取得
   String errorMessage = (String) request.getAttribute("errorMessage");
+
+  Integer totalCompanies = (Integer) request.getAttribute("totalCompanies");
+  Integer recruitmentCompanies = (Integer) request.getAttribute("recruitmentCompanies");
+  Integer examineeNum = (Integer) request.getAttribute("examineeNum");
 %>
 <!--▲▲▲▲▲-->
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -677,12 +681,12 @@
                     </p>
                     <div class="card-stats" role="group" aria-label="学生統計">
                         <div class="stat-item">
-                            <span class="stat-number">250</span>
+                            <span class="stat-number"><%=totalCompanies%></span>
                             <span class="stat-label">総企業数</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">67</span>
-                            <span class="stat-label">募集中企業</span>
+                            <span class="stat-number"><%=recruitmentCompanies%></span>
+                            <span class="stat-label">採用実績あり</span>
                         </div>
                     </div>
                     <a href="CompanyListServlet" class="card-link" aria-label="学生一覧を表示">
@@ -699,13 +703,13 @@
                     </p>
                     <div class="card-stats" role="group" aria-label="登録統計">
                         <div class="stat-item">
-                            <span class="stat-number">43</span>
-                            <span class="stat-label">今月登録</span>
+                            <span class="stat-number"><%=examineeNum%></span>
+                            <span class="stat-label">登録数</span>
                         </div>
-                        <div class="stat-item">
+                        <!-- <div class="stat-item">
                             <span class="stat-number">5</span>
                             <span class="stat-label">未完了</span>
-                        </div>
+                        </div> -->
                     </div>
                     <a href="StatusServlet?view=SelectionStage" class="card-link" aria-label="選考ステージを登録">
                         選考ステージを登録
