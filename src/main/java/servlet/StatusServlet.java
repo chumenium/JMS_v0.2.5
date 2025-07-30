@@ -41,15 +41,25 @@ public class StatusServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("StatusServlet: doGet method called - NEW VERSION");
 		try {
 			String view = request.getParameter("view");
+			System.out.println("StatusServlet: Initial view parameter = " + view);
 			if (view == null) {
 				view = request.getParameter("status");
+				System.out.println("StatusServlet: view was null, trying status parameter = " + view);
 			}
 	        String nextPage = "/WEB-INF/jsp/status.jsp"; 
 
 	        // デバッグログ
 	        System.out.println("StatusServlet: view parameter = " + view);
+	        System.out.println("StatusServlet: view parameter length = " + (view != null ? view.length() : "null"));
+	        System.out.println("StatusServlet: view parameter equals DashBoard = " + ("DashBoard".equals(view)));
+	        if (view != null) {
+	            System.out.println("StatusServlet: view parameter bytes = " + java.util.Arrays.toString(view.getBytes()));
+	            System.out.println("StatusServlet: view parameter trimmed = '" + view.trim() + "'");
+	            System.out.println("StatusServlet: view parameter trimmed equals DashBoard = " + ("DashBoard".equals(view.trim())));
+	        }
 	        System.out.println("StatusServlet: request URI = " + request.getRequestURI());
 	        System.out.println("StatusServlet: context path = " + request.getContextPath());
 
@@ -72,7 +82,10 @@ public class StatusServlet extends HttpServlet {
 	        }
 			ServletContext sc = getServletContext();
 	        if (view != null) {
-	            switch (view) {
+	            String trimmedView = view.trim();
+	            System.out.println("StatusServlet: Entering switch statement with view = " + view);
+	            System.out.println("StatusServlet: Using trimmed view = " + trimmedView);
+	            switch (trimmedView) {
 	                case "index":
 	                    nextPage = "/WEB-INF/jsp/index.jsp";
 	                    break;
@@ -104,11 +117,19 @@ public class StatusServlet extends HttpServlet {
 	                    nextPage = "/WEB-INF/jsp/StudentManagement.jsp";
 	                    break;
 	                case "DashBoard":
+						System.out.println("StatusServlet: DashBoard case executed");
 						String role2 = (String) session.getAttribute("role");
+						System.out.println("StatusServlet: role2 = " + role2);
 						if(!role2.equals("student")){
+							System.out.println("StatusServlet: Not student role, getting data");
 							StudentDAO studentDao2 = new StudentDAO();
+							// データベースの日付を確認
+							studentDao2.checkDatabaseDate();
 							List<ExamineeBean> oneweekData = studentDao2.getExamineeBeanSchedule();
+							System.out.println("StatusServlet: oneweekData size = " + (oneweekData != null ? oneweekData.size() : "null"));
 							request.setAttribute("oneweekData",oneweekData);
+						} else {
+							System.out.println("StatusServlet: Student role, skipping data retrieval");
 						}
 	                    nextPage = "/WEB-INF/jsp/DashBoard.jsp";
 	                    break;
@@ -157,6 +178,7 @@ public class StatusServlet extends HttpServlet {
                     nextPage = "/WEB-INF/jsp/SelectionStage.jsp";
                     break;
 	                default:
+	                    System.out.println("StatusServlet: Default case executed for view = " + trimmedView);
 	                    nextPage = "/index.jsp";
 	                    break;
 					case "CompanyDetail":
@@ -174,6 +196,8 @@ public class StatusServlet extends HttpServlet {
 				
 
 	            }
+	        } else {
+	            System.out.println("StatusServlet: view is null, using default nextPage");
 	        }
 
 	        // デバッグログ

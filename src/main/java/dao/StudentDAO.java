@@ -375,10 +375,14 @@ public class StudentDAO {
         List<ExamineeBean> examineeBeans = new ArrayList<>();
         String sql = "SELECT ranked.student_id,s.name AS student_name,CONCAT(s.department, s.class) AS class,c.company_name,se.selection_name,ranked.date FROM (SELECT *,ROW_NUMBER() OVER (PARTITION BY student_id, companys_id ORDER BY date DESC, time DESC) AS rn FROM job_activity_detail_tbl) AS ranked JOIN students_tbl s ON ranked.student_id = s.student_id JOIN companys_tbl c ON ranked.companys_id = c.companys_id JOIN selection_tbl se ON ranked.selection_id = se.selection_id WHERE ranked.rn = 1 AND ranked.date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 7 DAY);";
         
+        System.out.println("StudentDAO: getExamineeBeanSchedule() called");
+        System.out.println("StudentDAO: SQL = " + sql);
+        
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             
+            int count = 0;
             while (rs.next()) {
                 ExamineeBean examineeBean = new ExamineeBean();
                 examineeBean.setStudentId(rs.getInt("student_id"));
@@ -388,8 +392,12 @@ public class StudentDAO {
                 examineeBean.setSelection(rs.getString("selection_name"));
                 examineeBean.setData(rs.getString("date"));
                 examineeBeans.add(examineeBean);
+                count++;
+                System.out.println("StudentDAO: Found data - " + examineeBean.getStudentName() + " - " + examineeBean.getCompanyName() + " - " + examineeBean.getData());
             }
+            System.out.println("StudentDAO: Total records found = " + count);
         } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("StudentDAO: Error in getExamineeBeanSchedule() - " + e.getMessage());
             e.printStackTrace();
         }
         return examineeBeans;
@@ -435,5 +443,27 @@ public class StudentDAO {
             e.printStackTrace();
         }
         return null;
+    }
+    
+    // データベースの現在日付とタイムゾーンを確認するメソッド
+    public void checkDatabaseDate() {
+        String sql = "SELECT CURDATE() as current_date, NOW() as current_datetime, @@global.time_zone as timezone";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            
+            if (rs.next()) {
+                String currentDate = rs.getString("current_date");
+                String currentDateTime = rs.getString("current_datetime");
+                String timezone = rs.getString("timezone");
+                System.out.println("StudentDAO: Database current date = " + currentDate);
+                System.out.println("StudentDAO: Database current datetime = " + currentDateTime);
+                System.out.println("StudentDAO: Database timezone = " + timezone);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            System.err.println("StudentDAO: Error checking database date - " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 } 
