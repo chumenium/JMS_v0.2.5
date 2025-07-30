@@ -414,6 +414,47 @@
 	        padding: 24px 12px;
 	    }
 	}
+	
+	/* 学生一覧表  */
+    .DashBoard-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        margin-bottom: 24px;
+        border: 1px solid #e9ecef;
+    }
+
+    .DashBoard-table th, .DashBoard-table td {
+        padding: 16px 12px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .DashBoard-table th {
+        background: linear-gradient(135deg, #e9f5ee 0%, #f1f8f5 100%);
+        color: #2C7744;
+        font-size: 16px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .DashBoard-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .DashBoard-table tr:hover {
+        background: linear-gradient(135deg, #f1f8f5 0%, #e9f5ee 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(44, 119, 68, 0.1);
+    }
+
+    .DashBoard-table tr {
+        transition: all 0.2s ease;
+    }
     
 </style>
 </head>
@@ -507,24 +548,24 @@
                 <% java.util.List<ExamineeBean> oneweekData = (java.util.List<ExamineeBean>)request.getAttribute("oneweekData"); %>
                     <div>
                         <h3>一週間後までの予定</h3>
-                        <table class="results-table">
+                        <table class="DashBoard-table" aria-label="一週間の予定表">
                             <thead>
                                 <tr>
-                                    <th>企業名</th>
-                                    <th>クラス</th>
-                                    <th>学生名</th>
-                                    <th>選考段階</th>
-                                    <th>実施予定日</th>
+                                    <th style="color: #000000">企業名</th>
+                                    <th style="color: #000000">クラス</th>
+                                    <th style="color: #000000">学生名</th>
+                                    <th style="color: #000000">選考段階</th>
+                                    <th style="color: #000000">実施予定日</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <%for(ExamineeBean examineeData : oneweekData){%>
                                     <tr>
-                                        <td><%=examineeData.getStudentId()%></td>
-                                        <td><%=examineeData.getClassName()%></td>
-                                        <td><%=examineeData.getStudentName()%></td>
-                                        <td><%=examineeData.getSelection()%></td>
-                                        <td><%=examineeData.getData()%></td>
+                                        <td style="color: #000000"><%=examineeData.getStudentId()%></td>
+                                        <td style="color: #000000"><%=examineeData.getClassName()%></td>
+                                        <td style="color: #000000"><%=examineeData.getStudentName()%></td>
+                                        <td style="color: #000000"><%=examineeData.getSelection()%></td>
+                                        <td style="color: #000000"><%=examineeData.getData()%></td>
                                     </tr>
                                 <% } %>
                             </tbody>
