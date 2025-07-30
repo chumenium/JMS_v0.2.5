@@ -559,15 +559,21 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <%for(ExamineeBean examineeData : oneweekData){%>
+                                <%if(oneweekData != null && !oneweekData.isEmpty()){%>
+                                    <%for(ExamineeBean examineeData : oneweekData){%>
+                                        <tr>
+                                            <td style="color: #000000"><%=examineeData.getCompanyName()%></td>
+                                            <td style="color: #000000"><%=examineeData.getClassName()%></td>
+                                            <td style="color: #000000"><%=examineeData.getStudentName()%></td>
+                                            <td style="color: #000000"><%=examineeData.getSelection()%></td>
+                                            <td style="color: #000000"><%=examineeData.getData()%></td>
+                                        </tr>
+                                    <% } %>
+                                <%} else {%>
                                     <tr>
-                                        <td style="color: #000000"><%=examineeData.getCompanyName()%></td>
-                                        <td style="color: #000000"><%=examineeData.getClassName()%></td>
-                                        <td style="color: #000000"><%=examineeData.getStudentName()%></td>
-                                        <td style="color: #000000"><%=examineeData.getSelection()%></td>
-                                        <td style="color: #000000"><%=examineeData.getData()%></td>
+                                        <td colspan="5" style="color: #000000; text-align: center;">データがありません</td>
                                     </tr>
-                                <% } %>
+                                <%}%>
                             </tbody>
                         </table>
                     </div>
