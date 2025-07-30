@@ -205,7 +205,10 @@ public class MasterDataManagementServlet extends HttpServlet {
             } else {
                 request.setAttribute("error", "職種の追加に失敗しました: " + e.getMessage());
             }
-        }
+        } catch (ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
         
         getOccupationList(request, response);
     }
@@ -247,7 +250,10 @@ public class MasterDataManagementServlet extends HttpServlet {
             } else {
                 request.setAttribute("error", "職種の更新に失敗しました: " + e.getMessage());
             }
-        }
+        } catch (ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
         
         getOccupationList(request, response);
     }
@@ -296,7 +302,10 @@ public class MasterDataManagementServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "職種の削除に失敗しました: " + e.getMessage());
-        }
+        } catch (ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
         
         getOccupationList(request, response);
     }
@@ -332,7 +341,10 @@ public class MasterDataManagementServlet extends HttpServlet {
             } else {
                 request.setAttribute("error", "勤務地の追加に失敗しました: " + e.getMessage());
             }
-        }
+        } catch (ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
         
         getWorkplaceList(request, response);
     }
@@ -374,7 +386,10 @@ public class MasterDataManagementServlet extends HttpServlet {
             } else {
                 request.setAttribute("error", "勤務地の更新に失敗しました: " + e.getMessage());
             }
-        }
+        } catch (ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
         
         getWorkplaceList(request, response);
     }
@@ -421,7 +436,10 @@ public class MasterDataManagementServlet extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             request.setAttribute("error", "勤務地の削除に失敗しました: " + e.getMessage());
-        }
+        } catch (ClassNotFoundException e1) {
+			// TODO 自動生成された catch ブロック
+			e1.printStackTrace();
+		}
         
         getWorkplaceList(request, response);
     }
