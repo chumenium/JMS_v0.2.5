@@ -561,7 +561,7 @@
                             <tbody>
                                 <%for(ExamineeBean examineeData : oneweekData){%>
                                     <tr>
-                                        <td style="color: #000000"><%=examineeData.getStudentId()%></td>
+                                        <td style="color: #000000"><%=examineeData.getCompanyName()%></td>
                                         <td style="color: #000000"><%=examineeData.getClassName()%></td>
                                         <td style="color: #000000"><%=examineeData.getStudentName()%></td>
                                         <td style="color: #000000"><%=examineeData.getSelection()%></td>
